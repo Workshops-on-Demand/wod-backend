@@ -186,6 +186,7 @@
         - nodejs
         - npm
         - vim
+        - telnet
         - pandoc
         - clang
         - cmake
