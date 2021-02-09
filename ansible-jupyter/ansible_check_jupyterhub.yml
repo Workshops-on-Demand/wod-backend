@@ -108,6 +108,13 @@
         - "ulimit -u 641465"
         - "ulimit -n 65535"
 
+    - name: Copy the skeleton content under /etc/skel
+      become: yes
+      become_user: root
+      ansible.posix.synchronize:
+        dest: /etc/skel/
+        src: '{{ JUPPROC }}/skel/'
+
     - name: Test .profile file
       command: ls "{{ ansible_env.HOME }}/.profile"
       register: profile_path
