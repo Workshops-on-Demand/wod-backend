@@ -4,7 +4,7 @@ JPIP: 172.17.70.5
 JPHOSTEXT: notebooks4.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: 7921ee68ad464e438483f5ebd1358afe
-BASESTDID: 0
+BASESTDID: 4000
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 APIUSER: moderator
 APIPWD: CloudSystem$
