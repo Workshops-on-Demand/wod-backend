@@ -500,6 +500,10 @@
     - name: Wait 3 seconds to let Jupyterhub start
       shell: sleep 3
 
+    - name: Existing token
+      debug:
+        msg: "Existing token: {{ JPHUBTOKEN }}"
+
     - name: Test Jupyterhub token
       get_url:
         url: "{{ JPHUBAPISRV }}/hub/api/users/jupyter"
@@ -528,6 +532,16 @@
         regexp: "^JPHUBTOKEN"
         line: "JPHUBTOKEN: {{ jup_token.stdout_lines[0] }}"
         state: present
+      when: answer.status_code != 200
+
+    - name: Use new token
+      set_fact:
+        JPHUBTOKEN: "{{ jup_token.stdout_lines[0] }}"
+      when: answer.status_code != 200
+
+    - name: New token
+      debug:
+        msg: "New token: {{ JPHUBTOKEN }}"
       when: answer.status_code != 200
 
     - name: Enable postfix service
