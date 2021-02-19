@@ -40,6 +40,19 @@ get_workshop_id() {
 	echo "$id"
 }
 
+# This function exits when the student id is not in the correct range
+teststdid() {
+	
+	# We need to ensure that we've got a correct id as parameter if needed
+	MIN={{ USERMIN }}
+	MAX={{ USERMAX }}
+
+	if [ $1 -lt $MIN ] ||  [ $1 -gt $MAX ]; then
+                echo "Student id ($1) should be between $MIN and $MAX"
+                exit -1
+        fi
+}
+
 # This function returns the status of the reset boolean for the workshop id given as parameter
 get_reset_status() {
 

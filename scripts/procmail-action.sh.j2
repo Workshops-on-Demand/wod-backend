@@ -51,16 +51,6 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
-# We need to ensure that we've got a correct id as parameter if needed
-MIN={{ USERMIN }}
-MAX={{ USERMAX }}
-
-if [ $stdid -lt $MIN ] ||  [ $stdid -gt $MAX ]; then
-	echo "Student id ($stdid) should be between $MIN and $MAX"
-	exit -1
-fi
-
-export stddir="{{ STDDIR }}/student$stdid"
 JUPPROC=$HOME/jupyter-procmail
 std0="$HOME/student0"
 accessToken=`get_session_token`
@@ -71,6 +61,9 @@ id=`get_workshop_id $w`
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
+	export stddir="{{ STDDIR }}/student$stdid"
+	teststdid $stdid
+
 	userid=$1
 	if [ _"$1" = _"" ]; then
 		echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
@@ -171,7 +164,9 @@ elif [ "$action" = "RESET" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`
+			teststdid $min
 			max=`echo $stdid | cut -d, -f2`
+			teststdid $max
 			min=$((min+{{ BASESTDID }}))
 			max=$((max+{{ BASESTDID }}))
 			i=$max
@@ -184,6 +179,7 @@ elif [ "$action" = "RESET" ]; then
   				--data '{"capacity":"'$cap'"}' \
   				"$APIENDPOINT/workshop/$id"
 		else
+			teststdid $stdid
 			# We have a single value to manage
 			i=$((stdid+{{ BASESTDID }}))
 			j=$((stdid+{{ BASESTDID }}))
