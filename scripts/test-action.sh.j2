@@ -42,6 +42,26 @@ if [ $ACTION != "CREATE" ]  && [ $ACTION != "CLEANUP" ]  && [ $ACTION != "RESET"
 	echo "A correct ACTION is mandatory"
 	exit -1
 fi
+
+
+# This function creates the mail to be sent
+send_mail() {
+
+	cat > /tmp/mail.$$ << EOF
+MAIL FROM: hpedev.hackshack@hpe.com
+RCPT TO: jupyter@`hostname`
+DATA
+Subject: $ACTION $1 0
+
+$WKSHP
+.
+EOF
+	echo "Sending a mail to $ACTION student $1 for workshop $WKSHP"
+	cat /tmp/mail.$$ | telnet localhost {{ POSTPORT }}
+	rm -f /tmp/mail.$$
+}
+
+
 i=$STDMIN
 if [ $ACTION = "PDF" ]; then
 	source "{{ JPHUB }}/bin/activate"
@@ -60,18 +80,19 @@ if [ $ACTION = "WORD" ]; then
 	chmod 644 /student/student$i/$WKSHP/*.docx
 	exit 0
 fi
-while [ $i -le $STDMAX ]; do
-	cat > /tmp/mail.$$ << EOF
-MAIL FROM: hpedev.hackshack@hpe.com
-RCPT TO: jupyter@`hostname`
-DATA
-Subject: $ACTION $i 0
 
-$WKSHP
-.
-EOF
-	echo "Sending a mail to $ACTION student $i for workshop $WKSHP"
-	cat /tmp/mail.$$ | telnet localhost {{ POSTPORT }}
-	((i=i+1))
-done
-rm -f /tmp/mail.$$
+# do we have a range
+echo $STDRANGE | grep -q ','
+if [ $? -eq 0 ]; then
+	# Yes we do
+	if [ $ACTION = "RESET" ]; then
+		# For RESET we can use the range directly
+		send_mail $STDRANGE
+	else
+		# For other actions we need to loop
+		while [ $i -le $STDMAX ]; do
+			send_mail $i
+			((i=i+1))
+		done
+	fi
+fi
