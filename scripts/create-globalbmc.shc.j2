@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# This script creates the OpenBMC simulator in the openbmcs VM
+# This script creates the BMC simulators in the VMs
 # associated to the student. 
 
 KITPATH=/usr/kits
 KITPATHVM=$KITPATH/VMs/OpenBMC
 KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
 
-# Test if we are launched as jupyter (initial setup ) or student (reset during workshop)
+# Test if we are launched as jupyter (initial setup ) or somebody else (reset during workshop by student or developer/writer)
 if [ _"$USER" != _"jupyter" ]; then
 	stdid=`echo $USER | sed 's/student//'`
 	script="{{ STDDIR }}/$USER/reset-globalbmc.shc.x"
@@ -23,7 +23,7 @@ FWDPORTRFSY=$(({{ ILOSYBASEPORT }}+$stdid))
 # Kill a potential qemu process remaining for ilo or openbmcsimulators
 $script
 
-# Copy QEMU base images for this student
+# Copy QEMU base image and Redfish mockups for this student
 ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} cp -a $KITPATHVM/flash-palmetto-ssh-student $KITPATHVM/student$stdid-Obmc.mtd
 
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5

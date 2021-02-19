@@ -1,0 +1,61 @@
+#!/bin/bash
+
+cd /student/student$stdid/$w
+echo " This script resets the   WKSHP-MLOps-AI101-CNN Workshop content for:" student$stdid
+# associated to studentXY.
+##
+echo "Setting  environment variables to help cleanup"
+#
+#
+studentId="student$stdid" 
+password="$randompw" 
+
+tenantname="K8sMLTenant" #case sensitive
+
+# fixed environment variables setup by the HPE ECP lab administrator - Please DO NOT MODIFY!!
+
+gateway_host="gateway2.etc.fr.comm.hpecorp.net"
+controller_endpoint="${gateway_host}:8080"
+Internet_access="notebooks.hpedev.io"
+
+clusterName="jupyter-notebook-${studentId}"
+JupyterNotebookApp="cr-cluster-jupyter-notebook.yaml" # the Jupyter Notebook KD App manifest you will deploy to build your model
+sc_secret="sc-secret-AI101-students.yaml"
+
+
+#
+echo "Your studentId is: "$studentId 
+echo "your operation context is:" $studentId "on tenant" $tenantname 
+echo "your REST API endpoint is:" $controller_endpoint
+
+## Authenticate as a Student ID in the specified tenant
+sessionlocation=$(curl -k -i -s --request POST "https://${controller_endpoint}/api/v2/session" \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"name": "'"$studentId"'",
+"password": "'"$password"'",
+"tenant_name": "'"$tenantname"'"
+}' | grep Location | awk '{print $2}' | tr -d '\r') #we remove any cr that might exist
+echo "This is your session location: " $sessionlocation
+SessionId=$(echo $sessionlocation | cut -d'/' -f 5) # extract sessionId for later, for logout
+echo "This is your session_Id:" $SessionId
+
+##Get the Kubeconfig file for your tenant working context
+rm -f ~/.kube/config
+curl -k -s --request GET "https://${controller_endpoint}/api/v2/k8skubeconfig" \
+--header "X-BDS-SESSION: $sessionlocation" \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' > ~/.kube/config
+
+#Check your working tenant context
+kubectl config current-context
+
+kubectl delete -f $sc_secret
+kubectl delete -f $JupyterNotebookApp
+
+#Closing the session
+curl -k -i -s --request DELETE "https://${controller_endpoint}/api/v2/session/${SessionId}" \
+--header "X-BDS-SESSION: $sessionlocation" \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json'

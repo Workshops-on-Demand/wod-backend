@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -x
+
+cd /student/student$stdid/$w
+echo " This script resets the Managing HPE Cloud Volumes through API calls Workshop content for: student$stdid"
+
+
+## Get token to authentificate to cloud Volume API
+TOKEN=`$HOME/get-cloudvol-token.shc.x`
+echo ${TOKEN}
+
+
+## Authenticate Now using the token
+
+curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/session' \
+--header "X-Auth-Token: ${TOKEN}" \
+--header 'Content-Type: application/json'
+
+# Define cloud Volume to delete associated to student$stdid
+# This volume name is based on cloud-vol-$stdid-Date
+
+# we will use cloud_vol-$stdid-*
+
+CloudVolumeID='cloud_vol-$stdid'
+echo "The Student cloudvolume id is ${CloudVolumeID}"
+
+##Deleting Possible Remaining Cloud Volume
+curl -s --location --request DELETE "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/${CloudVolumeID}" \
+--header "X-auth-Token: ${TOKEN}" \
+--header 'Content-Type: application/json'
+
+
+##Close the login session
+echo "logging out"

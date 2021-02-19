@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Test if we are launched as jupyter (initial setup) or student (reset during workshop)
+if [ _"$USER" != _"jupyter" ]; then
+        script="$stddir/reset-globalbmc.shc.x"
+else
+        script="{{ SCRIPTDIR }}/reset-globalbmc.shc"
+fi
+if [ ! -x $script ]; then
+	echo "Front-end probbly not up to date wrt compile scripts to generate"
+	exit -1
+fi
+$script
