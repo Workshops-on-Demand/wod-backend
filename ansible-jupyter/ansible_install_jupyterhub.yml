@@ -228,6 +228,7 @@
         - lld
         - libzmq3-dev
         - libc6-dev
+        - nfs-common
       when:
         - ansible_facts['os_family'] == "Debian"
 
@@ -241,6 +242,7 @@
         - glibc-devel
         - java
         - llvm-toolset-7.0-lld
+        - nfs-utils
         - zeromq-devel
       when:
         - ansible_facts['distribution'] == "CentOS"
