@@ -546,6 +546,14 @@
         msg: "New token: {{ JPHUBTOKEN }}"
       when: answer.status_code != 200
 
+    - name: Setup ansible configuration
+      copy:
+        src: "{{ JUPPROC }}/.ansible.cfg"
+        dest: "{{ ansible_env.HOME }}/.ansible.cfg"
+        owner: jupyter
+        group: jupyter
+        mode: 0644
+
     - name: Enable postfix service
       become: yes
       become_user: root
