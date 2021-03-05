@@ -95,4 +95,6 @@ if [ $? -eq 0 ]; then
 			((i=i+1))
 		done
 	fi
+else
+	send_mail $STDRANGE
 fi

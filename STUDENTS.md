@@ -228,6 +228,7 @@ Last seat for speaker
 [1400] Speakers SMES
 
 
+
 1401-1475 SPIFFE-SPIRE
 
 [1401-1420] challenges  Location :  Grenoble
@@ -237,6 +238,7 @@ Last seat for speaker
 [1475] speaker for live sessions
 
 
+
 1476-1550 Git 101
 
 [1476-1495] challenges  Location :  Grenoble
@@ -244,6 +246,7 @@ Last seat for speaker
 [1496-1549] workshops Location :  Mougins
 
 [1550] speaker for live sessions
+
 
 
 
