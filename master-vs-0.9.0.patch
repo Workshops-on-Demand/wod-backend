@@ -1,0 +1,131 @@
+diff --git a/ansible_kernel/convert_playbook.py b/ansible_kernel/convert_playbook.py
+index 375090e..fe43ca3 100644
+--- a/ansible_kernel/convert_playbook.py
++++ b/ansible_kernel/convert_playbook.py
+@@ -123,7 +123,7 @@ def main(args=None):
+ 
+     with open(playbook_file) as f:
+         content = f.read()
+-        plays = yaml.load(content)
++        plays = yaml.load(content, Loader=yaml.FullLoader)
+ 
+     cells = []
+ 
+diff --git a/ansible_kernel/kernel.py b/ansible_kernel/kernel.py
+index 03e8357..280d65e 100644
+--- a/ansible_kernel/kernel.py
++++ b/ansible_kernel/kernel.py
+@@ -182,6 +182,7 @@ class AnsibleKernel(Kernel):
+         self.original_iopub_socket = self.iopub_socket
+ 
+         self.iopub_socket = Splitter([self.original_iopub_socket, self])
++        self.user_ns = {}
+ 
+         self.shell = self.shell_class.instance(parent=self,
+                                                profile_dir=self.profile_dir,
+@@ -289,7 +290,7 @@ class AnsibleKernel(Kernel):
+     def rewrite_ports(self):
+ 
+         with open(self.playbook_file, 'r') as f:
+-            playbook = yaml.load(f.read())
++            playbook = yaml.load(f.read(), Loader=yaml.FullLoader)
+         playbook[0]['tasks'][0]['pause_for_kernel']['port'] = self.helper.pause_socket_port
+         with open(self.playbook_file, 'w') as f:
+             f.write(yaml.safe_dump(playbook, default_flow_style=False))
+@@ -324,6 +325,8 @@ class AnsibleKernel(Kernel):
+                 pass
+             elif event == 'playbook_on_include':
+                 pass
++            elif event == 'runner_on_start':
++                pass
+             elif event == 'playbook_on_task_start':
+                 logger.debug('playbook_on_task_start')
+                 task_args = event_data.get('task_args', [])
+@@ -628,14 +631,14 @@ class AnsibleKernel(Kernel):
+         if self.is_ansible_alive():
+             self.do_shutdown(False)
+         self.start_helper()
+-        code_data = yaml.load(code)
++        code_data = yaml.load(code, Loader=yaml.FullLoader)
+         logger.debug('code_data %r', code_data)
+         logger.debug('code_data type: %s', type(code_data))
+         self.current_play = code
+ 
+         playbook = []
+ 
+-        current_play = yaml.load(self.current_play)
++        current_play = yaml.load(self.current_play, Loader=yaml.FullLoader)
+         if current_play is None:
+             current_play = {}
+         playbook.append(current_play)
+@@ -754,7 +757,7 @@ class AnsibleKernel(Kernel):
+         self.registered_variable = None
+         self.current_task = code
+         try:
+-            code_data = yaml.load(code)
++            code_data = yaml.load(code, Loader=yaml.FullLoader)
+         except Exception:
+             code_data = code
+         logger.debug('code_data %s', code_data)
+@@ -786,7 +789,7 @@ class AnsibleKernel(Kernel):
+ 
+         if not isinstance(code_data, dict):
+             try:
+-                code_data = yaml.load(code)
++                code_data = yaml.load(code, Loader=yaml.FullLoader)
+                 tb = []
+             except Exception:
+                 tb = traceback.format_exc(1).splitlines()
+@@ -811,7 +814,7 @@ class AnsibleKernel(Kernel):
+ 
+             tasks = []
+ 
+-            current_task_data = yaml.load(self.current_task)
++            current_task_data = yaml.load(self.current_task, Loader=yaml.FullLoader)
+             current_task_data['ignore_errors'] = True
+             tasks.append(current_task_data)
+             tasks.append({'pause_for_kernel': {'host': '127.0.0.1',
+@@ -966,10 +969,10 @@ class AnsibleKernel(Kernel):
+         found_module = False
+         code_data = None
+         try:
+-            code_data = yaml.load(code)
++            code_data = yaml.load(code, Loader=yaml.FullLoader)
+         except Exception:
+             try:
+-                code_data = yaml.load(code + ":")
++                code_data = yaml.load(code + ":", Loader=yaml.FullLoader)
+             except Exception:
+                 code_data = None
+ 
+@@ -1067,7 +1070,7 @@ class AnsibleKernel(Kernel):
+ 
+         data = dict()
+ 
+-        code_data = yaml.load(code)
++        code_data = yaml.load(code, Loader=yaml.FullLoader)
+ 
+         logger.debug("code_data %s", code_data)
+ 
+diff --git a/ansible_kernel/module_args.py b/ansible_kernel/module_args.py
+index 8883fcc..4c0dfaf 100644
+--- a/ansible_kernel/module_args.py
++++ b/ansible_kernel/module_args.py
+@@ -1,5 +1,5 @@
+ import pkg_resources
+ import yaml
+ with open(pkg_resources.resource_filename('ansible_kernel', 'module_args.yml')) as f:
+-    module_args = yaml.load(f.read())
++    module_args = yaml.load(f.read(), Loader=yaml.FullLoader)
+ module_args = module_args
+diff --git a/ansible_kernel/modules.py b/ansible_kernel/modules.py
+index c27d785..c116405 100644
+--- a/ansible_kernel/modules.py
++++ b/ansible_kernel/modules.py
+@@ -1,5 +1,5 @@
+ import pkg_resources
+ import yaml
+ with open(pkg_resources.resource_filename('ansible_kernel', 'modules.yml')) as f:
+-    modules = yaml.load(f.read())
++    modules = yaml.load(f.read(), Loader=yaml.FullLoader)
+ modules = modules
