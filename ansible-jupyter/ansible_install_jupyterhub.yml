@@ -410,6 +410,27 @@
         - ansible_kernel
       changed_when: False
 
+    - name: Fix ansible kernel path to include virtualenv setup
+      lineinfile:
+        path: "{{ JPHUB }}/share/jupyter/kernels/ansible/kernel.json"
+        regexp: '"python",$'
+        line: '   "/usr/local/bin/kernel_python",'
+        state: present
+
+    - name: Check whether to patch ansible kernel
+      command: "grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py"
+      register: patch_done
+      ignore_errors: true
+      changed_when: False
+
+    - name: patch ansible kernel with fixes coming from master
+      ansible.posix.patch:
+        src: "{{ JUPPROC }}/master-vs-0.9.0.patch"
+        basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
+        strip: 2
+        backup: yes
+      when: patch_done.rc != 0
+
     - name: Test kubectl-hpecp presence
       command: ls /usr/local/bin/kubectl-hpecp
       register: kubectl_path

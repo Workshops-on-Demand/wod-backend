@@ -1,2 +1,3 @@
-# CentOS 7 needs that
+# Ubuntu 20.04 needs that
 virtualenv_command: "virtualenv"
+python_lib: lib/python3.8/site-packages
