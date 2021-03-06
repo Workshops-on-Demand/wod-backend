@@ -547,7 +547,7 @@
       register: jup_token
       ignore_errors: true
       changed_when: false
-      when: answer.status_code != 200
+      when: answer.status_code >= 300
 
     - name: Fix Jupyter token in conf file
       lineinfile:
@@ -555,17 +555,17 @@
         regexp: "^JPHUBTOKEN"
         line: "JPHUBTOKEN: {{ jup_token.stdout_lines[0] }}"
         state: present
-      when: answer.status_code != 200
+      when: answer.status_code >= 300
 
     - name: Use new token
       set_fact:
         JPHUBTOKEN: "{{ jup_token.stdout_lines[0] }}"
-      when: answer.status_code != 200
+      when: answer.status_code >= 300
 
     - name: New token
       debug:
         msg: "New token: {{ JPHUBTOKEN }}"
-      when: answer.status_code != 200
+      when: answer.status_code >= 300
 
     - name: Setup ansible configuration
       copy:
