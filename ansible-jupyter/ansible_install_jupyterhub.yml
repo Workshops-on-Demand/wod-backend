@@ -411,11 +411,10 @@
       changed_when: False
 
     - name: Fix ansible kernel path to include virtualenv setup
-      lineinfile:
+      replace:
         path: "{{ JPHUB }}/share/jupyter/kernels/ansible/kernel.json"
-        regexp: '"python",$'
-        line: '   "/usr/local/bin/kernel_python",'
-        state: present
+        regexp: '(.+)"/opt/jupyterhub/bin/python3",(.+)$'
+        replace: '\1"/usr/local/bin/kernel_python",\2'
 
     - name: Check whether to patch ansible kernel
       command: "grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py"
