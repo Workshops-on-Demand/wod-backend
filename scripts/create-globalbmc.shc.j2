@@ -7,9 +7,9 @@ KITPATH=/usr/kits
 KITPATHVM=$KITPATH/VMs/OpenBMC
 KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
 
-# Test if we are launched as jupyter (initial setup ) or somebody else (reset during workshop by student or developer/writer)
+# Test if we are launched as jupyter (initial setup) or somebody else (reset during workshop by student or developer/writer)
 if [ _"$USER" != _"jupyter" ]; then
-	stdid=`echo $USER | sed 's/student//'`
+	export stdid=`echo $USER | sed 's/student//'`
 	script="{{ STDDIR }}/$USER/reset-globalbmc.shc.x"
 else
 	script="{{ SCRIPTDIR }}/reset-$w.sh"

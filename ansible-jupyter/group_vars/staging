@@ -32,9 +32,9 @@ ILODLBASEPORT: "45000"
 ILOSYBASEPORT: "46000"
 
 #
-HPEECPCTRL: "16.31.84.38 controller2 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
-HPEECPCTRLIP: "16.31.84.38"
-HPEECPCTRLNAME: "controller2.etc.fr.comm.hpecorp.net"
+HPEECPCTRL: "16.31.84.73 controller3 controller3.hpedevlab.net controller3.etc.fr.comm.hpecorp.net"
+HPEECPCTRLIP: "16.31.84.73"
+HPEECPCTRLNAME: "controller3.etc.fr.comm.hpecorp.net"
 HPEECPGWIP: "16.31.84.37"
 HPEECPGWNAME: "gateway2.hpedevlab.net"
 
