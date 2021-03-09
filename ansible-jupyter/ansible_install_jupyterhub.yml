@@ -267,6 +267,7 @@
         - hpeOneView
         - ansible-kernel
         - bash_kernel
+        - sshkernel
         - powershell_kernel
         - redfish
         - jupyter-docx-bundler
@@ -314,6 +315,7 @@
         - hpeOneView
         - ansible-kernel
         - bash_kernel
+        - sshkernel
         - powershell_kernel
         - redfish
         - jupyter-docx-bundler
@@ -402,6 +404,9 @@
     - name: Ensure jupyter docx bundle is installed
       shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && jupyter bundlerextension enable --py jupyter_docx_bundler --prefix={{ JPHUB }}
 
+    - name: Ensure jupyter ssh kernel is installed
+      shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
+
     - name: Ensure jupyter kernels are installed
       shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
@@ -412,9 +417,12 @@
 
     - name: Fix ansible kernel path to include virtualenv setup
       replace:
-        path: "{{ JPHUB }}/share/jupyter/kernels/ansible/kernel.json"
+        path: "{{ JPHUB }}/share/jupyter/kernels/{{ item }}/kernel.json"
         regexp: '(.+)"/opt/jupyterhub/bin/python3",(.+)$'
         replace: '\1"/usr/local/bin/kernel_python",\2'
+      with_items:
+        - ansible
+        - ssh
 
     - name: Check whether to patch ansible kernel
       command: "grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py"
@@ -433,6 +441,11 @@
     - name: Install HPE OneView collection in virtualenv
       shell: . '{{ JPHUB }}/bin/activate' && {{ JPHUB }}/bin/ansible-galaxy collection install -p {{ JPHUB }}/{{ python_lib }} hpe.oneview
 
+    - name: Remove former kernel files installed locally
+      file:
+        path: '{{ ansible_env.HOME }}/.local/share/jupyter/kernels'
+        state: absent
+      
     - name: Test kubectl-hpecp presence
       command: ls /usr/local/bin/kubectl-hpecp
       register: kubectl_path

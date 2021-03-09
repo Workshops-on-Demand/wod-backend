@@ -3,7 +3,7 @@ JPHOST: jupyterhub3.etc.fr.comm.hpecorp.net
 JPIP: 16.31.85.201
 JPHOSTEXT: notebooks3.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
-JPHUBTOKEN: 25b21de6eb0a45d08acb2a2b2e39c619
+JPHUBTOKEN: c62ce79001824a3f992ceda4bb0adf98
 BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 APIUSER: moderator
