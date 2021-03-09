@@ -430,6 +430,9 @@
         backup: yes
       when: patch_done.rc != 0
 
+    - name: Install HPE OneView collection in virtualenv
+      shell: . '{{ JPHUB }}/bin/activate' && {{ JPHUB }}/bin/ansible-galaxy collection install -p {{ JPHUB }}/{{ python_lib }} hpe.oneview
+
     - name: Test kubectl-hpecp presence
       command: ls /usr/local/bin/kubectl-hpecp
       register: kubectl_path

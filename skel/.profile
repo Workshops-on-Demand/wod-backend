@@ -25,3 +25,8 @@ fi
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
+
+# set PATH so venv binaries are seen before system ones
+if [ -d "/opt/jupyterhub//bin" ] ; then
+    PATH="/opt/jupyterhub/bin:$PATH"
+fi
