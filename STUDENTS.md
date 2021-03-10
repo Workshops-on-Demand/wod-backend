@@ -258,3 +258,14 @@ Last seat for speaker
 
 [1625] speaker for live sessions
 
+
+1626-1700 StackStorm 101
+
+[1626-1645] challenges  Location :  Grenoble
+
+[1646-1699] workshops Location :  Mougins
+
+[1700] speaker for live sessions
+
+
+

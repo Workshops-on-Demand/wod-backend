@@ -15,6 +15,12 @@ LDAPDMN: dc=hpedevlab,dc=net
 KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
 KIBANAPORT: "10022"
 #
+#
+STACKSTORMSRVNAME: "stackstorm"
+STACKSTORMSRIP: "16.31.86.206"
+STACKSTORMWEBUIPORT: "932"
+#
+
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
 VCENTERPWD: "vmware"

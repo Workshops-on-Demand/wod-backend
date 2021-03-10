@@ -14,6 +14,12 @@ LDAPDMN: dc=hp,dc=local
 KIBANAPWD: "5e8a3b4c-d07d-41a9-b431-6bf9495521b5"
 KIBANAPORT: "10022"
 #
+#
+STACKSTORMSRVNAME: "stackstorm"
+STACKSTORMSRIP: "192.168.10.46"
+STACKSTORMWEBUIPORT: "10021"
+#
+
 VCENTERAPP: "vcenterapp65.hp.local"
 VCENTERADMIN: "Administrator@vsphere.local"
 VCENTERPWD: "P@ssw0rd"
