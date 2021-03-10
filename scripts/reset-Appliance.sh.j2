@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -x
+
+HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
+if [ _"$HOMEDIR" != _"" ]; then
+	ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
+	if [ _"$w" = _"WKSHP-StackStorm101" ]; then
+                # That Workshop also need another passwd reset
+                ssh $RTARGET "echo $randompw | sudo htpasswd -i /etc/st2/htpasswd student$stdid"
+        fi
+	ssh $RTARGET sudo rm -f $HOMEDIR/.ssh/authorized_keys
+	EXITVAL=0
+else
+	echo "student$stdid doesn't exist on the appliance $RTARGET"
+	EXITVAL=-1
+fi
+
+## check staging or prod
+exit $EXITVAL
