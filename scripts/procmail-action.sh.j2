@@ -155,6 +155,8 @@ if [ $action != "RESET" ]; then
 		else
 			echo "Unknown action $action"
 		fi
+	else
+		echo "Student directeory not found for $stddir"
 	fi
 
 elif [ "$action" = "RESET" ]; then
