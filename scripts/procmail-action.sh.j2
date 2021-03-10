@@ -83,6 +83,10 @@ if [ $action != "RESET" ]; then
 			update_ldap_passwd
 			create_var_passwd
 		fi
+		# Some Notebooks need to get the passwd for the user
+		if [ _"`get_varpass_status $id`" != _"false" ]; then
+			create_var_passwd
+		fi
 
 		if [ "$action" = "CREATE" ]; then
 			erase_student

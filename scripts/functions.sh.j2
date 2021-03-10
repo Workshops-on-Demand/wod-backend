@@ -67,6 +67,14 @@ get_ldap_status() {
 	echo "$ret"
 }
 
+
+# This function returns the status of the need of Var Pass setup for the workshop id given as parameter
+get_varpass_status() {
+
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.varpass'`
+	echo "$ret"
+}
+
 # This function returns the status of the need of compiled scripts for the workshop id given as parameter
 get_compile_status() {
 
@@ -89,7 +97,7 @@ EOF
 	rm -f /tmp/ldif.$$
 }
 
-# This function creates a variable file in which password is stored fro athe ansble playbook to handle and use to substitue $$PASSWD in notebook the LDAP passwd with $randompw
+# This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
 	ansible-vault encrypt_string --vault-password-file $JUPPROC/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $JUPPROC/ansible-jupyter/$PBKDIR/variables_${w}_pass.yml
