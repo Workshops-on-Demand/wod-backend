@@ -119,6 +119,8 @@ erase_student() {
 		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
 		sudo chmod -R 600 $stddir/.ssh/*
         	sudo chmod 700 $stddir/.ssh
+		echo "Create ssh keys to allow remote connections to appliance if needed"
+		sudo su - student${stdid} -c "ssh-keygen -b 2048 -t rsa -f .ssh/id_rsa -N ''"
 	fi
 }
 
