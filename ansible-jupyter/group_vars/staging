@@ -10,8 +10,8 @@ APIUSER: moderator
 APIPWD: CloudSystem$
 LDAPDMN: dc=hpedevlab,dc=net
 #
-KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
-KIBANAPORT: "10022"
+KIBANAPWD: "3768d5a9-ecd4-439e-89cc-b4a2d8e4274a"
+KIBANAPORT: "10023"
 #
 STACKSTORMSRVNAME: "sta-stackstorm"
 STACKSTORMSRIP: "16.31.86.205"
