@@ -2,8 +2,15 @@
 
 set -x
 
-cd /student/student$stdid/$w
 echo " This script resets the Managing HPE Cloud Volumes through API calls Workshop content for: student$stdid"
+cd /student/student$stdid
+
+# we will use cloud_vol-$stdid-*
+CloudVolumeID=cloud_vol-$stdid
+echo "The Student cloudvolume id is ${CloudVolumeID}"
+
+
+
 
 ## Get token to authentificate to cloud Volume API
 if [ -x "./get-cloudvol-token.shc.x" ]; then
@@ -16,7 +23,6 @@ else
 fi
 
 ## Authenticate Now using the token
-
 curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/session' \
 --header "X-Auth-Token: ${TOKEN}" \
 --header 'Content-Type: application/json'
@@ -24,13 +30,23 @@ curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/sessi
 # Define cloud Volume to delete associated to student$stdid
 # This volume name is based on cloud-vol-$stdid-Date
 
-# we will use cloud_vol-$stdid-*
+initiator_ip=`curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/initiators' \
+--header "X-Auth-Token: ${TOKEN}" \
+--data-raw '' | jq -r '. | .[] | .[] | .attributes.ip' `
+echo " your initiator IP is ${initiator_ip}"
 
-CloudVolumeID='cloud_vol-$stdid'
-echo "The Student cloudvolume id is ${CloudVolumeID}"
+# Detach
+curl -s --location --request POST "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/${CloudVolumeID}/detach" \
+--header 'Content-Type: application/json' \
+--header "X-Auth-Token: ${TOKEN}" \
+--data-raw '{
+"data": {
+"initiator_ip": "'${initiator_ip}'"
+}
+}'
 
 ##Deleting Possible Remaining Cloud Volume
-curl -s --location --request DELETE "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/${CloudVolumeID}" \
+curl -s --location --request DELETE "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/${CloudVolumeID}?force=true" \
 --header "X-auth-Token: ${TOKEN}" \
 --header 'Content-Type: application/json'
 
