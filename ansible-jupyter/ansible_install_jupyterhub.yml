@@ -349,6 +349,11 @@
         group: jupyter
         mode: 0755
 
+    - name: Cleanup intermediate go directory
+      file:
+        path: '{{ ansible_env.HOME }}/go'
+        state: absent
+
     - name: Make kernel_python available under /usr/local/bin
       copy:
         src: "{{ SCRIPTDIR }}/kernel_python"
