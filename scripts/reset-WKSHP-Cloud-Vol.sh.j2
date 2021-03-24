@@ -31,7 +31,7 @@ echo " $Authentification_log "
 
 initiator_ip=$(curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/initiators' \
 --header "X-Auth-Token: ${TOKEN}" \
---data-raw '' |  jq -r '. | .[] | .[] | .attributes.ip' )
+--data-raw '' |  jq -r '. | .[] | .[] | .attributes.ip' | sort -u)
 echo " your initiator IP is ${initiator_ip}"
 
 volume_id_list=$(curl -s --location --request GET "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes" \
