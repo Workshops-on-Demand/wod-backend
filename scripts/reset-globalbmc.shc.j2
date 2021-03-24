@@ -1,11 +1,28 @@
 #!/bin/bash
 
-# This script kills the OpenBMC and iLO 5 simulators in the corresponding VM
-# associated to the student. 
+# This script kills the OpenBMC and iLO 5 simulators in the corresponding VMs
+# associated to the student. It removes as well the associated Redfish mockups if any.
 
+# Version 0.2
+
+KITPATH=/usr/kits
+KITPATHMOCKUPS=$KITPATH/VMs/RedfishMockups
+SSHOBMC="ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }}"
+SSHMOCKUPS="ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ ILOSIMUIP }}"
+
+echo "stdid: $stdid"
 # Kill a potential qemu process remaining
-ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} pkill -f qemu-student$stdid
-ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} pkill -f student$stdid-ilo5
-ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} pkill -f student$stdid-ilo5-Sy480
+$SSHOBMC     pkill -f qemu-student$stdid
+$SSHMOCKUPS  pkill -f student$stdid-ilo5
+$SSHMOCKUPS  pkill -f student$stdid-ilo5-Sy480
+
+# Remove/cleanup Redfish mockups.
+# This is needed to make sure new Mockups are effectively deployed.
+$SSHMOCKUPS "[ -d $KITPATHMOCKUPS/student$stdid-ilo5-Sy480 ]" && \
+   $SSHMOCKUPS "rm -r $KITPATHMOCKUPS/student$stdid-ilo5-Sy480"
+
+$SSHMOCKUPS "[ -d $KITPATHMOCKUPS/student$stdid-ilo5 ]" && \
+    $SSHMOCKUPS "rm -r $KITPATHMOCKUPS/student$stdid-ilo5"
+
 # do not remove so callers are happy whatever upper result
 exit 0
