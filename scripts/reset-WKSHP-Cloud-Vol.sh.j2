@@ -23,33 +23,42 @@ else
 fi
 
 ## Authenticate Now using the token
-curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/session' \
+Authentification_log=`curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/session' \
 --header "X-Auth-Token: ${TOKEN}" \
---header 'Content-Type: application/json'
+--header 'Content-Type: application/json'`
 
-# Define cloud Volume to delete associated to student$stdid
-# This volume name is based on cloud-vol-$stdid-Date
+echo " $Authentification_log "
 
-initiator_ip=`curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/initiators' \
+initiator_ip=$(curl -s --location --request GET 'https://demo.cloudvolumes.hpe.com/api/v2/initiators' \
 --header "X-Auth-Token: ${TOKEN}" \
---data-raw '' | jq -r '. | .[] | .[] | .attributes.ip' `
+--data-raw '' |  jq -r '. | .[] | .[] | .attributes.ip' )
 echo " your initiator IP is ${initiator_ip}"
 
-# Detach
-curl -s --location --request POST "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/${CloudVolumeID}/detach" \
+volume_id_list=$(curl -s --location --request GET "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes" \
 --header 'Content-Type: application/json' \
 --header "X-Auth-Token: ${TOKEN}" \
---data-raw '{
-"data": {
-"initiator_ip": "'${initiator_ip}'"
-}
-}'
-
-##Deleting Possible Remaining Cloud Volume
-curl -s --location --request DELETE "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/${CloudVolumeID}?force=true" \
---header "X-auth-Token: ${TOKEN}" \
---header 'Content-Type: application/json'
-
+--data-raw ''   | jq -r '. | .[] | .[] | .id')
+echo ${volume_id_list}
+for i in ${volume_id_list}
+do
+  echo ${i}
+    if [ $i -ne 8345 ]; then
+    echo "Detaching Volume Now"
+    curl -s --location --request POST "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/$i/detach" \
+      --header 'Content-Type: application/json' \
+      --header "X-Auth-Token: ${TOKEN}" \
+      --data-raw '{
+        "data":  {
+        "initiator_ip": "'${initiator_ip}'"
+          }
+        }'
+    echo "Deleting Volume Now"
+    curl -s --location --request DELETE "https://demo.cloudvolumes.hpe.com/api/v2/cloud_volumes/$i?force=true" \
+     --header "X-auth-Token: ${TOKEN}" \
+     --header 'Content-Type: application/json'
+    fi
+done
+echo "reset done- check cloudvolume portal"
 
 ##Close the login session
 echo "logging out"
