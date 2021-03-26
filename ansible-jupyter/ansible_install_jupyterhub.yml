@@ -208,6 +208,7 @@
         - man
         - unzip
         - shc
+        - patch
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
