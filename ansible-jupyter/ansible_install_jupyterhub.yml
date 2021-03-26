@@ -350,6 +350,8 @@
         mode: 0755
 
     - name: Cleanup intermediate go directory
+      become: yes
+      become_user: root
       file:
         path: '{{ ansible_env.HOME }}/go'
         state: absent
