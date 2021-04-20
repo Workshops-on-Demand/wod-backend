@@ -268,4 +268,11 @@ Last seat for speaker
 [1700] speaker for live sessions
 
 
+1900-2000 Jupyter Notebooks101
+
+[1900-1940] challenges  Location :  Grenoble
+
+[1941-1999] workshops Location :  Mougins
+
+[2000] speaker for live sessions
 
