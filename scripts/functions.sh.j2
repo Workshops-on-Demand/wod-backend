@@ -82,6 +82,20 @@ get_compile_status() {
 	echo "$ret"
 }
 
+# This function returns the min of the range of the users booked for the workshop id given as parameter
+get_range_min() {
+
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.range.[0]'`
+	echo "$ret"
+}
+
+# This function returns the max of the range of the users booked for the workshop id given as parameter
+get_range_max() {
+
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.range.[1]'`
+	echo "$ret"
+}
+
 # This function updates the LDAP passwd with $randompw for the student under management (using $stdid)
 update_ldap_passwd() {
 

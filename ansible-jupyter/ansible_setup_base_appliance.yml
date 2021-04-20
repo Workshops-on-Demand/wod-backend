@@ -1,0 +1,128 @@
+  tasks:
+    - name: Ensure that common packages are installed for repo setup
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - curl
+        - gnupg2
+        state: present
+        update_cache: yes
+
+    - name: Ensure that required packages are installed for repo setup
+      become: yes
+      become_user: root
+      apt:
+        pkg:
+        - apt-transport-https
+      when:
+       - ansible_facts['os_family'] == "Debian"
+
+    - name: Add universe repository into sources list
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
+        state: present
+      when:
+       - ansible_facts['distribution'] == "Ubuntu"
+       - ansible_facts['distribution_major_version'] == "20"
+
+    - name: Add EPEL repository into repo list
+      become: yes
+      become_user: root
+      yum:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts['distribution_major_version'] }}.noarch.rpm"
+        state: present
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
+    - name: Update apt cache
+      become: yes
+      become_user: root
+      apt:
+        update_cache: yes
+      changed_when: False
+      when:
+        - ansible_facts['os_family'] == "Debian"
+
+    - name: Ensure all required packages are installed
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - vim
+      update_cache: yes
+
+    - name: Ensure that directory /student exists
+      become: yes
+      become_user: root
+      file:
+        path: "/student"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0711
+
+    - set_fact: USERMIN="hostvars[inventory_hostname][{{ ansible_env.WKSHP }}-CHALGMIN]"
+    - set_fact: USERMAX="hostvars[inventory_hostname][{{ ansible_env.WKSHP }}-SPEAKER]"
+
+    - name: Remove Linux users and their home directory
+      become: yes
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: absent
+        remove: yes
+        force: yes
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      when: CLEAN|bool
+
+    - name: Ensure dedicated students groups exist
+      become: yes
+      become_user: root
+      group:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        gid: "{{ item + GIDBASE }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+
+    - name: Ensure Linux students users exists with their home dir
+      become: yes
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        create_home: true
+        home: "/student/{{ 'student%s' | format(item) }}"
+        comment: "{{ 'student%s' | format(item) }}"
+        shell: /bin/bash
+        uid: "{{ item + UIDBASE }}"
+        group: "{{ 'student%s' | format(item) }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+
+        - name: Setup ACL for students with jupyter account
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        recursive: yes
+        entity: jupyter
+        etype: user
+        permissions: rwx
+        state: present
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+
+    - name: Setup default ACL for students with jupyter account
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        recursive: yes
+        entity: jupyter
+        etype: user
+        permissions: rwx
+        default: yes
+        state: present
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+

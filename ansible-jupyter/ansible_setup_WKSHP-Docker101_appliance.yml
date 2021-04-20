@@ -1,0 +1,30 @@
+  tasks:
+  - name: Setup Docker repo for RPM
+      become: yes
+      become_user: root
+      yum_repository:
+        name: docker
+        baseurl: "https://yum.dockerproject.org/repo/main/centos/{{ ansible_facts['distribution_major_version'] }}"
+        description: "Upstream Docker Yum repository"
+        enabled: yes
+        state: present
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
+  - name: Setup Docker repo for APT
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: deb https://apt.dockerproject.org/repo debian-stretch main
+        state: present
+      when:
+       - ansible_facts['distribution'] == "Ubuntu"
+       - ansible_facts['distribution_major_version'] == "20"
+
+  - name: Ensure all required packages are installed
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - docker-engine
+      update_cache: yes

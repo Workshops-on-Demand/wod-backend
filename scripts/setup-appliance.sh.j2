@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# Script to be called to setup an appliance needed for a certain workshop
+#
+# (c) Bruno Cornec <bruno.cornec@hpe.com>, Hewlett Packard Development
+# (c) Frederic Passeron <frederic.passeron@hpe.com>, Hewlett Packard Development
+#
+# Released under the GPLv2 License
+#
+set -e
+set -x
+
+# Main of script
+wkshp=$1
+echo "we are working on "$wkshp
+if [ _"$1" = _"" ]; then
+	echo "Syntax: setup-appliance.sh WKSHP-Name"
+	echo "WORKSHOP is mandatory"
+	exit -1
+fi
+shift
+
+
+source {{ SCRIPTDIR }}/functions.sh
+#
+# Main part
+#
+# Variables declaration
+#
+
+# endpoint variable - Has to be global
+export APIENDPOINT={{ APIENDPOINT }}
+export APIUSER={{ APIUSER }}
+export APIPWD={{ APIPWD }}
+export JUPPROC=$HOME/jupyter-procmail
+export std0="$HOME/student0"
+export accessToken=`get_session_token`
+# If that doesn't fail, then export the workshop name
+export w=$1
+export wid=`get_workshop_id $w`
+export RTARGET=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`-IP
+
+if [ -x "$JUPPROC/scripts/setup-$w" ]; then
+	echo "Setup Appliance for Workshop $w at `date`"
+	$JUPPROC/scripts/setup-$w
+	echo "End of Appliance setup for Workshop $w at `date`"
+fi
