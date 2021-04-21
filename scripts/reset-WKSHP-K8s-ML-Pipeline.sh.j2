@@ -59,6 +59,7 @@ kubectl config current-context
 
 kubectl delete -f $DeploymentEngineApp
 kubectl delete -f $PipelineConfigMap
+kubectl delete -f $PipelineConfigMapv2
 kubectl delete -f $JupyterNotebookApp
 
 #reset the application deployment name in the YAML file

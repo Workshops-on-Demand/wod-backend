@@ -22,6 +22,15 @@ echo "Your studentId is: "$studentId
 echo "your operation context is:" $studentId "on tenant" $tenantname 
 echo "your REST API endpoint is:" $controller_endpoint
 
+
+sc_secret="sc-secret-mlops-students.yaml" # The secret object for the GitHub VCS information. it is used by the notebook to know how to connect to the VCS.
+JupyterNotebookApp="cr-cluster-mlops-jupyter-notebook.yaml" # the Jupyter Notebook ML Ops app manifest you will deploy to build your model
+DeploymentEngineApp="cr-cluster-mlops-endpoint-wrapper.yaml" # the Deployment engine KD App manifest you will deploy to query your model for answers 
+PipelineConfigMap="mlops-pipeline-configmap.yaml" # ConfigMap manifest used to register the trained model version 1 
+
+
+
+
 ## Authenticate as a Student ID in the specified tenant
 sessionlocation=$(curl -k -i -s --request POST "https://${controller_endpoint}/api/v2/session" \
 --header 'Accept: application/json' \
