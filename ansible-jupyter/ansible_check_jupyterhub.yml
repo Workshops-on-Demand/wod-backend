@@ -53,7 +53,7 @@
         - { key: "kernel.pid_max", value: "200000" }
         - { key: "vm.max_map_count", value: "600000" }
 
-    - name: Setup ufw firewall rules
+    - name: Setup ufw firewall TCP rules
       become: yes
       become_user: root
       community.general.ufw:
@@ -66,12 +66,27 @@
         - "443"
         - "80"
         - "22"
+        - "123"
         - "{{POSTPORT}}"
       when:
         - ansible_facts['distribution'] == "Ubuntu"
         - ansible_facts['distribution_major_version'] >= "20"
 
-    - name: Setup firewalld rules
+    - name: Setup ufw firewall UDP rules
+      become: yes
+      become_user: root
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: udp
+        state: enabled
+      with_items:
+        - "123"
+      when:
+        - ansible_facts['distribution'] == "Ubuntu"
+        - ansible_facts['distribution_major_version'] >= "20"
+
+    - name: Setup firewalld TCP rules
       become: yes
       become_user: root
       ansible.posix.firewalld:
@@ -83,7 +98,21 @@
         - "443"
         - "80"
         - "22"
+        - "123"
         - "{{POSTPORT}}"
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] >= "7"
+
+    - name: Setup firewalld UDP rules
+      become: yes
+      become_user: root
+      ansible.posix.firewalld:
+        port: "{{ item }}/udp"
+        permanent: yes
+        state: enabled
+      with_items:
+        - "123"
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] >= "7"
@@ -96,6 +125,30 @@
         daemon_reload: yes
         enabled: yes
         name: firewalld
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] >= "7"
+
+    - name: Enable NTP service
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: ntp
+      when:
+        - ansible_facts['distribution'] == "Ubuntu"
+        - ansible_facts['distribution_major_version'] >= "20"
+
+    - name: Enable NTP service
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: ntpd
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] >= "7"

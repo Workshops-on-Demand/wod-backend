@@ -52,6 +52,7 @@
       package:
         pkg:
         - vim
+        - ntp
       update_cache: yes
 
     - name: Ensure that directory /student exists
