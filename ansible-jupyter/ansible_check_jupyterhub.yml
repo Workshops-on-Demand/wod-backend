@@ -360,9 +360,9 @@
         cron_file: check-template
         state: present
 
-    - name: Deliver create/reset scripts as ansible template for variable expansion
+    - name: Deliver create/reset/setup scripts as ansible template for variable expansion
       template: src={{ item }} dest={{ SCRIPTDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0755
-      with_fileglob: [ '{{ SCRIPTDIR }}/reset-*.sh*.j2', '{{ SCRIPTDIR }}/create-*.sh*.j2' ]
+      with_fileglob: [ '{{ SCRIPTDIR }}/reset-*.sh*.j2', '{{ SCRIPTDIR }}/create-*.sh*.j2', '{{ SCRIPTDIR }}/setup-*.sh*.j2' ]
 
     - name: Deliver variables files as ansible template for variable expansion
       template: src={{ item }} dest={{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0644
