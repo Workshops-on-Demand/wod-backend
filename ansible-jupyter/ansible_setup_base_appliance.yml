@@ -1,3 +1,7 @@
+---
+
+- name: Setup playbook for a generic appliance
+  hosts: '{{ RTARGET }}'
   tasks:
     - name: Ensure that common packages are installed for repo setup
       become: yes
@@ -53,7 +57,6 @@
         pkg:
         - vim
         - ntp
-      update_cache: yes
 
     - name: Ensure that directory /student exists
       become: yes
@@ -65,9 +68,6 @@
         group: jupyter
         mode: 0711
 
-    - set_fact: USERMIN="hostvars[inventory_hostname][{{ ansible_env.WKSHP }}-CHALGMIN]"
-    - set_fact: USERMAX="hostvars[inventory_hostname][{{ ansible_env.WKSHP }}-SPEAKER]"
-
     - name: Remove Linux users and their home directory
       become: yes
       become_user: root
@@ -76,7 +76,7 @@
         state: absent
         remove: yes
         force: yes
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
       when: CLEAN|bool
 
     - name: Ensure dedicated students groups exist
@@ -86,7 +86,7 @@
         name: "{{ 'student%s' | format(item) }}"
         state: present
         gid: "{{ item + GIDBASE }}"
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
 
     - name: Ensure Linux students users exists with their home dir
       become: yes
@@ -100,9 +100,9 @@
         shell: /bin/bash
         uid: "{{ item + UIDBASE }}"
         group: "{{ 'student%s' | format(item) }}"
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
 
-        - name: Setup ACL for students with jupyter account
+    - name: Setup ACL for students with jupyter account
       become: yes
       become_user: root
       ansible.posix.acl:
@@ -112,7 +112,7 @@
         etype: user
         permissions: rwx
         state: present
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
 
     - name: Setup default ACL for students with jupyter account
       become: yes
@@ -125,5 +125,5 @@
         permissions: rwx
         default: yes
         state: present
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
 

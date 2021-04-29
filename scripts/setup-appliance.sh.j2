@@ -8,18 +8,17 @@
 # Released under the GPLv2 License
 #
 set -e
-set -x
+#set -x
 
 # Main of script
-wkshp=$1
-echo "we are working on "$wkshp
-if [ _"$1" = _"" ]; then
+export w=$1
+if [ _"$w" = _"" ]; then
 	echo "Syntax: setup-appliance.sh WKSHP-Name"
 	echo "WORKSHOP is mandatory"
 	exit -1
 fi
 shift
-
+echo "We are working on the setup of the $w appliance"
 
 source {{ SCRIPTDIR }}/functions.sh
 #
@@ -29,19 +28,28 @@ source {{ SCRIPTDIR }}/functions.sh
 #
 
 # endpoint variable - Has to be global
+echo "Prepare environment variables for Workshop $w at `date`"
 export APIENDPOINT={{ APIENDPOINT }}
 export APIUSER={{ APIUSER }}
 export APIPWD={{ APIPWD }}
 export JUPPROC=$HOME/jupyter-procmail
+export PBKDIR={{ PBKDIR }}
 export std0="$HOME/student0"
 export accessToken=`get_session_token`
 # If that doesn't fail, then export the workshop name
-export w=$1
 export wid=`get_workshop_id $w`
-export RTARGET=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`-IP
+#export WKSHP=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`
+export RTARGET=`grep IP-$w $JUPPROC/ansible-jupyter/group_vars/$PBKDIR | cut -d: -f2 | sed 's/[ 	]*//'`
+export APPMIN=`get_range_min $wid`
+max=`get_range_max $wid`
+export APPMAX=$(($max+1))
 
-if [ -x "$JUPPROC/scripts/setup-$w" ]; then
+echo "Setup Global Appliance for Workshop $w at `date`"
+$JUPPROC/scripts/setup-globalappliance.sh
+echo "End of Global Appliance setup for Workshop $w at `date`"
+
+if [ -x "$JUPPROC/scripts/setup-$w.sh" ]; then
 	echo "Setup Appliance for Workshop $w at `date`"
-	$JUPPROC/scripts/setup-$w
+	$JUPPROC/scripts/setup-$w.sh
 	echo "End of Appliance setup for Workshop $w at `date`"
 fi

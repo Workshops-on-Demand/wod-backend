@@ -1,17 +1,21 @@
+---
+
+- name: Setup Playbook for WKSHP-Docker101 appliance
+  hosts: '{{ RTARGET }}'
   tasks:
-  - name: Setup Docker repo for RPM
+    - name: Setup Docker repo for RPM
       become: yes
       become_user: root
       yum_repository:
         name: docker
-        baseurl: "https://yum.dockerproject.org/repo/main/centos/{{ ansible_facts['distribution_major_version'] }}"
+        baseurl: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
         description: "Upstream Docker Yum repository"
         enabled: yes
         state: present
       when:
         - ansible_facts['distribution'] == "CentOS"
 
-  - name: Setup Docker repo for APT
+    - name: Setup Docker repo for APT
       become: yes
       become_user: root
       apt_repository:
@@ -21,10 +25,60 @@
        - ansible_facts['distribution'] == "Ubuntu"
        - ansible_facts['distribution_major_version'] == "20"
 
-  - name: Ensure all required packages are installed
+    - name: Ensure all APT required packages are installed
       become: yes
       become_user: root
       package:
         pkg:
         - docker-engine
-      update_cache: yes
+      when:
+       - ansible_facts['distribution'] == "Ubuntu"
+       - ansible_facts['distribution_major_version'] == "20"
+
+    - name: Add Docker GPG Key to RPM DB
+      become: yes
+      become_user: root
+      rpm_key:
+        key: "{{ item }}"
+        state: present
+      with_items:
+        - https://download.docker.com/linux/centos/gpg
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
+    - name: Ensure all RPM required packages are installed
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - docker-ce
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
+    - name: Enable Docker service
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: docker
+
+    - name: Ensure jupyter user belong to the docker group
+      become: yes
+      become_user: root
+      user:
+        name: "jupyter"
+        state: present
+        append: yes
+        groups: "docker"
+
+    - name: Ensure Linux students users belong to the docker group
+      become: yes
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        append: yes
+        groups: "docker"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"

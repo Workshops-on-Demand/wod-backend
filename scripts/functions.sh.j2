@@ -8,12 +8,12 @@
 # Released under the GPLv2 License
 #
 set -e
-set -x
+#set -x
 
 # This function fetches an accessToken using user moderator credentials and open a session
 get_session_token() {
 
-	ret=`curl --location --request POST "$APIENDPOINT/login" \
+	ret=`curl -s --location --request POST "$APIENDPOINT/login" \
 			--header 'Content-Type: application/json' \
 			--data "{\"username\":\"$APIUSER\",\"password\":\"$APIPWD\"}" | jq -r '.accessToken'`
         echo "$ret"

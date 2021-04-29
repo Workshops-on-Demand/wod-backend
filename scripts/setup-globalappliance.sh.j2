@@ -1,13 +1,15 @@
 #!/bin/bash
 
-set -x
+#set -x
 
-### copy ssh keys on the remote server
-export RTARGET=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`
+echo "Use ansible to setup generic remote appliance at $RTARGET"
+ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_base_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX"
+if [ -f "$JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml" ]; then
+	echo "Use ansible to setup specificities for $w on remote appliance $RTARGET"
+	ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX"
+fi
 
-ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_base_appliance.yml -l ${RTARGET}-IP --limit {{ PBKDIR }} -e "WORKSHOP=$w WKSHP=$RTARGET"
-ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -l ${RTARGET}-IP --limit {{ PBKDIR }} -e "WORKSHOP=$w WKSHP=$RTARGET"
-
+echo "Finale script setup phase for $w on remote appliance $RTARGET"
 HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
 exit 0
 
