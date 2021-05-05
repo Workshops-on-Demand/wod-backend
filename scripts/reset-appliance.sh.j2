@@ -2,17 +2,18 @@
 
 set -x
 
+### copy ssh keys on the Appliance server
+if [ _"$RTARGET" = _"" ]; then
+	echo "RTARGET is not defined. Aborting..."
+	exit -1
+fi
 HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ]; then
-	ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
-	if [ _"$w" = _"WKSHP-StackStorm101" ]; then
-                # That Workshop also need another passwd reset
-                ssh $RTARGET "echo $randompw | sudo htpasswd -i /etc/st2/htpasswd student$stdid"
-        fi
-	ssh $RTARGET sudo rm -f $HOMEDIR/.ssh/authorized_keys
+	ssh -q $RTARGET sudo rm -rf $HOMEDIR/.ssh
+	ssh -q $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	EXITVAL=0
 else
-	echo "student$stdid doesn't exist on the appliance $RTARGET"
+	echo "student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
 	EXITVAL=-1
 fi
 

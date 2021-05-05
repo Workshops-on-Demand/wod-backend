@@ -80,7 +80,6 @@ COPY ssh_host_ecdsa_key.pub /etc/ssh/ssh_host_ecdsa_key.pub
 COPY ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
 COPY ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ed25519_key.pub
 RUN chmod 600 /etc/ssh/ssh_host_*
-ENTRYPOINT /usr/sbin/sshd && /usr/local/bin/dockerd-entrypoint.sh
 EOF
 
 # Clean before

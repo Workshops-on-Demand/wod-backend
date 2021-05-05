@@ -10,19 +10,27 @@ export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Docker101'] }}
 NAME=dockerlab
 TMPDIR=/tmp/$NAME.$stdid
 
+
 mkdir -p $TMPDIR
+
 cat > $TMPDIR/Dockerfile << EOF
 FROM ${NAME}:latest
-RUN useradd student$stdid -G docker
+RUN mkdir -p /student/student$stdid
+RUN addgroup docker
+RUN adduser student$stdid -D -G docker -h /student/student$stdid
+# Used: perl -e 'use Crypt::PasswdMD5; print crypt("Redfish@TSS19", "\$6\$rl1WNGdr\$"),"\n"' to create the Password
+# Unlock the account
+RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
 RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
 WORKDIR /student/student$stdid
-USER student$stdid
 RUN mkdir .ssh
 RUN chmod 700 .ssh
-COPY .ssh/authorized_keys .ssh
+COPY authorized_keys .ssh
 RUN chmod 600 .ssh/authorized_keys
-# Used: perl -e 'use Crypt::PasswdMD5; print crypt("Redfish@TSS19", "\$6\$rl1WNGdr\$"),"\n"' to create the Password
-#RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
+RUN chown -R student$stdid:docker /student/student$stdid/.ssh
+ENTRYPOINT /usr/sbin/sshd && /usr/local/bin/dockerd-entrypoint.sh
+# Would require dind-rootless but with that one I'm unable to install with apk packages. To be looked at.
+#USER student$stdid
 EOF
 
 echo wid=$wid
@@ -31,6 +39,14 @@ echo stdid=$stdid
 echo APPMIN=$APPMIN
 sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Docker101'] }}))
 webport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['WEBPORT-WKSHP-Docker101'] }}))
+
+# Adapt the ssh config for the student
+cat > $TMPDIR/config << EOF
+Host $RTARGET
+    Port $sshport
+EOF
+sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+
 cat > $TMPDIR/docker-compose.yml << EOF
 version: '3.5'
 services:
@@ -39,26 +55,27 @@ services:
     build: .
     privileged: true
     ports:
-      - $webport:80
-      - $sshport:22
+      - "$webport:80"
+      - "$sshport:22"
 EOF
 cat > $TMPDIR/launch-$NAME << EOF
 #!/bin/bash
 cd $TMPDIR
-docker-compose up -d
+docker-compose up --build -d
 EOF
 
 # Stop/Remove existing content first - these commands could fail so protect with true from set -e
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker stop $NAME$stdid\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rm $NAME$stdid\' && /bin/true
+{{ SCRIPTDIR }}/reset-$w.sh
 
 # Copy content and start container
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo cp /student/student$stdid/.ssh/authorized_keys $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo chmod 644 $TMPDIR/authorized_keys
 scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $RTARGET:$TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
 
 # Cleanup
-ssh {{ NOCHECKSSH }} $RTARGET rm -rf $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET rm -rf $TMPDIR
 rm -rf $TMPDIR
