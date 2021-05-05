@@ -14,7 +14,6 @@ KIBANAPWD: "3768d5a9-ecd4-439e-89cc-b4a2d8e4274a"
 KIBANAPORT: "10023"
 #
 STACKSTORMSRVNAME: "sta-stackstorm"
-STACKSTORMSRVIP: "16.31.86.205"
 STACKSTORMWEBUIPORT: "931"
 #
 VCENTERAPP: "esx-sta-vcenter.etc.fr.comm.hpecorp.net"

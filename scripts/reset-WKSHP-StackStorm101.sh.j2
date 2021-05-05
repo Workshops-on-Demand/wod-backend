@@ -2,5 +2,5 @@
 
 set -x
 
-export RTARGET={{ STACKSTORMSRVNAME }}
-{{ SCRIPTDIR }}/reset-Appliance.sh
+export RTARGET={{ hostvars[inventory_hostname]["IP-WKSHP-StackStorm101"] }}
+{{ SCRIPTDIR }}/reset-appliance.sh

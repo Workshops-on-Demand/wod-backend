@@ -2,5 +2,6 @@
 
 set -x
 
-export RTARGET={{ STACKSTORMSRVNAME }}
-{{ SCRIPTDIR }}/create-Appliance.sh
+export RTARGET={{ hostvars[inventory_hostname]["IP-WKSHP-StackStorm101"] }}
+{{ SCRIPTDIR }}/create-appliance.sh
+ssh $RTARGET "echo $randompw | sudo htpasswd -i /etc/st2/htpasswd student$stdid"
