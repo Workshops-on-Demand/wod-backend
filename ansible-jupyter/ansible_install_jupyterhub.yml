@@ -196,6 +196,7 @@
         - libzmq3-dev
         - libc6-dev
         - nfs-common
+        - libcrypt-passwdmd5-perl
       when:
         - ansible_facts['os_family'] == "Debian"
 
@@ -211,6 +212,7 @@
         - llvm-toolset-7.0-lld
         - nfs-utils
         - zeromq-devel
+        - perl-Crypt-PasswdMD5
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] == "7"
