@@ -31,6 +31,7 @@
       package:
         pkg:
         - docker-engine
+        - docker-compose
       when:
        - ansible_facts['distribution'] == "Ubuntu"
        - ansible_facts['distribution_major_version'] == "20"
@@ -52,6 +53,7 @@
       package:
         pkg:
         - docker-ce
+        - docker-compose
       when:
         - ansible_facts['distribution'] == "CentOS"
 
