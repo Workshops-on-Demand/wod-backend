@@ -9,32 +9,5 @@ if [ -f "$JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml" ]; then
 	ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX"
 fi
 
-echo "Finale script setup phase for $w on remote appliance $RTARGET"
-HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
+echo "Final script setup phase for $w on remote appliance $RTARGET"
 exit 0
-
-TMPDIR=/tmp/sk.$$
-sudo mkdir -p $TMPDIR
-sudo cp {{ STDDIR }}/student$stdid/.ssh/id_rsa.pub $TMPDIR
-sudo chown -R $USER $TMPDIR
-ssh $RTARGET mkdir -p $TMPDIR
-scp $TMPDIR/id_rsa.pub $RTARGET:$TMPDIR/
-HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
-if [ _"$HOMEDIR" != _"" ]; then
-	ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
-	if [ _"$w" = _"WKSHP-StackStorm101" ]; then
-		# That Workshop also need another passwd reset
-		ssh $RTARGET "echo $randompw | sudo htpasswd -i /etc/st2/htpasswd student$stdid"
-	fi
-	ssh $RTARGET sudo install -d -m 0700 -o student$stdid $HOMEDIR/.ssh
-	ssh $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
-	EXITVAL=0
-else
-	echo "student$stdid doesn't exist on the appliance $RTARGET"
-	EXITVAL=-1
-fi
-
-## check staging or prod
-ssh $RTARGET rm -rf $TMPDIR
-rm -rf $TMPDIR
-exit $EXITVAL

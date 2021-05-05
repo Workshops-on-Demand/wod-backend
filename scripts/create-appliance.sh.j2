@@ -7,6 +7,11 @@ TMPDIR=/tmp/app.$$
 sudo mkdir -p $TMPDIR
 sudo cp {{ STDDIR }}/student$stdid/.ssh/id_rsa.pub $TMPDIR
 sudo chown -R $USER $TMPDIR
+
+if [ _"$RTARGET" = _"" ]; then
+	echo "RTARGET is not defined. Aborting..."
+	exit -1
+fi
 ssh $RTARGET mkdir -p $TMPDIR
 scp $TMPDIR/id_rsa.pub $RTARGET:$TMPDIR/
 HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
@@ -16,7 +21,7 @@ if [ _"$HOMEDIR" != _"" ]; then
 	ssh $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
 	EXITVAL=0
 else
-	echo "student$stdid doesn't exist on the appliance $RTARGET"
+	echo "student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
 	EXITVAL=-1
 fi
 

@@ -38,6 +38,10 @@ OBMCBASEPORT: "44000"
 ILODLBASEPORT: "45000"
 ILOSYBASEPORT: "46000"
 
+IP-WKSHP-Docker101: undefined
+SSHPORT-WKSHP-Docker101: 14001
+WEBPORT-WKSHP-Docker101: 14101
+
 #
 HPEECPCTRL: "16.31.84.36 haecpctrl haecpctrl.hpedevlab.net haecpctrl.etc.fr.comm.hpecorp.net"
 HPEECPCTRLIP: "16.31.84.36"

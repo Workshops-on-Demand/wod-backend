@@ -20,7 +20,7 @@ source {{ SCRIPTDIR }}/functions.sh
 #
 
 # endpoint variable - Has to be global
-APIENDPOINT={{ APIENDPOINT }}
+export APIENDPOINT={{ APIENDPOINT }}
 APIUSER={{ APIUSER }}
 APIPWD={{ APIPWD }}
 PBKDIR={{ PBKDIR }}
@@ -53,11 +53,11 @@ shift
 
 JUPPROC=$HOME/jupyter-procmail
 std0="$HOME/student0"
-accessToken=`get_session_token`
+export accessToken=`get_session_token`
 w=`get_workshop_name`
 # If that doesn't fail, then export the workshop name
 export w
-id=`get_workshop_id $w`
+export wid=`get_workshop_id $w`
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
@@ -79,18 +79,18 @@ if [ $action != "RESET" ]; then
 		generate_randompwd
 
 		# Some Notebooks need an LDAP passwd update as well
-		if [ _"`get_ldap_status $id`" != _"false" ]; then
+		if [ _"`get_ldap_status $wid`" != _"false" ]; then
 			update_ldap_passwd
 			create_var_passwd
 		fi
 		# Some Notebooks need to get the passwd for the user
-		if [ _"`get_varpass_status $id`" != _"false" ]; then
+		if [ _"`get_varpass_status $wid`" != _"false" ]; then
 			create_var_passwd
 		fi
 
 		if [ "$action" = "CREATE" ]; then
 			erase_student
-			compile=`get_compile_status $id`
+			compile=`get_compile_status $wid`
 			if [ _"$compile" = _"null" ]; then
                                 compile=""
                         fi
@@ -137,7 +137,7 @@ if [ $action != "RESET" ]; then
 				--request DELETE \
                                 "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server" 
 			#Get Worshop reset status to determine if users should be updated to inactive or not
-			if [ _"`get_reset_status $id`" = _"false" ]; then
+			if [ _"`get_reset_status $wid`" = _"false" ]; then
 				##Update student status to inactive
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   					--request PUT \
@@ -166,7 +166,7 @@ if [ $action != "RESET" ]; then
 elif [ "$action" = "RESET" ]; then
 	# Avoid concurrency with CLEANUP phase
 	sleep 10
-	if [ _"`get_reset_status $id`" = _"true" ]; then
+	if [ _"`get_reset_status $wid`" = _"true" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`
@@ -183,7 +183,7 @@ elif [ "$action" = "RESET" ]; then
 	        	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"capacity":"'$cap'"}' \
-  				"$APIENDPOINT/workshop/$id"
+  				"$APIENDPOINT/workshop/$wid"
 		else
 			teststdid $stdid
 			# We have a single value to manage
@@ -199,7 +199,7 @@ elif [ "$action" = "RESET" ]; then
 			generate_randompwd
 	
 			# Some Notebooks need an LDAP passwd update as well
-			if [ _"`get_ldap_status $id`" != _"false" ]; then
+			if [ _"`get_ldap_status $wid`" != _"false" ]; then
 				update_ldap_passwd
 			fi
 			((i=i-1))
