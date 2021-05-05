@@ -47,6 +47,13 @@
       when:
         - ansible_facts['distribution'] == "CentOS"
 
+    - name: Ensure there is no pre-existing docker.sock socket
+      become: yes
+      become_user: root
+      file:
+        path: /var/run/docker.sock
+        state: absent
+
     - name: Ensure all RPM required packages are installed
       become: yes
       become_user: root
