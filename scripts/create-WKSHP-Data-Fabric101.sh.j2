@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -x
+
+source {{ SCRIPTDIR }}/functions.sh
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Data-Fabric101'] }}
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+{{ SCRIPTDIR }}/reset-$w.sh
+{{ SCRIPTDIR }}/create-appliance.sh

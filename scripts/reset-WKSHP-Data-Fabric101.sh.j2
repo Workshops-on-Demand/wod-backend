@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -x
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Data-Fabric101'] }}
+{{ SCRIPTDIR }}/reset-appliance.sh
+
+exit 0
