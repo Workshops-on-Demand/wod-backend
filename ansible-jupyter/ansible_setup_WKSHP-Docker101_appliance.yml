@@ -47,6 +47,21 @@
       when:
         - ansible_facts['distribution'] == "CentOS"
 
+    - name: Disable Docker service
+      become: yes
+      become_user: root
+      systemd:
+        state: stopped
+        enabled: no
+        name: docker
+
+    - name: Disable Docker socket
+      become: yes
+      become_user: root
+      systemd:
+        state: stopped
+        name: docker.socket
+
     - name: Ensure there is no pre-existing docker.sock socket
       become: yes
       become_user: root

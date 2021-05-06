@@ -5,6 +5,8 @@ set -x
 source {{ SCRIPTDIR }}/functions.sh
 
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Docker101'] }}
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+{{ SCRIPTDIR }}/reset-$w.sh
 {{ SCRIPTDIR }}/create-appliance.sh
 
 NAME=dockerlab
@@ -63,9 +65,6 @@ cat > $TMPDIR/launch-$NAME << EOF
 cd $TMPDIR
 docker-compose up --build -d
 EOF
-
-# Stop/Remove existing content first - these commands could fail so protect with true from set -e
-{{ SCRIPTDIR }}/reset-$w.sh
 
 # Copy content and start container
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
