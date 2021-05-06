@@ -55,6 +55,7 @@ LDAPSRV: "172.17.70.9 ldapsrv4.hpedevlab.net ldapsrv4.etc.fr.comm.hpecorp.net"
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
 LDAPBASE: dc=hpedevlab,dc=net
+LDAPSRVIP: "172.17.70.9"
 
 # Postfix Port
 POSTPORT: "10027"
