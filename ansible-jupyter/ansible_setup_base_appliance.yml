@@ -1,8 +1,8 @@
 ---
-
 - name: Setup playbook for a generic appliance
   hosts: '{{ RTARGET }}'
   tasks:
+
     - name: Ensure that common packages are installed for repo setup
       become: yes
       become_user: root
@@ -108,7 +108,7 @@
       become: yes
       become_user: root
       template:
-        src: "{{ ansible_env.HOME }}/ldap.conf"
+        src: "{{ JUPPROC }}/ldap.conf.j2"
         dest: /etc/ldap.conf
         owner: root
         group: root
@@ -138,9 +138,37 @@
       become_user: root
       lineinfile:
         path: /etc/nsswitch.conf
-        regex: '^(passwd|shadow|group|netgroup|automount):(.*)$'
+        # idempotence: matching each time as long as there isn't ldap already in it
+        regex: '^({{ item }}):(?!ldap)$'
+        backrefs: yes
         line: '\1: ldap \2'
         state: present
+      with_items:
+        - passwd
+        - shadow
+        - group
+        - netgroup
+        - automount
+      when: LDAPSETUP == "1"
+
+    - name: Ensure LDAP RPM required packages are installed
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - nss-pam-ldapd
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+      when: LDAPSETUP == "1"
+
+    - name: Enable nslcd service
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: nslcd
       when: LDAPSETUP == "1"
 
     - name: Ensure Linux students users home dir exist
@@ -151,6 +179,7 @@
         owner: "{{ 'student%s' | format(item) }}"
         group: "{{ 'student%s' | format(item) }}"
         mode: 0750
+        state: directory
       loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
       when: LDAPSETUP == "1"
 
@@ -178,4 +207,3 @@
         default: yes
         state: present
       loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
-
