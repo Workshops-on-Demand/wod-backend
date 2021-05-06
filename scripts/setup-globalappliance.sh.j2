@@ -2,11 +2,21 @@
 
 #set -x
 
+source {{ SCRIPTDIR }}/functions.sh
+
+# Do we need LDAP setup or not
+if [ _"`get_ldap_status $wid`" != _"false" ]; then
+	echo "This is a setup with LDAP"
+	LDAPSETUP=1
+else
+	LDAPSETUP=0
+fi
+
 echo "Use ansible to setup generic remote appliance at $RTARGET"
-ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_base_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX"
+ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_base_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP"
 if [ -f "$JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml" ]; then
 	echo "Use ansible to setup specificities for $w on remote appliance $RTARGET"
-	ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX"
+	ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP"
 fi
 
 echo "Final script setup phase for $w on remote appliance $RTARGET"

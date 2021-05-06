@@ -1,0 +1,1 @@
+ldapsearch -x -h 16.31.84.48 -b dc=hpedevlab,dc=net -LLL "(uid=student*)"

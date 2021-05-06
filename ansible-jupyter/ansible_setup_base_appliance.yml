@@ -87,6 +87,7 @@
         state: present
         gid: "{{ item + GIDBASE }}"
       loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+      when: LDAPSETUP != "1"
 
     - name: Ensure Linux students users exists with their home dir
       become: yes
@@ -101,6 +102,57 @@
         uid: "{{ item + UIDBASE }}"
         group: "{{ 'student%s' | format(item) }}"
       loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+      when: LDAPSETUP != "1"
+
+    - name: Configure LDAP client 1/3
+      become: yes
+      become_user: root
+      template:
+        src: "{{ ansible_env.HOME }}/ldap.conf"
+        dest: /etc/ldap.conf
+        owner: root
+        group: root
+        mode: 0644
+      when: LDAPSETUP == "1"
+
+    - name: Configure LDAP client 2/3
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/openldap/ldap.conf
+        line: 'URI ldap://{{ LDAPSRVIP }}'
+        state: present
+      when: LDAPSETUP == "1"
+
+    - name: Configure LDAP client 3/3
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/openldap/ldap.conf
+        line: 'BASE {{ LDAPBASE }}'
+        state: present
+      when: LDAPSETUP == "1"
+
+    - name: Configure nsswitch.conf for LDAP client
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/nsswitch.conf
+        regex: '^(passwd|shadow|group|netgroup|automount):(.*)$'
+        line: '\1: ldap \2'
+        state: present
+      when: LDAPSETUP == "1"
+
+    - name: Ensure Linux students users home dir exist
+      become: yes
+      become_user: root
+      file:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        owner: "{{ 'student%s' | format(item) }}"
+        group: "{{ 'student%s' | format(item) }}"
+        mode: 0750
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+      when: LDAPSETUP == "1"
 
     - name: Setup ACL for students with jupyter account
       become: yes

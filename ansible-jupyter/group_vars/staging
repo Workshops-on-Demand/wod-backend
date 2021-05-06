@@ -50,8 +50,10 @@ HPEECPGWNAME: "gateway2.hpedevlab.net"
 
 #LDAP Server
 LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
+LDAPSRVIP: "16.31.84.48"
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
+LDAPBASE: dc=hpedevlab,dc=net
 
 # Postfix Port
 POSTPORT: "10026"
