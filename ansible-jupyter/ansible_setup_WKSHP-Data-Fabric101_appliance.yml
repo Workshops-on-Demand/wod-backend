@@ -1,0 +1,33 @@
+---
+
+- name: Setup Playbook for WKSHP-Data Fabric appliance
+  hosts: '{{ RTARGET }}'
+  tasks:
+    - name: Ensure all RPM required packages are installed
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - nfs-utils
+        - openldap-clients
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
+    - name: Enable RPC service
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: rpcbind
+
+    - name: Ensure NFS mount is setup
+      become: yes
+      become_user: root
+      ansible.posix.mount:
+        src: "mapr-nfs.etc.fr.comm.hpecorp.net:/mapr"
+        path: /mapr
+        opts: rw,nfsvers=3
+        state: mounted
+        fstype: nfs
