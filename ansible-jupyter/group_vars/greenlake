@@ -54,6 +54,7 @@ HPEECPGWNAME: "gateway4.hpedevlab.net"
 LDAPSRV: "172.17.70.9 ldapsrv4.hpedevlab.net ldapsrv4.etc.fr.comm.hpecorp.net"
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
+LDAPBASE: dc=hpedevlab,dc=net
 
 # Postfix Port
 POSTPORT: "10027"
