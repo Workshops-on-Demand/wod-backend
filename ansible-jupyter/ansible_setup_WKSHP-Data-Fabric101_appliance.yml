@@ -9,6 +9,7 @@
       package:
         pkg:
         - nfs-utils
+        - jq
         - openldap-clients
       when:
         - ansible_facts['distribution'] == "CentOS"
