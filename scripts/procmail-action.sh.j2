@@ -103,6 +103,10 @@ if [ $action != "RESET" ]; then
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
 			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			if [ -x "$JUPPROC/scripts/post-copy-$w.sh" ]; then
+				echo "Perform post actions for workshop $w"
+				$JUPPROC/scripts/post-copy-$w.sh
+			fi
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
