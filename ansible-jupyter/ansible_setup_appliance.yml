@@ -1,0 +1,6 @@
+---
+- hosts: '{{ RTARGET }}'
+  tasks:
+
+    - name: Base setup for a JupyterHub environment server or appliance
+      include: ansible_setup_base_appliance.yml
