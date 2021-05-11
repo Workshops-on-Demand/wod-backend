@@ -18,6 +18,14 @@
         msg: PBKDIR variable is empty ! Fat fingers ?!?
       when: PBKDIR is not defined
 
+    - name: check VARDIR exists
+      file:
+        path: "{{ VARDIR }}/pass"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0751
+
     - name: check variables file exists
       stat:
         path: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
@@ -28,16 +36,17 @@
         file: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
       when: variables_file.stat.exists
   
-    - name: check password file exists
-      stat:
-        path: "{{ VARDIR }}/variables_{{ WORKSHOP }}_pass.yml"
-      ignore_errors: true
-      register: pass_file
+     - name: check password file exists
+       stat:
+         path: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
+       ignore_errors: true
+       register: pass_file
+ 
+     - include_vars:
+         file: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
+       when: pass_file.stat.exists
+   
 
-    - include_vars:
-        file: "{{ VARDIR }}/variables_{{ WORKSHOP }}_pass.yml"
-      when: pass_file.stat.exists
-  
     # find all notebooks
     - name: find jupyter notebooks
       find:

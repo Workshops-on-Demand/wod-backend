@@ -114,7 +114,7 @@ EOF
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
-	ansible-vault encrypt_string --vault-password-file $JUPPROC/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $JUPPROC/ansible-jupyter/$PBKDIR/variables_${w}_pass.yml
+	ansible-vault encrypt_string --vault-password-file $JUPPROC/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $JUPPROC/ansible-jupyter/$PBKDIR/pass/variables_${w}_${stdid}.yml
 }
 
 # This function retuns the workshop name from the mail body
@@ -146,7 +146,7 @@ erase_student() {
 	fi
 }
 
-#this function creates a random password for a user, it is used for local and ldap users'passwords.
+# This function creates a random password for a user, it is used for local and ldap users'passwords.
 generate_randompwd() {
 
 	if [ _"$RANDOMPW" != _"" ]; then

@@ -9,5 +9,6 @@ scripts/*.x
 scripts/*.x.c
 jupyterhub.sqlite
 ansible-jupyter/*/*_pass.yml
+ansible-jupyter/*/*/*_pass.yml
 *.sw?
 ansible-jupyter/*/variables_WKSHP-OneView-Advanced.yml
