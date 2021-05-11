@@ -65,14 +65,14 @@
       mode: 0711
 
   - name: Use USERMIN for APPMIN if installing
-      set_fact:
-        APPMIN: "{{ USERMIN }}"
-      when: APPMIN is not defined
+    set_fact:
+      APPMIN: "{{ USERMIN }}"
+    when: APPMIN is not defined
 
   - name: Use USERMAX for APPMAX if installing
-      set_fact:
-        APPMAX: "{{ USERMAX }}"
-      when: APPMAX is not defined
+    set_fact:
+      APPMAX: "{{ USERMAX }}"
+    when: APPMAX is not defined
 
   - name: Remove Linux users and their home directory
     become: yes
