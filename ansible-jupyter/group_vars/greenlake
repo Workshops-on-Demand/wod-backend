@@ -5,7 +5,8 @@ JPHOSTEXT: notebooks4.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: b5a98d5edfee44fe8348400f856ae084
 BASESTDID: 4000
-APIENDPOINT: https://hackshackondemand.hpedev.io/api
+#APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIENDPOINT: https://hackshackchallenge.hpedev.io/api
 APIUSER: moderator
 APIPWD: CloudSystem$
 LDAPDMN: dc=hpedevlab,dc=net

@@ -41,6 +41,15 @@ ILOSYBASEPORT: "46000"
 IP-WKSHP-Docker101: undefined
 SSHPORT-WKSHP-Docker101: 14001
 WEBPORT-WKSHP-Docker101: 14101
+DATAFABRICAPISERVERIP: "16.31.85.156"
+DATAFABRICAPPLIANCEIP: "16.31.86.198"
+DATAFABRICVOL: "vol1"
+DATAFABRICSECVOL: "sec-vol1"
+DATAFABRICSNAPVOL: "snapvol1"
+DATAFABRICADGROUP: "data-fabric-users"
+DATAFABRICVOLSRCVOLNAME: "src-mirrvol1"
+DATAFABRICVOLDSTVOLNAME: "dst-mirrvol1"
+DATAFABRICCLUSTERAME: "mapr-cluster2.etc.fr.comm.hpecorp.net"
 
 #
 HPEECPCTRL: "16.31.84.36 haecpctrl haecpctrl.hpedevlab.net haecpctrl.etc.fr.comm.hpecorp.net"
