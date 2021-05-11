@@ -74,6 +74,11 @@
       APPMAX: "{{ USERMAX }}"
     when: APPMAX is not defined
 
+  - name: No LDAPSETUP during install
+    set_fact:
+      LDAPSETUP: "0"
+    when: LDAPSETUP is not defined
+
   - name: Remove Linux users and their home directory
     become: yes
     become_user: root
