@@ -1,8 +1,12 @@
 #!/bin/bash
-
 set -x
 
+source {{ SCRIPTDIR }}/functions.sh
+
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Data-Fabric101'] }}
+if [ _"`get_ldap_status $wid`" != _"false" ]; then
+	export LDAPSETUP=1
+fi
 {{ SCRIPTDIR }}/reset-appliance.sh
 
 exit 0

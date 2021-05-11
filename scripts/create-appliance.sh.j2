@@ -16,7 +16,8 @@ ssh $RTARGET mkdir -p $TMPDIR
 scp $TMPDIR/id_rsa.pub $RTARGET:$TMPDIR/
 HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ]; then
-	ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
+	# Avoid changing passwd in case of LDAP
+	[ -z ${LDAPSETUP+x} ] && ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	ssh $RTARGET sudo install -d -m 0700 -o student$stdid $HOMEDIR/.ssh
 	ssh $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
 	EXITVAL=0

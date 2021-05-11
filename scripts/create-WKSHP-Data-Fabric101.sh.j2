@@ -4,7 +4,30 @@ set -x
 
 source {{ SCRIPTDIR }}/functions.sh
 
+if [ _"`get_ldap_status $wid`" != _"false" ]; then
+	export LDAPSETUP=1
+fi
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Data-Fabric101'] }}
 # Start by cleaning up stuff - do it early as after we setup .ssh content
 {{ SCRIPTDIR }}/reset-$w.sh
 {{ SCRIPTDIR }}/create-appliance.sh
+
+# Setup sec-student for ssh connection
+HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
+HOMESECDIR=`ssh $RTARGET getent passwd sec-student$stdid | cut -d: -f6`
+if [ _"$HOMEDIR" != _"" ] && [ _"$HOMESECDIR" != _"" ]; then
+	ssh $RTARGET sudo install -d -m 0700 -o sec-student$stdid $HOMESECDIR/.ssh
+	ssh $RTARGET sudo install -m 0600 -o sec-student$stdid $HOMEDIR/.ssh/authorized_keys $HOMESECDIR/.ssh/authorized_keys
+else
+        echo "student$stdid or sec-student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
+        EXITVAL=-1
+fi
+TMPDIR=/tmp/app.$$
+mkdir -p $TMPDIR
+cat > $TMPDIR/config << EOF
+Host sec-appliance
+    Hostname $RTARGET
+    User sec-student$stdid
+EOF
+sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+rm -rf $TMPDIR

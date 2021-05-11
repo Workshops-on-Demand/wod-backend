@@ -32,3 +32,14 @@
         opts: rw,nfsvers=3
         state: mounted
         fstype: nfs
+
+    - name: Ensure Linux sec-students users home dir exist
+      become: yes
+      become_user: root
+      file:
+        path: "/student/{{ 'sec-student%s' | format(item) }}"
+        owner: "{{ 'sec-student%s' | format(item) }}"
+        group: "{{ 'sec-student%s' | format(item) }}"
+        mode: 0750
+        state: directory
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
