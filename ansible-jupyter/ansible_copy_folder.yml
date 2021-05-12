@@ -36,15 +36,15 @@
         file: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
       when: variables_file.stat.exists
   
-     - name: check password file exists
-       stat:
-         path: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
-       ignore_errors: true
-       register: pass_file
+    - name: check password file exists
+      stat:
+        path: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
+      ignore_errors: true
+      register: pass_file
  
-     - include_vars:
-         file: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
-       when: pass_file.stat.exists
+    - include_vars:
+        file: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
+      when: pass_file.stat.exists
    
 
     # find all notebooks
