@@ -4,9 +4,13 @@ scripts/functions.sh
 scripts/cleanup-users.sh
 scripts/reset-*.sh
 scripts/create-*.sh
+scripts/setup-*.sh
+scripts/post-*.sh
 scripts/*.shc
 scripts/*.x
 scripts/*.x.c
+scripts/*.sh.c
+scripts/*.sh.x.c
 jupyterhub.sqlite
 ansible-jupyter/*/*_pass.yml
 ansible-jupyter/*/*/*_pass.yml
