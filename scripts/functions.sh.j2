@@ -99,10 +99,14 @@ get_range_max() {
 # This function updates the LDAP passwd with $randompw for the student under management (using $stdid)
 update_ldap_passwd() {
 
+	# define that variable to overload the student name (used by sec-student e.g.)
+	if [ _"$LDAPSETUPUSER" = _"" ]; then
+		LDAPSETUPUSER="student"
+	fi
 	rm -f /tmp/ldif.$$
 	cat > /tmp/ldif.$$ << EOF
 #modify user password
-dn: uid=student$stdid,ou=People,{{ LDAPDMN }}
+dn: uid=$LDAPSETUPUSER$stdid,ou=People,{{ LDAPDMN }}
 changetype: modify
 replace: userPassword
 userPassword: $randompw

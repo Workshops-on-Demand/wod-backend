@@ -18,6 +18,9 @@ HOMESECDIR=`ssh $RTARGET getent passwd sec-student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ] && [ _"$HOMESECDIR" != _"" ]; then
 	ssh $RTARGET sudo install -d -m 0700 -o sec-student$stdid $HOMESECDIR/.ssh
 	ssh $RTARGET sudo install -m 0600 -o sec-student$stdid $HOMEDIR/.ssh/authorized_keys $HOMESECDIR/.ssh/authorized_keys
+	export LDAPSETUPUSER="sec-student"
+	update_ldap_passwd
+	export LDAPSETUPUSER=""
 else
         echo "student$stdid or sec-student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
         EXITVAL=-1
