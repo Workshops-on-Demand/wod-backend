@@ -152,7 +152,6 @@
       # find ldap if any and remove it
       regexp: '\bldap\b'
       replace: ''
-      state: present
     with_items:
       - passwd
       - shadow
