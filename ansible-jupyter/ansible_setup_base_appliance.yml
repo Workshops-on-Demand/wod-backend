@@ -144,15 +144,32 @@
       state: present
     when: LDAPSETUP == "1"
 
-  - name: Configure nsswitch.conf for LDAP client
+  - name: Configure nsswitch.conf for LDAP client 1/2
+    become: yes
+    become_user: root
+    replace:
+      path: /etc/nsswitch.conf
+      # find ldap if any and remove it
+      regex: '\bldap\b'
+      replace: ''
+      state: present
+    with_items:
+      - passwd
+      - shadow
+      - group
+      - netgroup
+      - automount
+    when: LDAPSETUP == "1"
+
+  - name: Configure nsswitch.conf for LDAP client 2/2
     become: yes
     become_user: root
     lineinfile:
       path: /etc/nsswitch.conf
-      # idempotence: matching each time as long as there isn't ldap already in it
-      regex: '^({{ item }}):(?!ldap)$'
+      # force ldap on that line
+      regex: '^({{ item }}):(\s+)(.+)$'
       backrefs: yes
-      line: '\1: ldap \2'
+      line: '\1:\2ldap \3'
       state: present
     with_items:
       - passwd
