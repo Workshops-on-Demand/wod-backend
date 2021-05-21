@@ -150,7 +150,7 @@
     replace:
       path: /etc/nsswitch.conf
       # find ldap if any and remove it
-      regex: '\bldap\b'
+      regexp: '\bldap\b'
       replace: ''
       state: present
     with_items:
@@ -167,7 +167,7 @@
     lineinfile:
       path: /etc/nsswitch.conf
       # force ldap on that line
-      regex: '^({{ item }}):(\s+)(.+)$'
+      regexp: '^({{ item }}):(\s+)(.+)$'
       backrefs: yes
       line: '\1:\2ldap \3'
       state: present
