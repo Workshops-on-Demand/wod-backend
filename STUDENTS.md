@@ -268,6 +268,16 @@ Last seat for speaker
 [1700] speaker for live sessions
 
 
+1701-1775 GreenLake VMAAS API 101
+
+[1701-1720] challenges  Location :  Greenlake
+
+[1721-1774] workshops Location :  Greenlake
+
+[1775] speaker for live sessions
+
+
+
 1900-2000 Jupyter Notebooks101
 
 [1900-1940] challenges  Location :  Grenoble

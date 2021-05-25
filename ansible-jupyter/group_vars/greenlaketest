@@ -1,0 +1,82 @@
+PBKDIR: greenlaketest
+JPHOST: jupyterhub5.etc.fr.comm.hpecorp.net
+JPIP: 172.17.70.15
+JPHOSTEXT: notebooks5.hpedev.io
+JPHUBAPISRV: http://{{ JPHOST }}:8000
+JPHUBTOKEN: b5a98d5edfee44fe8348400f856ae084
+BASESTDID: 4000
+#APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIENDPOINT: https://hackshackchallenge.hpedev.io/api
+APIUSER: moderator
+APIPWD: CloudSystem$
+LDAPDMN: dc=hpedevlab,dc=net
+#
+KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
+KIBANAPORT: "10022"
+#
+STACKSTORMSRVNAME: Stackstormsrv"
+STACKSTORMSRVIP: "172.17.70.8"
+STACKSTORMWEBUIPORT: "931"
+
+#
+IP-WKSHP-Docker101: 16.31.86.200
+SSHPORT-WKSHP-Docker101: 14001
+WEBPORT-WKSHP-Docker101: 14051
+IP-WKSHP-StackStorm101: 16.31.86.205
+IP-WKSHP-Data-Fabric101: 16.31.86.199
+
+
+VCENTERAPP: "esx-sta-vcenter.etc.fr.comm.hpecorp.net"
+VCENTERADMIN: "root"
+VCENTERPWD: "vmware"
+#
+# Used by Francois for Redfish notebooks
+REDFISHILO: "16.31.87.100 ilo5"
+# Virtual Machine containing Francois' OpenBMCs simulators
+OBMCSIMUIP: "16.31.86.77"
+OBMCSIMUNAME: "openbmcsimulators"
+OBMCSIMUACC: jupyter
+ILOSIMUIP: "16.31.86.81"
+ILOSIMUNAME: "ilo5simulators"
+ILOSIMUACC: jupyter
+SSHOBMCBASEPORT: "22000"
+OBMCBASEPORT: "44000"
+ILODLBASEPORT: "45000"
+ILOSYBASEPORT: "46000"
+
+#
+HPEECPCTRL: "16.31.84.38 controller4 controller4.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
+HPEECPCTRLIP: "16.31.84.38"
+HPEECPCTRLNAME: "controller4.etc.fr.comm.hpecorp.net"
+HPEECPGWIP: "16.31.84.37"
+HPEECPGWNAME: "gateway4.hpedevlab.net"
+
+#LDAP Server
+LDAPSRV: "172.17.70.9 ldapsrv4.hpedevlab.net ldapsrv4.etc.fr.comm.hpecorp.net"
+LDAPPWD: "CloudSystem$"
+LDAPPORT: "389"
+LDAPBASE: dc=hpedevlab,dc=net
+LDAPSRVIP: "172.17.70.9"
+
+# Postfix Port
+POSTPORT: "10028"
+
+#Oneview API Endpoints
+OVVMSIMU1: "GREEN1-HPEOneView-DCS_5.40"
+OVVMSIMU1IP: "16.31.86.247"
+OVVMSIMU1NAME: "ov31"
+OVVMSIMU1FQDN: "ov31.etc.fr.comm.hpecorp.net"
+OVVMSIMU2: "GREEN2-HPEOneView-DCS_5.40"
+OVVMSIMU2IP: "16.31.86.78"
+OVVMSIMU2NAME: "ov41"
+OVVMSIMU2FQDN: "ov41.etc.fr.comm.hpecorp.net"
+OVVMSIMU3: "GREEN3-HPEOneView-DCS_5.40"
+OVVMSIMU3IP: "16.31.86.62"
+OVVMSIMU3NAME: "ov52"
+OVVMSIMU3FQDN: "ov52.etc.fr.comm.hpecorp.net"
+OVVMSIMU4: "GREEN4-HPEOneView-DCS_5.40"
+OVVMSIMU4IP: "16.31.86.65"
+OVVMSIMU4NAME: "ov62"
+OVVMSIMU4FQDN: "ov62.etc.fr.comm.hpecorp.net"
+
+

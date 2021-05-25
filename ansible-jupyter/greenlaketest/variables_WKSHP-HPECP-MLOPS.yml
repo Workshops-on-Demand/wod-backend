@@ -1,0 +1,5 @@
+---
+substitutions:
+  - varname: PASSSTU
+    varsubst:
+      "826": F4S1nFNS
