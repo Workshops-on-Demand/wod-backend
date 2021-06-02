@@ -14,9 +14,9 @@ tenantname="K8sMLTenant" #case sensitive
 
 # fixed environment variables setup by the HPE ECP lab administrator - Please DO NOT MODIFY!!
 
-gateway_host="gateway2.etc.fr.comm.hpecorp.net"
+gateway_host="{{ HPEECPGWNAME }}"
 controller_endpoint="${gateway_host}:8080"
-Internet_access="notebooks.hpedev.io"
+Internet_access="{{ JPHOSTEXT }}"
 
 clusterName="jupyter-notebook-${studentId}"
 JupyterNotebookApp="cr-cluster-jupyter-notebook.yaml" # the Jupyter Notebook KD App manifest you will deploy to build your model
