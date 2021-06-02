@@ -8,7 +8,6 @@ BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 APIUSER: moderator
 APIPWD: CloudSystem$
-LDAPDMN: dc=hpedevlab,dc=net
 #
 KIBANAPWD: "3768d5a9-ecd4-439e-89cc-b4a2d8e4274a"
 KIBANAPORT: "10023"
@@ -64,7 +63,7 @@ LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
 LDAPSRVIP: "16.31.84.48"
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
-LDAPBASE: dc=hpedevlab,dc=net
+LDAPDMN: dc=hpedevlab,dc=net
 
 # Postfix Port
 POSTPORT: "10026"

@@ -9,7 +9,6 @@ BASESTDID: 4000
 APIENDPOINT: https://hackshackchallenge.hpedev.io/api
 APIUSER: moderator
 APIPWD: CloudSystem$
-LDAPDMN: dc=hpedevlab,dc=net
 #
 KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
 KIBANAPORT: "10022"
@@ -53,9 +52,9 @@ HPEECPGWNAME: "gateway4.hpedevlab.net"
 
 #LDAP Server
 LDAPSRV: "172.17.70.9 ldapsrv4.hpedevlab.net ldapsrv4.etc.fr.comm.hpecorp.net"
+LDAPDMN: dc=hpedevlab,dc=net
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
-LDAPBASE: dc=hpedevlab,dc=net
 LDAPSRVIP: "172.17.70.9"
 
 # Postfix Port

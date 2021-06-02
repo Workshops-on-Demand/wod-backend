@@ -140,7 +140,7 @@
     become_user: root
     lineinfile:
       path: /etc/openldap/ldap.conf
-      line: 'BASE {{ LDAPBASE }}'
+      line: 'BASE {{ LDAPDMN }}'
       state: present
     when: LDAPSETUP == "1"
 
