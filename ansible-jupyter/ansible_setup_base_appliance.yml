@@ -188,6 +188,12 @@
       - ansible_facts['distribution'] == "CentOS"
       - LDAPSETUP == "1"
 
+  - name: Setup authconfig for LDAP
+    become: yes
+    become_user: root
+    cmd: "authconfig-tui --enableldap --enableldapauth --ldapserver={{ LDAPSRVIP }} --ldapbasedn='{{ LDAPDMN }}' --disableldaptls --kickstart --update"
+    when: LDAPSETUP == "1"
+
   - name: Enable nslcd service
     become: yes
     become_user: root
