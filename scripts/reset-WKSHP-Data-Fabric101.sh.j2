@@ -1,12 +1,67 @@
 #!/bin/bash
 set -x
-
+###Reseting Appliance
+echo "Resetting Workshop appliance"
 source {{ SCRIPTDIR }}/functions.sh
 
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Data-Fabric101'] }}
 if [ _"`get_ldap_status $wid`" != _"false" ]; then
 	export LDAPSETUP=1
 fi
-{{ SCRIPTDIR }}/reset-appliance.sh
 
+###Reseting Mapr cluster volumes, snapshots, mirrors
+username="student$stdid" # your Data Fabric login credentials - username  
+password="$randompw" # your Data Fabric login credentials - password - 
+sec_username="sec-student$stdid" # your Data Fabric login credentials - sec username  
+sec_password="$randompw" # your Data Fabric login credentials - sec password - 
+apiserver_host="{{ DATAFABRICAPISERVERIP }}" # API Server for the Data Fabric Cluster
+ad_group="{{ DATAFABRICADGROUP }}" # LDAP Domain Group for Data Fabric users
+vol_name="{{ DATAFABRICVOL }}" # suffix for student volume name
+snapvol_name="{{ DATAFABRICSNAPVOL }}" # suffix for student snap volume name
+cluster_name="{{ DATAFABRICCLUSTERAME }}" # Data Fabric Cluster Name
+src_vol_name="{{ DATAFABRICVOLSRCVOLNAME }}" # suffix for student source mirror volume name
+dst_vol_name="{{ DATAFABRICVOLDSTVOLNAME }}"  # suffix for student destination mirror volume name
+secvol_name="{{ DATAFABRICSECVOL }}"  # suffix for student volume name used for security comparison / user access 
+
+
+
+##Deleting Lab1 volumes
+
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/remove?name='$username-$vol_name 
+
+##Deleting Lab2 snapshots
+#Listing Student snapshot and extracting right one
+snapid=$(ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/snapshot/list'| jq -r | grep -B 12 -A 2 ''$username-$snapvol_name'' | grep snapshotid | cut -c22-30)
+
+##Deleting LAB2 Snapshot
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/snapshot/remove?snapshots='$snapid
+
+##Deleting LAB2 Snapshot Associated Volume
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/remove?name='$username-$snapvol_name
+
+#Deleting Lab3 Mirror
+#Deleting Student Mirrors related snapshots
+#Deleting dstmirror
+snapdstmirrorid=$(ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/snapshot/list'| jq -r | grep -B 12 -A 2 ''$username-$dst_vol_name'' | grep snapshotid | cut -c22-30)
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/snapshot/remove?snapshots='$snapdstmirrorid
+
+#Deleting srcmirror
+snapsrcmirrorid=$(ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/snapshot/list'| jq -r | grep -B 12 -A 2 ''$username-$src_vol_name'' | grep snapshotid | cut -c22-30)
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/snapshot/remove?snapshots='$snapsrcmirrorid
+
+
+#Deleting Student Mirrors related volumes
+#Remove the Mirror Volume:
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/remove?name='$username-$dst_vol_name -force
+
+#Removing the Source Volume:
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/remove?name='$username-$src_vol_name -force
+
+#Deleting Lab4 volumes
+ssh $RTARGET curl -k --user $username:$randompw -X POST 'https://'$apiserver_host':8443/rest/volume/remove?name='$username-$secvol_name 
+
+
+
+
+{{ SCRIPTDIR }}/reset-appliance.sh
 exit 0
