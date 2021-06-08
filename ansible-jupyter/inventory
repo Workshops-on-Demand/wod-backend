@@ -11,6 +11,9 @@ jupyterhub3.etc.fr.comm.hpecorp.net
 [greenlake]
 jupyterhub4.etc.fr.comm.hpecorp.net
 
+[greenlaketest]
+jupyterhub5.etc.fr.comm.hpecorp.net
+
 [prod]
 jupyterhub.etc.fr.comm.hpecorp.net
 
