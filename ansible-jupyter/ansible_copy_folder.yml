@@ -46,7 +46,6 @@
         file: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
       when: pass_file.stat.exists
    
-
     # find all notebooks
     - name: find jupyter notebooks
       find:
@@ -105,6 +104,15 @@
         src: "{{ item.path }}"
         dest: "{{ item.path | regex_replace(STD0DIR, STDDIR + '/student' + STDID) }}"
       with_items: "{{ notebooks.files }}"
+
+    - name: Create fix symlink to variable README
+      become: yes
+      become_user: root
+      file:
+        src: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
+        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/0-ReadMeFirst.ipynb"
+        state: link
+        #force: yes
 
     - name: Adapt owner/group/modes for target workshop
       become: yes
