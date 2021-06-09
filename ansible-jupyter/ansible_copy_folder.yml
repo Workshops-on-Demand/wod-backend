@@ -86,9 +86,36 @@
         #| .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
         #with_items: "{{ notebooks.files }}"
         #when: item.path is not search("Variables.ps1")
+        
+    - name: Purge potential remaining workshop (no CLEANUP done)
+      become: yes
+      become_user: root
+      file:
+        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        state: absent
  
-    # Synchronize target students with student0 Workshop content
-    - name: synchronize master folder
+    - name: Create workspace directory for jupyter
+      become: yes
+      become_user: root
+      file:
+        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces"
+        state: directory
+        owner: student{{ STDID }}
+        group: student{{ STDID }}
+        mode: 0751
+        recurse: true
+
+    - name: Deliver workspace setup to point to README
+      become: yes
+      become_user: root
+      template:
+        src: "{{ JUPPROC }}/lab-a511.jupyterlab-workspace.j2"
+        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/lab-a511.jupyterlab-workspace"
+        owner: student{{ STDID }}
+        group: student{{ STDID }}
+        mode: 0644
+
+    - name: Synchronize target students with student0 Workshop content
       ansible.posix.synchronize:
         src: "{{ STD0DIR }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
@@ -105,14 +132,21 @@
         dest: "{{ item.path | regex_replace(STD0DIR, STDDIR + '/student' + STDID) }}"
       with_items: "{{ notebooks.files }}"
 
-    - name: Create fix symlink to variable README
-      become: yes
-      become_user: root
+    - name: Create a checkpoint directory
       file:
+        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0751
+
+    - name: Create a checkpoint file for the user
+      copy:
         src: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
-        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/0-ReadMeFirst.ipynb"
-        state: link
-        #force: yes
+        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
+        owner: jupyter
+        group: jupyter
+        mode: 0644
 
     - name: Adapt owner/group/modes for target workshop
       become: yes
