@@ -12,7 +12,7 @@ scripts/*.x.c
 scripts/*.sh.c
 scripts/*.sh.x.c
 jupyterhub.sqlite
-ansible-jupyter/*/*_pass.yml
-ansible-jupyter/*/*/*_pass.yml
+ansible-jupyter/prod/pass/variables_*.yml
+prod/pass/variables_*.yml
+ansible-jupyter/prod/variables_*.yml
 *.sw?
-ansible-jupyter/*/variables_WKSHP-OneView-Advanced.yml
