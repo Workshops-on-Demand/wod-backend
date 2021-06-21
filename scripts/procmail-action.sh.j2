@@ -127,12 +127,12 @@ if [ $action != "RESET" ]; then
   				--data '{"active": "true"}' \
   				"$APIENDPOINT/customer/$userid"
 			##Start Student jupyterhub dedicated server
-			#curl --header "Content-Type: application/json" \
-			#	--header "Authorization: token {{ JPHUBTOKEN }}" \
-                        #        --location \
-                        #        --request POST \
-			#	--data-raw '{}' \
-                        #        "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+			curl --header "Content-Type: application/json" \
+				--header "Authorization: token {{ JPHUBTOKEN }}" \
+                                --location \
+                                --request POST \
+				--data-raw '{}' \
+                                "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 
 		elif [ "$action" = "CLEANUP" ]; then
 			#Delete Student jupyterhub dedicated server
