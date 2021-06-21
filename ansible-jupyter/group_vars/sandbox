@@ -63,8 +63,11 @@ HPEECPGWNAME: "gateway1.hpedevlab.net"
 
 #LDAP Server
 LDAPSRV: "192.168.10.228 ldapsrv02.hp.local"
+LDAPSRVIP: "192.168.10.228"
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
+LDAPDMN: dc=hp,dc=local
+
 
 # Postfix Port
 POSTPORT: "10025"
