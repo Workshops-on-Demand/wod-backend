@@ -68,6 +68,8 @@ HPEECPCTRLIP: "16.31.84.38"
 HPEECPCTRLNAME: "controller4.etc.fr.comm.hpecorp.net"
 HPEECPGWIP: "16.31.84.37"
 HPEECPGWNAME: "gateway4.hpedevlab.net"
+HPEECPK8S101PORT: "9911"
+
 
 #LDAP Server
 LDAPSRV: "172.17.70.9 ldapsrv4.hpedevlab.net ldapsrv4.etc.fr.comm.hpecorp.net"

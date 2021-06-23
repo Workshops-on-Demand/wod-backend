@@ -62,6 +62,7 @@ HPEECPCTRLIP: "16.31.84.36"
 HPEECPCTRLNAME: "haecpctrcl.etc.fr.comm.hpecorp.net"
 HPEECPGWIP: "16.31.84.46"
 HPEECPGWNAME: "haecpgtw.etc.fr.comm.hpecorp.net"
+HPEECPK8S101PORT: "9911"
 
 #LDAP Server
 LDAPSRV: "16.31.84.50 ldapsrv02.hpedevlab.net ldapsrv02.etc.fr.comm.hpecorp.net"
