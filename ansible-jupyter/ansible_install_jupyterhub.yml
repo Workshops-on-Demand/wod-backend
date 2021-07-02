@@ -239,6 +239,9 @@
         - powershell_kernel
         - redfish
         - jupyter-docx-bundler
+        - pyaoscx
+        - requests
+        - PyYAML
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -287,6 +290,9 @@
         - powershell_kernel
         - redfish
         - jupyter-docx-bundler
+        - requests
+        - pyaoscx
+        - PyYAML
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -415,6 +421,9 @@
 
     - name: Install HPE OneView collection in virtualenv
       shell: . '{{ JPHUB }}/bin/activate' && {{ JPHUB }}/bin/ansible-galaxy collection install -p {{ JPHUB }}/{{ python_lib }} hpe.oneview
+
+    - name: Install AOS-CX Ansible Collection  in virtualenv
+      shell: . '{{ JPHUB }}/bin/activate' && {{ JPHUB }}/bin/ansible-galaxy collection install -p {{ JPHUB }}/{{ python_lib }} arubanetworks.aoscx
 
     - name: Remove former kernel files installed locally
       file:

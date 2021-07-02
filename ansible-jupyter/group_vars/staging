@@ -58,7 +58,15 @@ HPEECPCTRLIP: "16.31.84.73"
 HPEECPCTRLNAME: "controller3.etc.fr.comm.hpecorp.net"
 HPEECPGWIP: "16.31.84.37"
 HPEECPGWNAME: "gateway2.hpedevlab.net"
-HPEECPK8S101PORT: "9912"
+HPEECPK8S101PORT: 9912
+
+#SPIFFE-SPIRE
+SPIFFEPORT: "142"
+
+
+#ARUBA
+ARUBAADMIN: "admin"
+ARUBAADMINPWD: "admin123"
 
 #LDAP Server
 LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
