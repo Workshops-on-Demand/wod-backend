@@ -140,6 +140,14 @@
         group: jupyter
         mode: 0751
 
+    - name: Copy the generate-pdf script in the workshop dir
+      copy:
+        src: "{{ JUPPROC }}/scripts/generate-pdf.sh"
+        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/generate-pdf.sh"
+        owner: student{{ STDID }}
+        group: student{{ STDID }}
+        mode: 0755
+
     - name: Create a checkpoint file for the user
       copy:
         src: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"

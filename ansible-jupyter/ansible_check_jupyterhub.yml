@@ -282,6 +282,7 @@
         - procmail-action.sh
         - test-action.sh
         - cleanup-users.sh
+        - cleanup-processes.sh
         - functions.sh
         - get-cloudvol-token.shc
 
@@ -314,6 +315,29 @@
         user: root
         job: "/usr/local/bin/upd"
         cron_file: upd
+        state: present
+
+    - name: Install the cleanup-processes script
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ SCRIPTDIR }}/cleanup-processes.sh"
+        dest: /usr/local/bin/cleanup-processes
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Setup weekly process cleanup
+      become: yes
+      become_user: root
+      cron:
+        name: cleanup-processes
+        minute: "{{ 59 | random(seed=inventory_hostname) }} "
+        hour: "04"
+        weekday: "0"
+        user: root
+        job: "/usr/local/bin/cleanup-processes"
+        cron_file: cleanup-processes
         state: present
 
     - name: Install the deliver script

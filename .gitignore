@@ -12,7 +12,7 @@ scripts/*.x.c
 scripts/*.sh.c
 scripts/*.sh.x.c
 jupyterhub.sqlite
-ansible-jupyter/prod/pass/variables_*.yml
-prod/pass/variables_*.yml
-ansible-jupyter/prod/variables_*.yml
+ansible-jupyter/*/pass/variables_*.yml
+ansible-jupyter/*/variables_*.yml
+*/pass/variables_*.yml
 *.sw?
