@@ -1,0 +1,7 @@
+#!/bin/bash
+# Cleanup remaining processes
+
+ids=`ps -aux | grep /jupyter | grep -vE '^jupyter|^root' | grep -E ' [JFMASOND][a-z][a-z][0-9][0-9] ' | awk '{ print $2 '}`
+if [ _"$ids" != _"" ]; then
+	sudo kill $ids
+fi
