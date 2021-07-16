@@ -443,6 +443,20 @@
         line: "sshCommand = ssh -i ~/.ssh/id_jupproc -F /dev/null"
         insertafter: '^\s+logallrefupdates'
 
+    - name: Ensure that required nbconvert directories exists
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0755
+      with_items:
+        - /usr/local/share/jupyter/nbconvert/
+        - /usr/local/share/jupyter/nbconvert/templates/
+        - /usr/local/share/jupyter/nbconvert/templates/html/
+        - /usr/local/share/jupyter/nbconvert/templates/latex/
+        - /opt/jupyterhub/share/jupyter/nbconvert/templates/html/
+
     - name: Remove existing jupyter users
       command:
         cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ JPHUBAPISRV }}/hub/api/users/{{ 'student%s' | format(item) }}"

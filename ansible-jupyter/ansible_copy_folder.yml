@@ -141,6 +141,8 @@
         mode: 0751
 
     - name: Copy the generate-pdf script in the workshop dir
+      become: yes
+      become_user: root
       copy:
         src: "{{ JUPPROC }}/scripts/generate-pdf.sh"
         dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/generate-pdf.sh"
