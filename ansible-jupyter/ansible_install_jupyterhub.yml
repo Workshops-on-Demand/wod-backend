@@ -241,6 +241,7 @@
         - jupyter-docx-bundler
         - pyaoscx
         - requests
+        - mpi4py
         - PyYAML
         state: absent
         virtualenv: "{{ JPHUB }}"
@@ -292,6 +293,7 @@
         - jupyter-docx-bundler
         - requests
         - pyaoscx
+        - mpi4py
         - PyYAML
         state: present
         virtualenv: "{{ JPHUB }}"
