@@ -96,6 +96,37 @@ get_range_max() {
 	echo "$ret"
 }
 
+# This function creates a  GreenLake Central user using studentid and  password (stdid and randompwd) for GreenLake Based Workshops
+create_greenlake_user() {
+
+        # Get Studentid Group id API Call
+        ret1=`curl -s --header "Authorization: {{ GREENLAKE_TOKEN }}" --header "Content-Type: application/json" '{{ GREENLAKE_API_URL }}/scim/v2/Groups?count=0&cursor=string&filter=displayName%20sw'"student$stdid" `
+        echo "$ret1"
+
+        # Create Studentxxx and Get glc_user_id API Call
+        ret2=`curl -s --location --request POST --header "Authorization: {{ GREENLAKE_TOKEN }}" --header "Content-Type: application/json" \
+                   --data "{ \"schemas\": [ [ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\" ] ], \"userName\": \"student$stdid\", \"password\": \"$randompw\", \"displayName\": \"student$stdid\", \"name\": { \"familyName\": \"student\", \"givenName\": \"$stdid\" }, \"emails\": [ { \"primary\": false, \"type\": \"SECONDARY\", \"value\": \"student$stdid@hpedev.io\" } ], \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\": { \"sendEmail\": true, \"changePassword\": true } }" '{{ GREENLAKE_API_URL }}/scim/v2/Users'  |jq -r '.id'`
+        echo "$ret2"
+
+        # Add Studentxxx  to Group Studentxxx using  glc_user_id  Group Studentxxx id  API Call
+	ret3=`curl -s --location --request POST --header "Authorization: {{ GREENLAKE_TOKEN }}" --header "Content-Type: application/json" \
+                   --data "{'userID': $ret2}" "{{ GREENLAKE_API_URL }}/iam/scim/v1/extensions/tenant/$ret1/Groups/$ret2/users"`
+        echo "$ret3"
+
+}
+# This function deletes a  GreenLake Central user using studentid and  password (stdid and randompwd) for GreenLake Based Workshops
+delete_greenlake_user() {
+
+        # Get Studentid from student list
+        ret1=`curl -s --header "Authorization: {{ GREENLAKE_TOKEN }}" --header "Content-Type: application/json" '{{ GREENLAKE_API_URL }}/scim/v2/Users?count=0&cursor=string&filter=userName%20sw'"student$stdid" `
+        echo "$ret1"
+
+        # Delete Studentid
+        ret2=`curl -s --location --request POST --header "Authorization: {{ GREENLAKE_TOKEN }}" --header "Content-Type: application/json" "{{ GREENLAKE_API_URL }}/scim/v2/Users/$ret1"`
+        echo "$ret2"
+}
+
+
 # This function updates the LDAP passwd with $randompw for the student under management (using $stdid)
 update_ldap_passwd() {
 
