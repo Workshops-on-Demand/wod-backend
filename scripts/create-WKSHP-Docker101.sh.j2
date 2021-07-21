@@ -18,8 +18,7 @@ mkdir -p $TMPDIR
 cat > $TMPDIR/Dockerfile << EOF
 FROM ${NAME}:latest
 RUN mkdir -p /student/student$stdid
-RUN addgroup docker
-RUN adduser student$stdid -D -G docker -h /student/student$stdid
+RUN useradd student$stdid -G docker -d /student/student$stdid
 # Used: perl -e 'use Crypt::PasswdMD5; print crypt("Redfish@TSS19", "\$6\$rl1WNGdr\$"),"\n"' to create the Password
 # Unlock the account
 RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
@@ -30,6 +29,7 @@ RUN chmod 700 .ssh
 COPY authorized_keys .ssh
 RUN chmod 600 .ssh/authorized_keys
 RUN chown -R student$stdid:docker /student/student$stdid/.ssh
+COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/sbin/sshd && /usr/local/bin/dockerd-entrypoint.sh
 # Would require dind-rootless but with that one I'm unable to install with apk packages. To be looked at.
 #USER student$stdid
@@ -49,6 +49,9 @@ Host $RTARGET
 EOF
 sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
 
+# Look at https://stackoverflow.com/questions/34264348/docker-inside-docker-container
+# and http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
+# For security consider using https://github.com/nestybox/sysbox
 cat > $TMPDIR/docker-compose.yml << EOF
 version: '3.5'
 services:
@@ -59,6 +62,8 @@ services:
     ports:
       - "$webport:80"
       - "$sshport:22"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
 EOF
 cat > $TMPDIR/launch-$NAME << EOF
 #!/bin/bash
@@ -70,7 +75,7 @@ EOF
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo cp /student/student$stdid/.ssh/authorized_keys $TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo chmod 644 $TMPDIR/authorized_keys
-scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $RTARGET:$TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME {{ SCRIPTDIR }}/dockerd-entrypoint.sh $RTARGET:$TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'

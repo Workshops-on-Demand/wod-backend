@@ -70,9 +70,21 @@ cat > ssh_host_ed25519_key.pub << EOF
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMRPco7kT8a0K0rWKGZEMFPn8kbE6vYfYSyaOI8ACB89
 EOF
 
+DCKBASE="centos:7"
+cat > docker.repo << 'EOF'
+[docker]
+baseurl = https://download.docker.com/linux/centos/$releasever/$basearch/stable
+name = Upstream Docker Yum repository
+enabled=1
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+EOF
 cat > Dockerfile << EOF
-FROM docker:dind
-RUN apk add perl openssh sudo curl docker-compose
+FROM $DCKBASE
+COPY docker.repo /etc/yum.repos.d/docker.repo
+RUN yum install -y perl openssh openssh-server sudo curl epel-release
+# Only available once EPEL is there
+RUN yum install -y docker-compose docker-ce
 COPY ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
 COPY ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 COPY ssh_host_ecdsa_key /etc/ssh/ssh_host_ecdsa_key
@@ -85,5 +97,5 @@ EOF
 # Clean before
 docker container prune -f
 docker image prune -f
-docker rmi docker:dind ${NAME}:latest
+docker rmi $DCKBASE ${NAME}:latest
 docker build -t $NAME .
