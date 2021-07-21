@@ -1,0 +1,81 @@
+#!/bin/bash
+
+set -x
+
+source {{ SCRIPTDIR }}/functions.sh
+
+# Change to its own appliance when in production
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Notebooks-CCPE'] }}
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+{{ SCRIPTDIR }}/reset-$w.sh
+{{ SCRIPTDIR }}/create-appliance.sh
+
+NAME=ccpelab
+TMPDIR=/tmp/$NAME.$stdid
+
+mkdir -p $TMPDIR
+
+cat > $TMPDIR/Dockerfile << EOF
+FROM ${NAME}:latest
+RUN mkdir -p /student/student$stdid
+RUN useradd student$stdid -G docker -d /student/student$stdid
+# Used: perl -e 'use Crypt::PasswdMD5; print crypt("Redfish@TSS19", "\$6\$rl1WNGdr\$"),"\n"' to create the Password
+# Unlock the account
+RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
+RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+WORKDIR /student/student$stdid
+RUN mkdir .ssh
+RUN chmod 700 .ssh
+COPY authorized_keys .ssh
+RUN chmod 600 .ssh/authorized_keys
+RUN chown -R student$stdid:docker /student/student$stdid/.ssh
+ENTRYPOINT /usr/sbin/sshd
+USER student$stdid
+EOF
+
+echo wid=$wid
+APPMIN=`get_range_min $wid`
+echo stdid=$stdid
+echo APPMIN=$APPMIN
+sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Notebooks-CCPE'] }}))
+webport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['WEBPORT-WKSHP-Notebooks-CCPE'] }}))
+
+# Adapt the ssh config for the student
+cat > $TMPDIR/config << EOF
+Host $RTARGET
+    Port $sshport
+EOF
+sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+
+# Look at https://stackoverflow.com/questions/34264348/docker-inside-docker-container
+# and http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
+# For security consider using https://github.com/nestybox/sysbox
+cat > $TMPDIR/docker-compose.yml << EOF
+version: '3.5'
+services:
+  $NAME$stdid:
+    image: ${NAME}$stdid
+    build: .
+    privileged: true
+    ports:
+      - "$webport:80"
+      - "$sshport:22"
+EOF
+cat > $TMPDIR/launch-$NAME << EOF
+#!/bin/bash
+cd $TMPDIR
+docker-compose up --build -d
+EOF
+
+# Copy content and start container
+ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo cp /student/student$stdid/.ssh/authorized_keys $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo chmod 644 $TMPDIR/authorized_keys
+scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME {{ SCRIPTDIR }}/dockerd-entrypoint.sh $RTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
+
+# Cleanup
+ssh -q {{ NOCHECKSSH }} $RTARGET rm -rf $TMPDIR
+rm -rf $TMPDIR

@@ -277,6 +277,15 @@ Last seat for speaker
 [1775] speaker for live sessions
 
 
+1776-1850 HPE Cray CCPE 101
+
+[1776-1795] challenges  Location :  Greenlake
+
+[1796-1849] workshops Location :  Greenlake
+
+[1850] speaker for live sessions
+
+
 
 1900-2000 Jupyter Notebooks101
 
