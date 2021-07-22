@@ -24,8 +24,8 @@ EOF
 cat > $TMPDIR/Dockerfile << EOF
 FROM cray/hpe_cpe_lab:1.5
 USER root
-RUN mkdir -p /student/student$stdid
-RUN useradd student$stdid -d /student/student$stdid
+RUN mkdir -p /student
+RUN useradd -m -d /student/student$stdid student$stdid 
 # Used: perl -e 'use Crypt::PasswdMD5; print crypt("Redfish@TSS19", "\$6\$rl1WNGdr\$"),"\n"' to create the Password
 # Unlock the account
 RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
@@ -37,6 +37,8 @@ COPY authorized_keys .ssh
 RUN chmod 600 .ssh/authorized_keys
 RUN chown -R student$stdid:users /student/student$stdid/.ssh
 COPY entrypoint.sh /entrypoint.sh
+# Fix a bug onSLES for the jupyter ssh kernel
+RUN mv /etc/profile /etc/profile.sav
 ENTRYPOINT sudo /entrypoint.sh
 USER student$stdid
 EOF
