@@ -156,6 +156,9 @@ EOF
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
+	if [ ! -d "$JUPPROC/ansible-jupyter/$PBKDIR/pass" ]; then
+		mkdir -p $JUPPROC/ansible-jupyter/$PBKDIR/pass
+	fi
 	ansible-vault encrypt_string --vault-password-file $JUPPROC/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $JUPPROC/ansible-jupyter/$PBKDIR/pass/variables_${w}_${stdid}.yml
 }
 
