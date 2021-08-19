@@ -52,7 +52,7 @@ fi
 shift
 
 JUPPROC=$HOME/jupyter-procmail
-std0="$HOME/student0"
+export std0="$HOME/student0"
 export accessToken=`get_session_token`
 w=`get_workshop_name`
 # If that doesn't fail, then export the workshop name
