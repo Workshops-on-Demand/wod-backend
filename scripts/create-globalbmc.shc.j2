@@ -3,6 +3,8 @@
 # This script creates the BMC simulators in the VMs
 # associated to the student. 
 
+# Version 0.3 
+
 KITPATH=/usr/kits
 KITPATHVM=$KITPATH/VMs/OpenBMC
 KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
@@ -18,6 +20,7 @@ FWDPORTSSH=$(({{ SSHOBMCBASEPORT }}+$stdid))
 FWDPORTHTTPS=$(({{ OBMCBASEPORT }}+$stdid))
 FWDPORTRF=$(({{ ILODLBASEPORT }}+$stdid))
 FWDPORTRFSY=$(({{ ILOSYBASEPORT }}+$stdid))
+FWDPORTRFSDF=$(({{ RMCBASEPORT }}+$stdid))
 
 # Kill a potential qemu process remaining for ilo or openbmcsimulators
 $script
@@ -28,6 +31,8 @@ ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} cp -a $KITPATHVM/flash-p
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
 
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5-Sy480 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5-Sy480
+
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/rmc $KITPATH/VMs/RedfishMockups/student$stdid-rmc
 
 
 # Start Obmc and ilo5 simulators
@@ -52,3 +57,13 @@ nohup python3 redfishMockupServer.py  \
     --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
     --host {{ ILOSIMUIP }} --port ${FWDPORTRFSY} \
     -D $KITPATH/VMs/RedfishMockups/student$stdid-ilo5-Sy480  > /dev/null 2>&1 &"
+
+
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
+nohup python3 redfishMockupServer.py  \
+    --ssl \
+    --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --host {{ ILOSIMUIP }} --port ${FWDPORTRFSY} \
+    -D $KITPATH/VMs/RedfishMockups/student$stdid-rmc  > /dev/null 2>&1 &"
+

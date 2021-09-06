@@ -61,6 +61,7 @@ SSHOBMCBASEPORT: "22000"
 OBMCBASEPORT: "44000"
 ILODLBASEPORT: "45000"
 ILOSYBASEPORT: "46000"
+RMCBASEPORT: "47000"
 
 #
 HPEECPCTRL: "16.31.84.38 controller4 controller4.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
