@@ -70,7 +70,7 @@ SPIFFEPORT: "142"
 
 #ARUBA
 ARUBAADMIN: "admin"
-ARUBAADMINPWD: "admin123"
+ARUBAADMINPWD: "Arubacx$"
 
 #LDAP Server
 LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
