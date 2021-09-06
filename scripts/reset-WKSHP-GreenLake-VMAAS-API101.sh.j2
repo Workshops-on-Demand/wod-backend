@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -x
-source function.sh
-delete_greenlake_user() 
+source {{ SCRIPTDIR }}/functions.sh
+generate_greenlake_token
+sleep 5
+delete_greenlake_user
 

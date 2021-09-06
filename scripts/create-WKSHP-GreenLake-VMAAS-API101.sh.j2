@@ -1,6 +1,10 @@
 #!/bin/bash
 
 set -x
-source function.sh
-create_greenlake_user() 
+source {{ SCRIPTDIR }}/functions.sh
+echo "Generating GreenLake Service Client API Token"
+generate_greenlake_token 
+sleep 5
+echo "Creating GreenLake User"
+create_greenlake_user
 

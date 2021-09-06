@@ -219,13 +219,20 @@ Last seat for speaker
 
 
 
-1326-1400 Aruba API Yourself
+1326-1336 Aruba-Python-SDK
 
-[1326-1345] Challenges
+[1326-1336] workshops Location :  Mougins 
 
-[1346-1399] workshops Location :  Mougins   (requires Video for replay) https://www.yammer.com/hpe.com/#/files/xxxxx
+[1326] Speakers SMES
 
-[1400] Speakers SMES
+
+
+1337-1347 Aruba-???
+
+[1337-1347] workshops Location :  Mougins 
+
+[1337] Speakers SMES
+
 
 
 
@@ -286,10 +293,19 @@ Last seat for speaker
 [1850] speaker for live sessions
 
 
+1851-1925 Data Fabric 201
 
-1900-2000 Jupyter Notebooks101
+[1851-1875] challenges  Location :  Grenoble
 
-[1900-1940] challenges  Location :  Grenoble
+[1876-1924] workshops Location :  Mougins
+
+[1925] speaker for live sessions
+
+
+
+1926-2000 Jupyter Notebooks101
+
+[1926-1940] challenges  Location :  Grenoble
 
 [1941-1999] workshops Location :  Mougins
 
