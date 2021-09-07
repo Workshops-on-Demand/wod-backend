@@ -3,7 +3,7 @@
 # This script creates the BMC simulators in the VMs
 # associated to the student. 
 
-# Version 0.3 
+# Version 0.31 
 
 KITPATH=/usr/kits
 KITPATHVM=$KITPATH/VMs/OpenBMC
@@ -64,6 +64,6 @@ nohup python3 redfishMockupServer.py  \
     --ssl \
     --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
     --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
-    --host {{ ILOSIMUIP }} --port ${FWDPORTRFSY} \
+    --host {{ ILOSIMUIP }} --port ${FWDPORTRFSDF} \
     -D $KITPATH/VMs/RedfishMockups/student$stdid-rmc  > /dev/null 2>&1 &"
 
