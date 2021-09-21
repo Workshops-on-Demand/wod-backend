@@ -10,16 +10,16 @@ fi
 # push student content into approprate git repo/branch
 mkdir -p $HOME/repo
 cd $HOME/repo
-rm -rf HPEECPSC.$stdid
-git clone git@github.com:sdcgsolutionslab/HPEECPSC.git HPEECPSC.$stdid
-cd HPEECPSC.$stdid
+rm -rf HPEECPGPU.$stdid HPEECPSC.$stdid
+git clone git@github.com:sdcgsolutionslab/HPEECPGPU.git HPEECPGPU.$stdid
+cd HPEECPGPU.$stdid
 git checkout student$stdid
 ret=$?
 if [ $ret -ne 0 ]; then
 	# branch doesn't exist
 	git checkout -b student$stdid
 fi
-cd HPEECPSC.$stdid
+cd HPEECPGPU.$stdid
 sudo cp /student/student$stdid/$w/Code/NYCTaxi/* .
 git add *
 git commit -m 'update values'
