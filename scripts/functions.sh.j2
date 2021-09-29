@@ -103,17 +103,31 @@ get_range_max() {
 	echo "$ret"
 }
 
+# This function generates a  GreenLake Central Token to be used for GreenLake Functions to reset Workshop Environment
+generate_greenlake_reset_token() {
+
+	export greenlake_reset_token=$(curl -s --location --request POST \
+'{{ GREENLAKE_IAM_API_URL }}/oauth2/{{ GREENLAKE_TENANT_ID }}/{{ GREENLAKE_IAM_ID }}/v1/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id={{ GREENLAKE_RESET_CLIENTID }}' \
+--data-urlencode 'client_secret={{ GREENLAKE_RESET_CLIENTSECRET }}' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'scope=hpe-tenant'| jq -r '.access_token')
+}
+
+
+
 # This function generates a  GreenLake Central Token to be used for other GreenLake Functions like user creation or deletion
 generate_greenlake_token() {
 
 	 export greenlake_token=$(curl -s --location --request POST \
-  https://iam.us1.greenlake-hpe.com/identity/v1/token \
+		 {{ GREENLAKE_IAM_API_URL }}/identity/v1/token \
   -H 'Content-Type: application/json' \
   -d '{
-    "client_id": "0oaaprw150pFReWZE357",
-    "client_secret": "ICq4GAxKwV88vSKNm0XvgUrnr_K0TjLNHMPC6gRV",
+    "client_id": "{{ GREENLAKE_CLIENTID }}",
+    "client_secret": "{{ GREENLAKE_CLIENTSECRET }}",
     "grant_type": "client_credentials",
-    "tenant_id": "buu0lcj6alfdq0ajli4g"
+    "tenant_id": "{{ GREENLAKE_TENANT_ID }}"
 }' | jq -r '.access_token')
 }
 
@@ -122,18 +136,18 @@ generate_greenlake_token() {
 create_greenlake_user() {
 
         # Get Studentid Group id API Call
-         ret1=`curl -s --header "Authorization: $greenlake_token" --header "Content-Type: application/json" "{{ GREENLAKE_API_URL }}/scim/v2/Groups?filter=displayName%20sw%20HPEDEV-HackShack-vmaas-workshop-student$stdid" |jq -r .Resources[].id`
+         ret1=`curl -s --header "Authorization: $greenlake_token" --header "Content-Type: application/json" "{{ GREENLAKE_IAM_API_URL }}/scim/v2/Groups?filter=displayName%20sw%20HPEDEV-HackShack-vmaas-workshop-student$stdid" |jq -r .Resources[].id`
          echo "Group Student$stdid id : $ret1"
 
 
         # Create Studentxxx and Get glc_user_id API Call
         ret2=`curl -s --location --request POST --header "Authorization: $greenlake_token" --header "Content-Type: application/scim+json" \
-                   --data "{ \"schemas\": [ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\" ], \"userName\": \"student$stdid@hpedev.io\", \"password\": \"$randompw$randompw\", \"displayName\": \"student$stdid\", \"name\": { \"familyName\": \"student$stdid\", \"givenName\": \"student$stdid\" }, \"emails\": [{ \"primary\": true, \"type\": \"PRIMARY\", \"value\": \"student$stdid@hpedev.io\"}, {\"primary\": false, \"type\": \"SECONDARY\", \"value\": \"hpedev.hackshack@hpe.com\" }], \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\": { \"sendEmail\": false, \"changePassword\": false } }" "{{ GREENLAKE_API_URL }}/scim/v2/Users" |jq -r '.id'`
+                   --data "{ \"schemas\": [ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\" ], \"userName\": \"student$stdid@hpedev.io\", \"password\": \"$randompw$randompw\", \"displayName\": \"student$stdid\", \"name\": { \"familyName\": \"student$stdid\", \"givenName\": \"student$stdid\" }, \"emails\": [{ \"primary\": true, \"type\": \"PRIMARY\", \"value\": \"student$stdid@hpedev.io\"}, {\"primary\": false, \"type\": \"SECONDARY\", \"value\": \"hpedev.hackshack@hpe.com\" }], \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\": { \"sendEmail\": false, \"changePassword\": false } }" "{{ GREENLAKE_IAM_API_URL }}/scim/v2/Users" |jq -r '.id'`
         echo "Student$stid GreenLake user_id: $ret2"
 
         # Add Studentxxx  to Group Studentxxx using  glc_user_id  Group Studentxxx id  API Call
         ret3=`curl -s --location --request PATCH --header "Authorization: $greenlake_token" --header 'Content-Type: application/scim+json' \
-		--data "{ \"schemas\": [ \"string\" ], \"operations\": [{\"op\": \"add\", \"path\": \"members\", \"value\": \"$ret2\"}]}" "https://iam.us1.greenlake-hpe.com/scim/v2/Groups/$ret1"`
+		--data "{ \"schemas\": [ \"string\" ], \"operations\": [{\"op\": \"add\", \"path\": \"members\", \"value\": \"$ret2\"}]}" "{{ GREENLAKE_IAM_API_URL }}/scim/v2/Groups/$ret1"`
         echo "$ret3"
 
 
@@ -142,16 +156,16 @@ create_greenlake_user() {
 delete_greenlake_user() {
 
         # Get Studentid from student list
-	ret1=`curl -s --header "Authorization: $greenlake_token" --header "Content-Type: application/json" "{{ GREENLAKE_API_URL }}//scim/v2/Users?count=200&filter=userName%20sw%20%22student$stdid%40hpedev.io%22&sortBy=name.givenName&sortOrder=asc" |jq -r  .Resources[].id`
+	ret1=`curl -s --header "Authorization: $greenlake_token" --header "Content-Type: application/json" "{{ GREENLAKE_IAM_API_URL }}//scim/v2/Users?count=200&filter=userName%20sw%20%22student$stdid%40hpedev.io%22&sortBy=name.givenName&sortOrder=asc" |jq -r  .Resources[].id`
         echo "Student$stid GreenLake user_id: $ret1"
  
 	# Deactivate student using  Studentid
-        ret2=`curl -s --location --request POST --header "Authorization: $greenlake_token" --header "Content-Type: application/scim+json" --data '[object DeactivateUser]' "{{ GREENLAKE_API_URL }}/scim/v2/Users/$ret1/lifecycle/deactivate?sendEmail=false" `
+        ret2=`curl -s --location --request POST --header "Authorization: $greenlake_token" --header "Content-Type: application/scim+json" --data '[object DeactivateUser]' "{{ GREENLAKE_IAM_API_URL }}/scim/v2/Users/$ret1/lifecycle/deactivate?sendEmail=false" `
         echo "$ret2"
 
 
         # Delete student using Studentid
-        ret3=`curl -s --location --request  DELETE --header "Authorization: $greenlake_token" --header "Content-Type: application/json" "{{ GREENLAKE_API_URL }}/scim/v2/Users/$ret1"`
+        ret3=`curl -s --location --request  DELETE --header "Authorization: $greenlake_token" --header "Content-Type: application/json" "{{ GREENLAKE_IAM_API_URL }}/scim/v2/Users/$ret1"`
         echo "$ret3"
 }
 

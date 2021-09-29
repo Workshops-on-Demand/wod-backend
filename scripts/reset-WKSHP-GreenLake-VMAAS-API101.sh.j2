@@ -2,6 +2,54 @@
 
 set -x
 source {{ SCRIPTDIR }}/functions.sh
+
+
+echo "student id is" $stdid
+
+generate_greenlake_reset_token
+
+#### Reseting Student Environmnet  in case of leftovers
+
+# Getting Student VM id:
+vmid=$(curl -s -X GET \
+"{{ GREENLAKE_CLIENT_URL }}?max=25&space=HPEDEV%20HackShack%20workshops&location=HPE&max=25&name=vm-student$stdid-api" \
+-H "Authorization: $greenlake_reset_token" | jq -r '.instances[0].id' )
+
+echo 'student vm is id' $vmid
+
+
+## Deleting vm instance
+
+
+echo "Deleting your student VM now"
+
+curl -s -X DELETE "{{ GREENLAKE_CLIENT_URL }}/$vmid?space=HPEDEV%20HackShack%20workshops&location=HPE&force=on" \
+-H "Authorization: $greenlake_reset_token" \
+-H "Content-Type: application/json"
+
+
+# Deleting Student$stdid Clone VM:
+# Getting clone vm id
+clonevmid=$(curl -s -X GET \
+"{{ GREENLAKE_CLIENT_URL }}?max=25&space=HPEDEV%20HackShack%20workshops&location=HPE&max=25&name=clone-vm-student$stdid-api" \
+-H "Authorization: $greenlake_reset_token" | jq -r '.instances[0].id' )
+
+
+echo 'student clone vm id is'$clonevmid
+
+
+## Deleting clone vm instance
+
+
+echo "Deleting your student clone instance now"
+
+curl -s -X DELETE "{{ GREENLAKE_CLIENT_URL }}/$clonevmid?space=HPEDEV%20HackShack%20workshops&location=HPE&force=on" \
+-H "Authorization: $greenlake_reset_token" \
+-H "Content-Type: application/json"
+
+
+# Deleting Student Users
+
 generate_greenlake_token
 sleep 5
 delete_greenlake_user
