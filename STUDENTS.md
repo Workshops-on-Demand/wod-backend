@@ -275,13 +275,19 @@ Last seat for speaker
 [1700] speaker for live sessions
 
 
-1701-1775 GreenLake VMAAS API 101
+1701-1735 GreenLake VMAAS API 101
 
-[1701-1720] challenges  Location :  Greenlake
+[1701-1735] workshops Location :  Greenlake
 
-[1721-1774] workshops Location :  Greenlake
+[1735] speaker for live sessions
+
+
+1736-1775 GreenLake VMAAS API Advanced
+
+[1736-1775] workshops Location :  Greenlake
 
 [1775] speaker for live sessions
+
 
 
 1776-1850 HPE Cray CCPE 101
