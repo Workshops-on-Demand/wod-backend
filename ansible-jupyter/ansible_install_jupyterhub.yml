@@ -196,6 +196,7 @@
         - libc6-dev
         - nfs-common
         - libcrypt-passwdmd5-perl
+        - libopenmpi-dev
       when:
         - ansible_facts['os_family'] == "Debian"
 
@@ -212,6 +213,7 @@
         - nfs-utils
         - zeromq-devel
         - perl-Crypt-PasswdMD5
+        - openmpi-devel
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] == "7"
@@ -293,8 +295,17 @@
         - jupyter-docx-bundler
         - requests
         - pyaoscx
-        - mpi4py
         - PyYAML
+        state: present
+        virtualenv: "{{ JPHUB }}"
+        virtualenv_command: "{{ virtualenv_command }}"
+
+    - name: Ensure all required pip mpi packages are installed
+      environment:
+        CC: /usr/lib64/openmpi/bin/mpicc
+      pip:
+        name:
+        - mpi4py
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
