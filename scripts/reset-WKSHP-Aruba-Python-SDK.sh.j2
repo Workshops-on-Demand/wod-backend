@@ -1,0 +1,28 @@
+#!/usr/local/bin/pwsh
+#
+#Get Studentid to match Arubasw ip
+#student1326 = 16.31.85.161
+#Data is stored in /jupyter-procmail/ansible-jupyter/staging/variables_WKSHP-Aruba-SDK.yml file
+#$Env:stdid
+#
+# script to reset Aruba  backend
+#Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
+#
+Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -DisplayDeprecationWarnings $false -Scope AllUsers -Confirm:$false
+
+$servername = "{{ VCENTERAPP }}"
+$username = "{{ VCENTERADMIN }}"
+$password = "{{ VCENTERPWD }}"
+#Reverting student Aruba Simulator 1 VM
+#Set Vm name as variable
+#$vmsimu1 = STA-Arubaoscx-$Env:stdid
+echo "reverting vm $vmsimu1 to snapshot"
+#-------------------------------------------------------------
+#Connect to Vcenter appliance :
+connect-viserver $servername -username $username -password $password
+#Get snapshot name from VMs
+$snap1 = Get-Snapshot -VM  {{ PBKDIR }}-Arubaoscx-$Env:stdid
+#Revert to snapshot
+#Reverting snap $snap1"
+Set-VM -VM  {{ PBKDIR }}-Arubaoscx-$Env:stdid -SnapShot $snap1 -Confirm:$false
+exit
