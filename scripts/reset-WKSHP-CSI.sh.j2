@@ -14,8 +14,8 @@ password="$randompw" # your HPE CP tenant login credentials - password
 ##
 ## fixed environment variables setup by the HPE CP lab administrator
 ##
-controller_endpoint="gateway1.hpedevlab.net:8080"
-gateway_host="gateway1.hpedevlab.net"
+controller_endpoint="{{ HPEECPCTRLNAME }}:8080"
+gateway_host="{{ HPEECPGWNAME }}"
 tenantname="CSITenant$stdid"
 k8sClusterId="3"  #this is the K8s Cluster Id provided by the HPE CP admisnistrator and assigned to your K8s tenant.
 echo "your operation context is:" $username "on tenant" $tenantname 

@@ -120,14 +120,18 @@ Last seat for speaker
   
 
 
-751-825 RedfishAnsible (Using the iLO Redfish API with Ansible and OneView)
-
-[751-775] Challenges 
+776-825 RedfishAnsible (Using the iLO Redfish API with Ansible and OneView)
 
 [776-824] workshops Location :  Mougins   (requires Video for replay) 
 
 [825] Speakers SMES 
 
+
+751-775 Superdome flex 101
+
+[751-775] workshop location : Mougins
+
+[775] Speaker SMES 
   
 
 
@@ -234,11 +238,13 @@ Last seat for speaker
 [1337] Speakers SMES
 
 
+1401-1420 Securing Microservice Communication with Envoy using X.509 SPIFFE IDs
+
+[1401-1420] workshops  Location :  Mougins
 
 
-1401-1475 SPIFFE-SPIRE
 
-[1401-1420] challenges  Location :  Grenoble
+1421-1475 SPIFFE-SPIRE
 
 [1421-1474] workshops Location :  Mougins
 
