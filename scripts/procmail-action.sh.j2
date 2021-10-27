@@ -135,6 +135,9 @@ if [ $action != "RESET" ]; then
                                 "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 
 		elif [ "$action" = "CLEANUP" ]; then
+			# Keep completion status
+			get_wod_completion_ratio >> $HOME/.mail/completion.log
+
 			#Delete Student jupyterhub dedicated server
 			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
                                 --location \

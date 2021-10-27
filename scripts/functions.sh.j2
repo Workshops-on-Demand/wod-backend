@@ -237,3 +237,17 @@ generate_randompwd() {
 	fi
 	echo "student$stdid:$randompw" | sudo chpasswd
 }
+
+# This function calculates a completion ratio at the end of a  workshop-on-demand.
+get_wod_completion_ratio() {
+
+	cd $stddir/
+	when=$(date +"%Y-%m-%d %H:%m:%S")
+	what=$(ls | grep WKSHP)
+	who=student$stdid
+	total=$(grep execution_count $what/*.ipynb  | wc -l)
+	missed=$(grep execution_count $what/*.ipynb  | grep null | wc -l)
+	done=$((total-missed))
+	completion=$((done*100/total))
+	echo "date:$when,user:$who,workshop:$what,completion:$completion%"
+}
