@@ -9,7 +9,7 @@ APIENDPOINT: https://hackshackondemand.hpedev.io/api
 APIUSER: moderator
 APIPWD: CloudSystem$
 #
-KIBANAPWD: "3768d5a9-ecd4-439e-89cc-b4a2d8e4274a"
+KIBANAPWD: "6ec13a7d-f862-40cf-bb88-63d803e3a701"
 KIBANAPORT: "10023"
 #
 STACKSTORMSRVNAME: "sta-stackstorm"

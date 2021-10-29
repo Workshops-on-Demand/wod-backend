@@ -12,7 +12,7 @@ APIPWD: CloudSystem$
 LDAPDMN: dc=hpedevlab,dc=net
 LDAPSRVIP: "16.31.84.50"
 #
-KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
+KIBANAPWD: "7c28feb9-30d6-4b58-8736-93c2a076d692"
 KIBANAPORT: "10022"
 #
 #
