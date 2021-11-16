@@ -51,6 +51,7 @@ kubectl config current-context
 
 
 echo "Deleting all PVC, Volumessnapshots in the studentSstdid tenant csitenant$stdid "
+kubectl delete pods,rs,deploy --all -n csitenant$stdid
 kubectl delete all,pvc,volumesnapshots --all -n csitenant$stdid
 
 ##Close the login session
