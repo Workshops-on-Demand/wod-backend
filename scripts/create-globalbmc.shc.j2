@@ -21,6 +21,7 @@ FWDPORTHTTPS=$(({{ OBMCBASEPORT }}+$stdid))
 FWDPORTRF=$(({{ ILODLBASEPORT }}+$stdid))
 FWDPORTRFSY=$(({{ ILOSYBASEPORT }}+$stdid))
 FWDPORTRFSDF=$(({{ RMCBASEPORT }}+$stdid))
+FWDPORTRMCGUI=$(({{ RMCGUIBASEPORT }}+$stdid))
 
 # Kill a potential qemu process remaining for ilo or openbmcsimulators
 $script
@@ -34,8 +35,9 @@ ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/Redfish
 
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/rmc $KITPATH/VMs/RedfishMockups/student$stdid-rmc
 
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }}  sed -i -e "s?http://localhost:8000?https://{{ JPHOSTEXT }}:${FWDPORTRFSDF}?g"  $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist/index.js
 
-# Start Obmc and ilo5 simulators
+# Start Obmc, ilo5 and SDF simulators
 ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
         -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
         -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FWDPORTHTTPS}-:443,hostname=qemu-student$stdid \
@@ -65,5 +67,8 @@ nohup python3 redfishMockupServer.py  \
     --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
     --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
     --host {{ ILOSIMUIP }} --port ${FWDPORTRFSDF} \
-    -D $KITPATH/VMs/RedfishMockups/student$stdid-rmc  > /dev/null 2>&1 &"
+    -D $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/data  > /dev/null 2>&1 &"
 
+ssh {{ NOCHECKSSH }}  {{ ILOSIMUACC }}@{{ ILOSIMUIP }}  "cd $KITPATHRF ; source ../bin/activate ; \
+cd $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist ; \
+nohup python3 -m http.server --bind {{ ILOSIMUIP }} ${FWDPORTRMCGUI} &>/dev/null & " 

@@ -9,16 +9,18 @@ KITPATH=/usr/kits
 KITPATHMOCKUPS=$KITPATH/VMs/RedfishMockups
 SSHOBMC="ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }}"
 SSHMOCKUPS="ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ ILOSIMUIP }}"
+FWDPORTRMCGUI=$(({{ RMCGUIBASEPORT }}+$stdid))
 
 echo "stdid: $stdid"
-# Kill a potential qemu process remaining
+# Kill a potential qemu/iLO/RMC simulators processes remaining
 $SSHOBMC     pkill -f qemu-student$stdid
 $SSHMOCKUPS  pkill -f student$stdid-ilo5
 $SSHMOCKUPS  pkill -f student$stdid-ilo5-Sy480
 $SSHMOCKUPS  pkill -f student$stdid-rmc
 
 # Remove/cleanup Redfish mockups.
-# This is needed to make sure new Mockups are effectively deployed.
+# This is needed to make sure new Mockups are effectively deployed 
+# during the next student infra instanciation.
 $SSHMOCKUPS "[ -d $KITPATHMOCKUPS/student$stdid-ilo5-Sy480 ]" && \
    $SSHMOCKUPS "rm -r $KITPATHMOCKUPS/student$stdid-ilo5-Sy480"
 
