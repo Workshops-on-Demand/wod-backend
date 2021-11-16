@@ -256,6 +256,9 @@
         - PyYAML
         - findspark
         - pyvmomi
+        - paramiko
+        - pycentral
+        - jwt
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -309,6 +312,9 @@
         - PyYAML
         - findspark
         - pyvmomi
+        - paramiko
+        - pycentral
+        - jwt
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
