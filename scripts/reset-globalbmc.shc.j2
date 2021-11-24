@@ -3,7 +3,7 @@
 # This script kills the OpenBMC and iLO 5 simulators in the corresponding VMs
 # associated to the student. It removes as well the associated Redfish mockups if any.
 
-# Version 0.31
+# Version 0.32
 
 KITPATH=/usr/kits
 KITPATHMOCKUPS=$KITPATH/VMs/RedfishMockups
@@ -17,6 +17,8 @@ $SSHOBMC     pkill -f qemu-student$stdid
 $SSHMOCKUPS  pkill -f student$stdid-ilo5
 $SSHMOCKUPS  pkill -f student$stdid-ilo5-Sy480
 $SSHMOCKUPS  pkill -f student$stdid-rmc
+$SSHMOCKUPS  pkill -f  ${FWDPORTRMCGUI}
+$SSHMOCKUPS  pkill -f  "http.server.*${FWDPORTRMCGUI}"
 
 # Remove/cleanup Redfish mockups.
 # This is needed to make sure new Mockups are effectively deployed 
