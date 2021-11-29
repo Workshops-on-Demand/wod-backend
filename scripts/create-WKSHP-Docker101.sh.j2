@@ -28,7 +28,7 @@ RUN mkdir .ssh
 RUN chmod 700 .ssh
 COPY authorized_keys .ssh
 RUN chmod 600 .ssh/authorized_keys
-RUN chown -R student$stdid:docker /student/student$stdid/.ssh
+RUN chown -R student$stdid:docker /student/student$stdid
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/sbin/sshd && /usr/local/bin/dockerd-entrypoint.sh
 # Would require dind-rootless but with that one I'm unable to install with apk packages. To be looked at.

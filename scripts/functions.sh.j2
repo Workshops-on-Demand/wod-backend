@@ -179,7 +179,8 @@ update_ldap_passwd() {
 	fi
 	rm -f /tmp/ldif.$$
 	cat > /tmp/ldif.$$ << EOF
-#modify user password
+
+# modify user password
 dn: uid=$LDAPSETUPUSER$stdid,ou=People,{{ LDAPDMN }}
 changetype: modify
 replace: userPassword
