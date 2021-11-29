@@ -35,7 +35,17 @@
     - include_vars:
         file: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
       when: variables_file.stat.exists
-  
+
+    - name: check GreenLake API CLient variables file exists
+      stat:
+        path: "{{ ansible_env.HOME }}/tmp/ac-student{{ STDID }}.yml"
+      ignore_errors: true
+      register: greenlake_api_client_file
+
+    - include_vars:
+        file: "{{ ansible_env.HOME }}/tmp/ac-student{{ STDID }}.yml"
+      when: greenlake_api_client_file.stat.exists
+
     - name: check password file exists
       stat:
         path: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"

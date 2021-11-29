@@ -107,6 +107,7 @@ if [ $action != "RESET" ]; then
 				echo "Perform post actions for workshop $w"
 				$JUPPROC/scripts/post-copy-$w.sh
 			fi
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
@@ -151,7 +152,8 @@ if [ $action != "RESET" ]; then
   					--data '{"assigned":"false"}' \
   					"$APIENDPOINT/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
-				erase_student
+	 			erase_student
+				cleanup_processes_student
 			else
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   					--request PUT \
@@ -231,6 +233,7 @@ elif [ "$action" = "RESET" ]; then
 			stdid=$((j-{{ BASESTDID }}))
 			stddir="/student/student$stdid"
 			erase_student
+			cleanup_processes_student
 			((j=j-1))
 		done
 	fi

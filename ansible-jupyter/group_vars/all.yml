@@ -16,10 +16,19 @@ TEMPTOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJuYW1lIjoi
 NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 GREENLAKE_IAM_API_URL: https://iam.us1.greenlake-hpe.com
 GREENLAKE_IAM_ID: ausanc3firBcvcYdT357
-GREENLAKE_CLIENTID: 0oaaprw150pFReWZE357
-GREENLAKE_CLIENTSECRET: ICq4GAxKwV88vSKNm0XvgUrnr_K0TjLNHMPC6gRV
+GREENLAKE_CLIENTID: 0oadwjzzjzZwh9Ui4357
+GREENLAKE_CLIENTSECRET: k48iU5ZfD4TodDDkAc5XXnaRGHhU1_mk-H6TFIZc
 GREENLAKE_RESET_API_URL: https://iam.us1.greenlake-hpe.com
 GREENLAKE_RESET_CLIENTID: 0oacejkw87PnnOpx6357
 GREENLAKE_RESET_CLIENTSECRET: 74bDXIHbJUAiwEUoqeCrAQeI1eI1DCQzrOWuSO6z
 GREENLAKE_TENANT_ID: buu0lcj6alfdq0ajli4g
 GREENLAKE_CLIENT_URL: https://client.greenlake.hpe.com/api/iac-vmaas/v1/instances
+GREENLAKE_API_CLIENT_URL: https://iam.us1.greenlake-hpe.com
+GREENLAKE_HACKSHACK_SPACE_ID: f282cf90-7c59-4a92-a4da-6ee3dbba37c8
+ARUBA_AUTHENTICATION_USER_URL: https://app1-apigw.central.arubanetworks.com/oauth2/authorize/central/api/login?
+ARUBA_AUTHENTICATION_TOKEN_URL: https://apigw-prod2.central.arubanetworks.com/oauth2/token? 
+ARUBA_CLIENTID: xxxxxx
+ARUBA_CLIENTSECRET: yyyyyyyy
+ARUBA_TOKEN_USERNAME: hpe.hackshack@protonmail.com
+ARUBA_TOKEN_PASSWORD: Aruba@100
+
