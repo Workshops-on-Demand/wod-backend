@@ -30,7 +30,7 @@ COPY authorized_keys .ssh
 RUN chmod 600 .ssh/authorized_keys
 RUN chown -R student$stdid:docker /student/student$stdid
 COPY dockerd-entrypoint.sh /usr/local/bin/
-ENTRYPOINT /usr/sbin/sshd && /usr/local/bin/dockerd-entrypoint.sh
+ENTRYPOINT /usr/sbin/sshd && /usr/sbin/httpd && /usr/local/bin/dockerd-entrypoint.sh
 # Would require dind-rootless but with that one I'm unable to install with apk packages. To be looked at.
 #USER student$stdid
 EOF
@@ -40,7 +40,7 @@ APPMIN=`get_range_min $wid`
 echo stdid=$stdid
 echo APPMIN=$APPMIN
 sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Docker101'] }}))
-webport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['WEBPORT-WKSHP-Docker101'] }}))
+export webport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['WEBPORT-WKSHP-Docker101'] }}))
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
@@ -60,7 +60,7 @@ services:
     build: .
     privileged: true
     ports:
-      - "$webport:80"
+      - "$webport:$webport"
       - "$sshport:22"
 #    volumes:
 #      - /var/run/docker.sock:/var/run/docker.sock
