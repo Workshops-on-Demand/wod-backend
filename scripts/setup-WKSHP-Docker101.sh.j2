@@ -82,7 +82,7 @@ EOF
 cat > Dockerfile << EOF
 FROM $DCKBASE
 COPY docker.repo /etc/yum.repos.d/docker.repo
-RUN yum install -y perl openssh openssh-server sudo curl epel-release httpd
+RUN yum install -y perl openssh openssh-server sudo curl epel-release vsftpd
 # Only available once EPEL is there
 RUN yum install -y docker-compose docker-ce
 COPY ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
@@ -92,7 +92,8 @@ COPY ssh_host_ecdsa_key.pub /etc/ssh/ssh_host_ecdsa_key.pub
 COPY ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
 COPY ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ed25519_key.pub
 RUN chmod 600 /etc/ssh/ssh_host_*
-RUN curl https://download.nextcloud.com/server/releases/nextcloud-22.1.1.zip -o /var/www/html/nextcloud-22.1.1.zip
+RUN curl https://download.nextcloud.com/server/releases/nextcloud-22.1.1.zip -o /var/ftp/pub/nextcloud-22.1.1.zip
+RUN perl -pi -e 's|^local_enable=YES|#local_enable=YES|; s|^write_enable=YES|#write_enable=YES|; s|^local_umask=022|#local_umask=022|' /etc/vsftpd/vsftpd.conf
 EOF
 
 # Clean before

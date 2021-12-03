@@ -1,0 +1,126 @@
+---
+  - name: Setup Docker repo for RPM
+    become: yes
+    become_user: root
+    yum_repository:
+      name: docker
+      baseurl: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
+      description: "Upstream Docker Yum repository"
+      enabled: yes
+      state: present
+    when:
+      - ansible_facts['distribution'] == "CentOS"
+
+  - name: Setup Docker repo for APT
+    become: yes
+    become_user: root
+    apt_repository:
+      repo: deb https://apt.dockerproject.org/repo debian-stretch main
+      state: present
+    when:
+     - ansible_facts['distribution'] == "Ubuntu"
+     - ansible_facts['distribution_major_version'] == "20"
+
+  - name: Ensure no existing docker pkg is installed
+    become: yes
+    become_user: root
+    package:
+      pkg:
+      - docker-client
+      - docker-common
+      - docker
+      - docker-engine
+      - docker-compose
+      state: absent
+
+  - name: Ensure all APT required packages are installed
+    become: yes
+    become_user: root
+    package:
+      pkg:
+      - docker-engine
+      - docker-compose
+    when:
+     - ansible_facts['distribution'] == "Ubuntu"
+     - ansible_facts['distribution_major_version'] == "20"
+
+  - name: Add Docker GPG Key to RPM DB
+    become: yes
+    become_user: root
+    rpm_key:
+      key: "{{ item }}"
+      state: present
+    with_items:
+      - https://download.docker.com/linux/centos/gpg
+    when:
+      - ansible_facts['distribution'] == "CentOS"
+
+  - name: Disable Docker service
+    register: service_stop
+    become: yes
+    become_user: root
+    failed_when:
+      - '"Could not find the requested service" not in service_stop.stdout'
+      - service_stop.rc != 0
+    systemd:
+      state: stopped
+      enabled: no
+      name: docker
+
+  - name: Disable Docker socket
+    register: service_stop
+    become: yes
+    become_user: root
+    failed_when:
+      - '"Could not find the requested service" not in service_stop.stdout'
+      - service_stop.rc != 0
+    systemd:
+      state: stopped
+      enabled: no
+      name: docker.socket
+
+  - name: Ensure there is no pre-existing docker.sock socket
+    become: yes
+    become_user: root
+    file:
+      path: /var/run/docker.sock
+      state: absent
+
+  - name: Ensure all RPM required packages are installed
+    become: yes
+    become_user: root
+    package:
+      pkg:
+      - docker-ce
+      - docker-compose
+    when:
+      - ansible_facts['distribution'] == "CentOS"
+
+  - name: Enable Docker service
+    become: yes
+    become_user: root
+    systemd:
+      state: started
+      daemon_reload: yes
+      enabled: yes
+      name: docker
+
+  - name: Ensure jupyter user belong to the docker group
+    become: yes
+    become_user: root
+    user:
+      name: "jupyter"
+      state: present
+      append: yes
+      groups: "docker"
+
+  - name: Ensure Linux students users belong to the docker group
+    become: yes
+    become_user: root
+    user:
+      name: "{{ 'student%s' | format(item) }}"
+      state: present
+      append: yes
+      groups: "docker"
+    loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+
