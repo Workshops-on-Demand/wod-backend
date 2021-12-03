@@ -1,0 +1,7 @@
+# /etc/fail2ban/jail.local
+[jupyterhub]
+enabled = true
+port = 443
+filter = jupyterhub
+backend = systemd
+maxretry = 3

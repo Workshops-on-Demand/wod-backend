@@ -206,6 +206,7 @@
         - nfs-common
         - libcrypt-passwdmd5-perl
         - libopenmpi-dev
+        - fail2ban
       when:
         - ansible_facts['os_family'] == "Debian"
 
@@ -223,6 +224,7 @@
         - zeromq-devel
         - perl-Crypt-PasswdMD5
         - openmpi-devel
+        - fail2ban-all
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] == "7"
@@ -627,6 +629,35 @@
         daemon_reload: yes
         enabled: yes
         name: postfix
+
+    - name: Configure fail2ban filter
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ JUPPROC }}/fail2ban.conf"
+        dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Configure fail2ban jail
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ JUPPROC }}/fail2ban.jail"
+        dest: "/etc/fail2ban/jail.local"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Enable fail2ban
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: fail2ban
 
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the jupyter-notebook git repo
