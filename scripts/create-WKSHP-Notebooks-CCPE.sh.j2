@@ -63,7 +63,7 @@ APPMIN=`get_range_min $wid`
 echo stdid=$stdid
 echo APPMIN=$APPMIN
 sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Notebooks-CCPE'] }}))
-webport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['WEBPORT-WKSHP-Notebooks-CCPE'] }}))
+webport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Notebooks-CCPE'] }}))
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
