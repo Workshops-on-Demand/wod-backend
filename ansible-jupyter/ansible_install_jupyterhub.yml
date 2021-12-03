@@ -182,7 +182,7 @@
         - shc
         - patch
         - expect
-        - acct
+        - psacct
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
