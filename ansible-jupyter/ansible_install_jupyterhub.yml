@@ -514,21 +514,27 @@
         group: jupyter
         mode: 0751
 
-    - name: Test Jupyterhub service presence
-      command: ls /etc/systemd/system/jupyterhub.service
-      register: serv_path
+    - name: Test HPEDev services presence
+      command: ls /etc/systemd/system/{{ item }}.service
+      register: {{ item }}_path
       ignore_errors: true
       changed_when: false
+      with_items:
+        - jupyterhub
+        - kill-processes
 
-    - name: Disable Jupyterhub service
+    - name: Disable HPEDev services
       become: yes
       become_user: root
       systemd:
         state: stopped
         daemon_reload: yes
         enabled: no
-        name: jupyterhub
-      when: serv_path.rc == 0
+        name: {{ item }}
+      when: {{ item }}_path.rc == 0
+      with_items:
+        - jupyterhub
+        - kill-processes
 
     - name: Remove jupyterhub configuration file
       file:
@@ -553,23 +559,29 @@
           c.JupyterHub.redirect_to_server = True
           #####################################################################################
 
-    - name: Copy jupyterhub service file
+    - name: Copy HPEDev service file
       become: yes
       become_user: root
       copy:
-        src: "{{ JUPPROC }}/jupyterhub.service"
-        dest: /etc/systemd/system/jupyterhub.service
+        src: "{{ JUPPROC }}/{{ item }}.service"
+        dest: /etc/systemd/system/{{ item }}.service
+      with_items:
+        - jupyterhub
+        - kill-processes
 
-    - name: Enable Jupyterhub service
+    - name: Enable HPEDev service
       become: yes
       become_user: root
       systemd:
         state: started
         daemon_reload: yes
         enabled: yes
-        name: jupyterhub
+        name: {{ item }}
+      with_items:
+        - jupyterhub
+        - kill-processes
 
-    - name: Wait 3 seconds to let Jupyterhub start
+    - name: Wait 3 seconds to let HPEDev services start
       shell: sleep 3
 
     - name: Existing token
