@@ -455,7 +455,7 @@
         - /usr/local/share/jupyter/nbconvert/templates/
         - /usr/local/share/jupyter/nbconvert/templates/html/
         - /usr/local/share/jupyter/nbconvert/templates/latex/
-        - {{ JPHUB }}/share/jupyter/nbconvert/templates/html/
+        - "{{ JPHUB }}/share/jupyter/nbconvert/templates/html/"
 
     - name: Remove existing jupyter users
       command:
