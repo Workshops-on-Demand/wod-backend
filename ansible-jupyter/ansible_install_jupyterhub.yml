@@ -556,9 +556,7 @@
     - name: Copy HPEDev service file as ansible template for variable expansion
       become: yes
       become_user: root
-      template: 
-        src: "{{ item }}"
-        dest: "/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}" mode=0644
+      template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
       with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
 
     - name: Enable HPEDev service

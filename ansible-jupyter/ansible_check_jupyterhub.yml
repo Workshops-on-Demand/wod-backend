@@ -231,14 +231,17 @@
         group: jupyter
         mode: 0751
 
-    - name: Enable Jupyterhub service
+    - name: Enable HPEDev services
       become: yes
       become_user: root
       systemd:
         state: started
         daemon_reload: yes
         enabled: yes
-        name: jupyterhub
+        name: "{{ item }}"
+      with_items:
+        - jupyterhub
+        - kill-processes
 
     - name: Ensure listening port in postfix master.cf is configured correctly
       become: yes
