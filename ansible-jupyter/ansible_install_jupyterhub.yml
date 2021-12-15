@@ -439,7 +439,7 @@
     - name: Fix ansible kernel path to include virtualenv setup
       replace:
         path: "{{ JPHUB }}/share/jupyter/kernels/{{ item }}/kernel.json"
-        regexp: '(.+)"/opt/jupyterhub/bin/python3",(.+)$'
+        regexp: '(.+)"{{ JPHUB }}/bin/python3",(.+)$'
         replace: '\1"/usr/local/bin/kernel_python",\2'
       with_items:
         - ansible
@@ -553,15 +553,13 @@
           c.JupyterHub.redirect_to_server = True
           #####################################################################################
 
-    - name: Copy HPEDev service file
+    - name: Copy HPEDev service file as ansible template for variable expansion
       become: yes
       become_user: root
-      copy:
-        src: "{{ JUPPROC }}/{{ item }}.service"
-        dest: /etc/systemd/system/{{ item }}.service
-      with_items:
-        - jupyterhub
-        - kill-processes
+      template: 
+        src="{{ item }}" 
+        dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}.service mode=0644
+      with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
 
     - name: Enable HPEDev service
       become: yes
