@@ -227,6 +227,7 @@
         - openmpi-devel
         - fail2ban-all
         - perl-Proc-ProcessTable
+        - perl-Data-Dumper
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] == "7"
