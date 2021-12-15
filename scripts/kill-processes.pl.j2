@@ -1,0 +1,83 @@
+#!/usr/bin/perl -w
+use strict;
+use Proc::ProcessTable;
+use Data::Dumper;
+
+# Process eevry 60 seconds by default
+my $loop = 60;
+# Commands that are black listed/killed
+my @blacklistcmd = (
+		"packetcrypt",
+);
+# Commands that are white listed/kept
+my @whitelistcmd = (
+		"mlops",
+);
+my $logf = "$ENV{'HOME'}/.mail/kill-process.log";
+
+open(LOG,"> $logf") || die "Unable to create $logf";
+
+while (1) {
+
+	my $t = Proc::ProcessTable->new;
+	# Maximum run time allowed for commands 10 minutes of run
+	my $maxruntime = time-10*60;
+	# Maximum run time allowed for jupyter server 4 hours of run
+	my $maxjuptime = time-4*60*60;
+
+	my %kill;
+	foreach my $p ( @{$t->table} ) {
+		my $uid = $p->uid;
+		my ($student,$blob) = getpwuid($uid);
+		if ($student =~ /student[0-9]+/) {
+			$kill{$student}->{fname} = ();
+			$kill{$student}->{pid} = ();
+			$kill{$student}->{uid} = ();
+			$kill{$student}->{uid} = $uid;
+		}
+		my $pid = $p->pid;
+		my $fname = $p->fname;
+		print(LOG "Analyses process $fname ($pid) for user $student ($uid)\n");
+		# Kill black listed commands
+		if (grep(/$p->cmndline/,@blacklistcmd)) {
+			push(@{$kill{$student}->{fname}},$fname);
+			push(@{$kill{$student}->{pid}},$pid);
+			$kill{$student}{uid} = $uid;
+			print(LOG "Will kill black listed process $fname ($pid) for user $student ($uid)\n");
+			print(LOG Dumper($p)."\n");
+		}
+		# Kill commands running for long, using CPU and not whitelisted run by a student
+    	if (($p->start() >= $maxruntime) && ($p->pctcpu+0 >= 0.98) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
+			push(@{$kill{$student}->{fname}},$fname);
+			push(@{$kill{$student}->{pid}},$pid);
+			$kill{$student}{uid} = $uid;
+			print(LOG "Will kill 98% process $fname ($pid) for user $student ($uid)\n");
+			print(LOG "Start:($p->start() maxruntime: $maxruntime\n");
+			print(LOG Dumper($p)."\n");
+		}
+		# Kill old jupyter server kernels and processes of that student
+    	if (($p->start() >= $maxjuptime) && ($p->cmndline =~ /kernel/ ) && ($student =~ /student[0-9]+/)) {
+			push(@{$kill{$student}->{fname}},$fname);
+			push(@{$kill{$student}->{pid}},$pid);
+			$kill{$student}{uid} = $uid;
+			print(LOG "Will kill jupyter process $fname ($pid) for user $student ($uid)\n");
+			print(LOG Dumper($p)."\n");
+		}
+	}
+
+	# Now kill all process identified and sleep
+	for my $s (keys %kill) {
+			# Skip empty students
+			#next if ($#{$kill{$s}->{fname}} == 0);
+			# The remaining ones should be killed
+			print(LOG "Killing all processes for user $s ($kill{$s}->{uid})\n");
+			foreach my $i (0..$#{$kill{$s}->{fname}}) {
+				print(LOG "--> ${$kill{$s}->{fname}}[$i] (@{$kill{$s}->{pid}}[$i])\n");
+			}
+			system("sudo pkill -KILL -U $s");
+	}
+	# Do that every timeout value
+	sleep($loop);
+
+}
+close(LOG);
