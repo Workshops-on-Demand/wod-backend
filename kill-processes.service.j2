@@ -1,0 +1,10 @@
+[Unit]
+Description=Killing mining and other processes service
+After=syslog.target network.target
+
+[Service]
+User=jupyter
+ExecStart={{ SCRIPTDIR }}/killing-processes.pl
+
+[Install]
+WantedBy=multi-user.target
