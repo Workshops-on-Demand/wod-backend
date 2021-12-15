@@ -557,7 +557,7 @@
       become: yes
       become_user: root
       template: 
-        src="{{ JUPPROC }}/{{ item }}.service.j2" 
+        src="{{ item }}.service.j2" 
         dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
       with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
 
