@@ -514,15 +514,6 @@
         group: jupyter
         mode: 0751
 
-    - name: Test HPEDev services presence
-      command: ls /etc/systemd/system/{{ item }}.service
-      register: {{ item }}_path
-      ignore_errors: true
-      changed_when: false
-      with_items:
-        - jupyterhub
-        - kill-processes
-
     - name: Disable HPEDev services
       become: yes
       become_user: root
@@ -531,7 +522,7 @@
         daemon_reload: yes
         enabled: no
         name: {{ item }}
-      when: {{ item }}_path.rc == 0
+	  ignore_errors: yes
       with_items:
         - jupyterhub
         - kill-processes
