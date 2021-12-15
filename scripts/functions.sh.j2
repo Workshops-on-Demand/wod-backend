@@ -361,10 +361,10 @@ EOF
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
-	if [ ! -d "$JUPPROC/ansible-jupyter/$PBKDIR/pass" ]; then
-		mkdir -p $JUPPROC/ansible-jupyter/$PBKDIR/pass
+	if [ ! -d "{{ JUPPROC }}/ansible-jupyter/$PBKDIR/pass" ]; then
+		mkdir -p {{ JUPPROC }}/ansible-jupyter/$PBKDIR/pass
 	fi
-	ansible-vault encrypt_string --vault-password-file $JUPPROC/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $JUPPROC/ansible-jupyter/$PBKDIR/pass/variables_${w}_${stdid}.yml
+	ansible-vault encrypt_string --vault-password-file {{ JUPPROC }}/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > {{ JUPPROC }}/ansible-jupyter/$PBKDIR/pass/variables_${w}_${stdid}.yml
 }
 
 # This function retuns the workshop name from the mail body
@@ -387,7 +387,7 @@ erase_student() {
 	if [ _"$stddir" != _"" ]; then
 		echo "Erasing target student dir $stddir content"
 		sudo rm -rf $stddir/* $stddir/.??*
-		sudo cp -a $JUPPROC/skel/.??* $stddir
+		sudo cp -a {{ JUPPROC }}/skel/.??* $stddir
 		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
 		echo "Create ssh keys to allow remote connections to appliance if needed"
 		sudo su - student${stdid} -c "ssh-keygen -b 2048 -t rsa -f .ssh/id_rsa -N ''"

@@ -207,6 +207,7 @@
         - libcrypt-passwdmd5-perl
         - libopenmpi-dev
         - fail2ban
+        - libproc-processtable-perl
       when:
         - ansible_facts['os_family'] == "Debian"
 
@@ -225,6 +226,7 @@
         - perl-Crypt-PasswdMD5
         - openmpi-devel
         - fail2ban-all
+        - perl-Proc-ProcessTable
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] == "7"
