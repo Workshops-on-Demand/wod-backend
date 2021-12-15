@@ -57,7 +57,7 @@ $WKSHP
 .
 EOF
 	echo "Sending a mail to $ACTION student $1 for workshop $WKSHP"
-	cat /tmp/mail.$$ | telnet localhost {{ POSTPORT }}
+	cat /tmp/mail.$$ | netcat localhost {{ POSTPORT }}
 	rm -f /tmp/mail.$$
 }
 

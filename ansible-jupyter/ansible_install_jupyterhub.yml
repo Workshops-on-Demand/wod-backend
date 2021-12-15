@@ -186,6 +186,7 @@
         - patch
         - expect
         - psacct
+        - netcat
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
