@@ -111,29 +111,29 @@ if [ $action != "RESET" ]; then
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
-    		# Only for API Calls 
+		# Only for API Calls
 		dbstdid=$((stdid+{{ BASESTDID }}))
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		##Update Password
 		curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  			--request PUT \
-  			--data '{"password":"'$randompw'"}' \
-  			"$APIENDPOINT/student/$dbstdid"
+			 --request PUT \
+			 --data '{"password":"'$randompw'"}' \
+			 "$APIENDPOINT/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
 			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  				--request PUT \
-  				--data '{"active": "true"}' \
-  				"$APIENDPOINT/customer/$userid"
+				 --request PUT \
+				 --data '{"active": "true"}' \
+				 "$APIENDPOINT/customer/$userid"
 			##Start Student jupyterhub dedicated server
 			curl --header "Content-Type: application/json" \
-				--header "Authorization: token {{ JPHUBTOKEN }}" \
-                                --location \
-                                --request POST \
-				--data-raw '{}' \
-                                "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+				 --header "Authorization: token {{ JPHUBTOKEN }}" \
+				 --location \
+				 --request POST \
+				 --data '{}' \
+                     "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Keep completion status
@@ -141,29 +141,29 @@ if [ $action != "RESET" ]; then
 
 			#Delete Student jupyterhub dedicated server
 			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
-                                --location \
+				--location \
 				--request DELETE \
-                                "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server" 
+                              "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $wid`" = _"false" ]; then
 				##Update student status to inactive
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  					--request PUT \
-  					--data '{"assigned":"false"}' \
-  					"$APIENDPOINT/student/$dbstdid"
+					 --request PUT \
+					 --data '{"assigned":"false"}' \
+					 "$APIENDPOINT/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
 	 			erase_student
 				cleanup_processes_student
 			else
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  					--request PUT \
-  					--data '{"assigned":"true"}' \
-  					"$APIENDPOINT/student/$dbstdid"
+					 --request PUT \
+					 --data '{"assigned":"true"}' \
+					 "$APIENDPOINT/student/$dbstdid"
 	 			# set customer  to inactive by default for all workshops
-        			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  					--request PUT \
-  					--data '{"active": "false"}' \
-  					"$APIENDPOINT/customer/$userid"
+				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+					     --request PUT \
+					     --data '{"active": "false"}' \
+					     "$APIENDPOINT/customer/$userid"
 			fi
 		else
 			echo "Unknown action $action"
@@ -190,9 +190,9 @@ elif [ "$action" = "RESET" ]; then
 
 			# API call to Now reset capacity to original value
 	        	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  				--request PUT \
-  				--data '{"capacity":"'$cap'"}' \
-  				"$APIENDPOINT/workshop/$wid"
+				--request PUT \
+				--data '{"capacity":"'$cap'"}' \
+				"$APIENDPOINT/workshop/$wid"
 		else
 			teststdid $stdid
 			# We have a single value to manage
@@ -219,7 +219,7 @@ elif [ "$action" = "RESET" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
-        		echo "Reseting workshop $w Backend"
+			echo "Reseting workshop $w Backend"
 			$JUPPROC/scripts/reset-$w.sh
 		fi
 
@@ -227,9 +227,9 @@ elif [ "$action" = "RESET" ]; then
 			# API call
 			# Update customer status to inactive
 			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-  				--request PUT \
-  				--data '{"assigned":"false"}' \
-  				"$APIENDPOINT/student/$j"
+				--request PUT \
+				--data '{"assigned":"false"}' \
+				"$APIENDPOINT/student/$j"
 			stdid=$((j-{{ BASESTDID }}))
 			stddir="/student/student$stdid"
 			erase_student
