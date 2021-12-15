@@ -167,10 +167,13 @@
         - texlive-xetex
         - aspnetcore-runtime-3.1
         - aspnetcore-runtime-5.0
+        - aspnetcore-runtime-6.0
         - dotnet-runtime-3.1
         - dotnet-runtime-5.0
+        - dotnet-runtime-6.0
         - dotnet-sdk-3.1
         - dotnet-sdk-5.0
+        - dotnet-sdk-6.0
         - postfix
         - procmail
         - conda
@@ -521,8 +524,8 @@
         state: stopped
         daemon_reload: yes
         enabled: no
-        name: {{ item }}
-	  ignore_errors: yes
+        name: "{{ item }}"
+      ignore_errors: yes
       with_items:
         - jupyterhub
         - kill-processes
@@ -567,7 +570,7 @@
         state: started
         daemon_reload: yes
         enabled: yes
-        name: {{ item }}
+        name: "{{ item }}"
       with_items:
         - jupyterhub
         - kill-processes
