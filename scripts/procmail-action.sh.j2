@@ -30,22 +30,22 @@ export USER=$LOGNAME
 action=$1
 echo "we are working on "$action
 if [ _"$1" = _"" ]; then
-	echo "Syntax: procmail-action.sh <CREATE||RESET> <student id> <user id>"
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET|PURGE> <student id> <user id>"
 	echo "ACTION is mandatory"
 	exit -1
 fi
 shift
 
 # Check action
-if [ $action != "CREATE" ]  && [ $action != "CLEANUP" ]  && [ $action != "RESET" ]; then
-	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> [<user id>]"
+if [ $action != "CREATE" ]  && [ $action != "CLEANUP" ]  && [ $action != "RESET" ] && [ $action != "PURGE" ]; then
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET|PURGE> <student id> [<user id>]"
 	echo "A correct ACTION is mandatory"
 	exit -1
 fi
 
 export stdid=$1
 if [ _"$1" = _"" ]; then
-	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> [<user id>]"
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET|PURGE> <student id> [<user id>]"
 	echo "Student Username id is mandatory"
 	exit -1
 fi
@@ -58,10 +58,15 @@ w=`get_workshop_name`
 # If that doesn't fail, then export the workshop name
 export w
 export wid=`get_workshop_id $w`
+export stddir="{{ STDDIR }}/student$stdid"
+
+if [ "$action" = "PURGE" ]; then
+	erase_student
+    exit 0
+fi
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
-	export stddir="{{ STDDIR }}/student$stdid"
 	teststdid $stdid
 
 	userid=$1
@@ -142,8 +147,8 @@ if [ $action != "RESET" ]; then
 			#Delete Student jupyterhub dedicated server
 			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
 				--location \
-				--request DELETE \
-                              "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+			--request DELETE \
+                         "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $wid`" = _"false" ]; then
 				##Update student status to inactive
@@ -231,7 +236,7 @@ elif [ "$action" = "RESET" ]; then
 				--data '{"assigned":"false"}' \
 				"$APIENDPOINT/student/$j"
 			stdid=$((j-{{ BASESTDID }}))
-			stddir="/student/student$stdid"
+			stddir="{{ STDDIR }}/student$stdid"
 			erase_student
 			cleanup_processes_student
 			((j=j-1))

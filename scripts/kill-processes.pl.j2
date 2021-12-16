@@ -37,7 +37,7 @@ while (1) {
 		}
 		my $pid = $p->pid;
 		my $fname = $p->fname;
-		print(LOG "Analyses process $fname ($pid) for user $student ($uid)\n");
+		#print(LOG "Analyses process $fname ($pid) for user $student ($uid)\n");
 		# Kill black listed commands
 		if (grep(/$p->cmndline/,@blacklistcmd)) {
 			push(@{$kill{$student}->{fname}},$fname);
@@ -46,21 +46,23 @@ while (1) {
 			print(LOG "Will kill black listed process $fname ($pid) for user $student ($uid)\n");
 			print(LOG Dumper($p)."\n");
 		}
-		# Kill commands running for long, using CPU and not whitelisted run by a student
-    	if (($p->start() >= $maxruntime) && ($p->pctcpu+0 >= 0.98) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
+		# Kill commands running for more than maxruntime, using CPU and not whitelisted run by a student
+		my $st = $p->start();
+		if (($st <= $maxruntime) && ($p->pctcpu+0 >= 0.98) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
 			print(LOG "Will kill 98% process $fname ($pid) for user $student ($uid)\n");
-			print(LOG "Start:($p->start() maxruntime: $maxruntime\n");
+			print(LOG "Start:$st maxruntime: $maxruntime\n");
 			print(LOG Dumper($p)."\n");
 		}
-		# Kill old jupyter server kernels and processes of that student
-    	if (($p->start() >= $maxjuptime) && ($p->cmndline =~ /kernel/ ) && ($student =~ /student[0-9]+/)) {
+		# Kill jupyter server kernels older than maxjuptime and processes of that student
+		if (($st <= $maxjuptime) && ($p->cmndline =~ /kernel/ ) && ($student =~ /student[0-9]+/)) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
 			print(LOG "Will kill jupyter process $fname ($pid) for user $student ($uid)\n");
+			print(LOG "Start:$st maxjuptime: $maxjuptime\n");
 			print(LOG Dumper($p)."\n");
 		}
 	}
@@ -75,6 +77,8 @@ while (1) {
 				print(LOG "--> ${$kill{$s}->{fname}}[$i] (@{$kill{$s}->{pid}}[$i])\n");
 			}
 			system("sudo pkill -KILL -U $s");
+			# Erase student dir as well
+			#system("{{ SCRIPDIR }}/test-action.sh PURGE VOID $s");
 	}
 	# Do that every timeout value
 	sleep($loop);

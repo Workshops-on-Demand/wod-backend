@@ -3,7 +3,7 @@
 
 ACTION=$1
 if [ _"$1" = _"" ]; then
-	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PDF|WORD> WKSHOP [MIN[,MAX]"
+	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PURGE|PDF|WORD> WKSHOP [MIN[,MAX]"
 	echo "ACTION is mandatory"
 	exit -1
 fi
@@ -12,7 +12,7 @@ shift
 
 WKSHP=$1
 if [ _"$1" = _"" ]; then
-	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PDF|WORD> WKSHOP [MIN[,MAX]"
+	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PURGE|PDF|WORD> WKSHOP [MIN[,MAX]"
 	echo "WKSHP is mandatory"
 	exit -1
 fi
@@ -28,7 +28,7 @@ if [ _"$STDRANGE" != _"" ]; then
 		STDMAX=$STDMIN
 	fi
 	if [ $STDMIN -gt $STDMAX ]; then
-		echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET> WKSHOP [MIN[,MAX]"
+		echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PURGE> WKSHOP [MIN[,MAX]"
 		echo "MIN should be lesser than MAX"
 		exit -1
 	fi
@@ -37,8 +37,8 @@ shift
 
 
 # Check action
-if [ $ACTION != "CREATE" ]  && [ $ACTION != "CLEANUP" ]  && [ $ACTION != "RESET" ] && [ $ACTION != "PDF" ] && [ $ACTION != "WORD" ]; then
-	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PDF|WORD> WKSHOP [MIN[,MAX]"
+if [ $ACTION != "CREATE" ]  && [ $ACTION != "CLEANUP" ]  && [ $ACTION != "RESET" ] && [ $ACTION != "PURGE" ] && [ $ACTION != "PDF" ] && [ $ACTION != "WORD" ]; then
+	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET|PURGE|PDF|WORD> WKSHOP [MIN[,MAX]"
 	echo "A correct ACTION is mandatory"
 	exit -1
 fi
@@ -55,6 +55,7 @@ Subject: $ACTION $1 0
 
 $WKSHP
 .
+QUIT
 EOF
 	echo "Sending a mail to $ACTION student $1 for workshop $WKSHP"
 	cat /tmp/mail.$$ | netcat localhost {{ POSTPORT }}
