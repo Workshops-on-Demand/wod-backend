@@ -261,6 +261,24 @@
         line: "myhostname = {{ JPHOST }}"
         state: present
 
+    - name: Ensure listening addresses in postfix main.cf is configured correctly
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regex: '^inet_interfaces ='
+        line: "inet_interfaces =  {{ JPHOST }},localhost"
+        state: present
+
+    - name: Ensure the mailbox command is correct
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regex: '^[#]*mailbox_command ='
+        line: "mailbox_command = /usr/bin/procmail -a \"$EXTENSION\""
+        state: present
+
     - name: Ensure mydestination in postfix main.cf is configured correctly
       become: yes
       become_user: root
