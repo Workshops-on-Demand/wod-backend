@@ -1,18 +1,20 @@
-PBKDIR: staging
-JPHOST: jupyterhub3.etc.fr.comm.hpecorp.net
+PBKDIR: orock
+JPHOST: jupyterhub7.orock.local
 JPIP: 16.31.85.201
-JPHOSTEXT: notebooks3.hpedev.io
+JPHOSTEXT: notebooks7.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: ffbbc1833fc240f88b9dbd6f718e8b72
 BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
+#APIENDPOINT: https://hackshackchallenge.hpedev.io/api
+
 APIUSER: moderator
 APIPWD: CloudSystem$
 #
 KIBANAPWD: "6ec13a7d-f862-40cf-bb88-63d803e3a701"
 KIBANAPORT: "10023"
 #
-STACKSTORMSRVNAME: "sta-stackstorm"
+STACKSTORMSRVNAME: "orock-stackstorm"
 STACKSTORMWEBUIPORT: "931"
 #
 VCENTERAPP: "esx-sta-vcenter.etc.fr.comm.hpecorp.net"

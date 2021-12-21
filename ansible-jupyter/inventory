@@ -20,6 +20,9 @@ jupyterhub.etc.fr.comm.hpecorp.net
 [sandbox]
 jupyterhub2.hp.local
 
+[orock]
+jupyterhub7.orock.local
+
 [test]
 jupyterhubtest.etc.fr.comm.hpecorp.net
 

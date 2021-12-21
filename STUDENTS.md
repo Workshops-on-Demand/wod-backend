@@ -272,13 +272,20 @@ Last seat for speaker
 [1625] speaker for live sessions
 
 
-1626-1700 StackStorm 101
+1626-1645 StackStorm 101
 
-[1626-1645] challenges  Location :  Grenoble
+[1626-1645] Workshop  Location :  Mougins
+
+[1645] speaker for live sessions
+
+
+
+1646-1700 Spark101
 
 [1646-1699] workshops Location :  Mougins
 
 [1700] speaker for live sessions
+
 
 
 1701-1735 GreenLake VMAAS API 101
