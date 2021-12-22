@@ -12,6 +12,8 @@ scripts/*.x
 scripts/*.x.c
 scripts/*.sh.c
 scripts/*.sh.x.c
+scripts/*.pl
+scripts/*.py
 jupyterhub.sqlite
 ansible-jupyter/*/pass/variables_*.yml
 ansible-jupyter/*/variables_*.yml
