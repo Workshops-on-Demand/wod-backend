@@ -152,7 +152,7 @@ create_greenlake_user() {
          echo "Group Student$stdid id : $ret1"
 
 
-        # Create Studentxxx and Get glc_user_id API Call
+        # Create Studentxxx and Get glc_user_id API Call - double randompw is NORMAL
         ret2=`curl -s --location --request POST --header "Authorization: $greenlake_token" --header "Content-Type: application/scim+json" \
                    --data "{ \"schemas\": [ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\" ], \"userName\": \"student$stdid@hpedev.io\", \"password\": \"$randompw$randompw\", \"displayName\": \"student$stdid\", \"name\": { \"familyName\": \"student$stdid\", \"givenName\": \"student$stdid\" }, \"emails\": [{ \"primary\": true, \"type\": \"PRIMARY\", \"value\": \"student$stdid@hpedev.io\"}, {\"primary\": false, \"type\": \"SECONDARY\", \"value\": \"hpedev.hackshack@hpe.com\" }], \"urn:ietf:params:scim:schemas:extensions:hpe-greenlake:2.0:UserCreate\": { \"sendEmail\": false, \"changePassword\": false } }" "{{ GREENLAKE_IAM_API_URL }}/scim/v2/Users" |jq -r '.id'`
         echo "Student$stid GreenLake user_id: $ret2"

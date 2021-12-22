@@ -30,21 +30,21 @@ while (1) {
 	# Maximum time allowed for student jupyter notebook server to run: 4 hours
 	my $maxjuptime = time-4*60*60;
 
-	my %kill;
+	my %kill = ();
 	foreach my $p ( @{$t->table} ) {
 		my $uid = $p->uid;
 		my ($student,$blob) = getpwuid($uid);
 		if ($student =~ /student[0-9]+/) {
 			$kill{$student}->{fname} = ();
 			$kill{$student}->{pid} = ();
-			$kill{$student}->{uid} = ();
 			$kill{$student}->{uid} = $uid;
 		}
 		my $pid = $p->pid;
 		my $fname = $p->fname;
+		my $cmndline = $p->cmndline;
 		#print(LOG "Analyses process $fname ($pid) for user $student ($uid)\n");
 		# Kill black listed commands
-		if (grep(/$p->cmndline/,@blacklistcmd)) {
+		if (grep(/$fname/,@blacklistcmd)) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
@@ -53,7 +53,8 @@ while (1) {
 		}
 		# Kill commands running for more than maxruntime, using CPU and not whitelisted run by a student
 		my $st = $p->start();
-		if (($st <= $maxruntime) && ($p->pctcpu+0 >= $maxcpu) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
+		my $pcpu = $p->pctcpu;
+		if (($st <= $maxruntime) && ($pcpu+0 >= $maxcpu) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
@@ -62,7 +63,7 @@ while (1) {
 			print(LOG Dumper($p)."\n");
 		}
 		# Kill jupyter server kernels older than maxjuptime and processes of that student
-		if (($st <= $maxjuptime) && ($p->cmndline =~ /kernel/ ) && ($student =~ /student[0-9]+/)) {
+		if (($st <= $maxjuptime) && ($cmndline =~ /kernel/ ) && ($student =~ /student[0-9]+/)) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
@@ -74,8 +75,10 @@ while (1) {
 
 	# Now kill all process identified and sleep
 	for my $s (keys %kill) {
-			# Skip empty students
-			#next if ($#{$kill{$s}->{fname}} == 0);
+			# Skip empty users
+		    my $fn = 0;
+			$fn = @{ $kill{$s}->{fname} } if (defined $kill{$s}->{fname});
+			next if ($fn == 0);
 			# The remaining ones should be killed
 			print(LOG "Killing all processes for user $s ($kill{$s}->{uid})\n");
 			foreach my $i (0..$#{$kill{$s}->{fname}}) {

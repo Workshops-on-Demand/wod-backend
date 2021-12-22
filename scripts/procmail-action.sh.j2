@@ -58,6 +58,7 @@ export accessToken=`get_session_token`
 
 # for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
+	generate_randompwd
 	erase_student
     exit 0
 fi
