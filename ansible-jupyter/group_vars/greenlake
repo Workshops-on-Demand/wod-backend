@@ -67,7 +67,7 @@ RMCGUIBASEPORT: "48000"
 #
 HPEECPCTRL: "172.17.70.16 hpeecp-ctrlsrv hpeecp-ctrlsrv.hpedevlab.net"
 HPEECPCTRLIP: "172.17.70.16"
-HPEECPCTRLNAME:"hpeecp-ctrlsrv hpeecp-ctrlsrv.hpedevlab.net"
+HPEECPCTRLNAME: "hpeecp-ctrlsrv hpeecp-ctrlsrv.hpedevlab.net"
 HPEECPGWIP: "172.17.70.17"
 HPEECPGWNAME: "hpeecp-gwsrv.hpedevlab.net"
 HPEECPK8S101PORT: "9911"
