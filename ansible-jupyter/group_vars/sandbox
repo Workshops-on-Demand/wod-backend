@@ -9,7 +9,6 @@ APIENDPOINT: https://hackshackchallenge.hpedev.io/api
 APIUSER: moderator
 APIPWD: CloudSystem$
 
-LDAPDMN: dc=hp,dc=local
 #
 KIBANAPWD: "5e8a3b4c-d07d-41a9-b431-6bf9495521b5"
 KIBANAPORT: "10022"
@@ -27,9 +26,6 @@ VCENTERPWD: "P@ssw0rd"
 REDFISHILO: "192.168.10.5 ilo5"
 REDFISHPWD: "'P@ssw0rd!'"
 
-# Used by Francois for Redfish notebooks
-REDFISHPWD: "'P@ssw0rd!'"
-REDFISHILO: "16.31.87.100 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
 OBMCSIMUIP: "192.168.10.70"
 OBMCSIMUNAME: "openbmcsimulators"
@@ -50,11 +46,9 @@ IP-WKSHP-Ansible101: 16.31.86.83
 SPARKPORT-WKSHP-Spark101: 17001
 SSHPORT-WKSHP-Ansible101: 16001
 SSHPORT-WKSHP-Notebooks-CCPE: 15001
-HTTPPORT-WKSHP-Docker101: 14051
 HTTPPORT-WKSHP-Ansible101: 16051
 HTTPPORT-WKSHP-Spark101: 17051
 HTTPPORT-WKSHP-Notebooks-CCPE: 15051
-IP-WKSHP-StackStorm101: 16.31.86.205
 IP-WKSHP-Notebooks-CCPE: 16.31.86.196
 IP-WKSHP-Docker101: 192.168.10.98
 SSHPORT-WKSHP-Docker101: 10031
