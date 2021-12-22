@@ -185,7 +185,6 @@
         - shc
         - patch
         - expect
-        - psacct
         - netcat
         update_cache: yes
 
@@ -212,6 +211,7 @@
         - libopenmpi-dev
         - fail2ban
         - libproc-processtable-perl
+        - acct
       when:
         - ansible_facts['os_family'] == "Debian"
 
@@ -232,6 +232,7 @@
         - fail2ban-all
         - perl-Proc-ProcessTable
         - perl-Data-Dumper
+        - psacct
       when:
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] == "7"
