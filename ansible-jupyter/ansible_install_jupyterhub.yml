@@ -510,6 +510,8 @@
 
     # Incorrect CentOS v6 package vs Ubuntu which provides /usr/bin/dotnet
     - name: Ensure dotnet link is correct if needed
+      become: yes
+      become_user: root
       file:
         src: /usr/share/dotnet/dotnet
         dest: /usr/local/bin/dotnet
