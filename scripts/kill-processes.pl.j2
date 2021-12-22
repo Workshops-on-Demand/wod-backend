@@ -5,6 +5,10 @@ use Data::Dumper;
 
 # Process eevry 60 seconds by default
 my $loop = 60;
+
+# Max CPU usage tolerated
+my $maxcpu = 0.98;
+
 # Commands that are black listed/killed
 my @blacklistcmd = (
 		"packetcrypt",
@@ -15,14 +19,15 @@ my @whitelistcmd = (
 );
 my $logf = "$ENV{'HOME'}/.mail/kill-processes.log";
 
+# Do not change below
 open(LOG,"> $logf") || die "Unable to create $logf";
 
 while (1) {
 
 	my $t = Proc::ProcessTable->new;
-	# Maximum run time allowed for commands 10 minutes of run
-	my $maxruntime = time-10*60;
-	# Maximum run time allowed for jupyter server 4 hours of run
+	# Maximum time allowed for commands to run: 5 minutes
+	my $maxruntime = time-5*60;
+	# Maximum time allowed for student jupyter notebook server to run: 4 hours
 	my $maxjuptime = time-4*60*60;
 
 	my %kill;
@@ -48,11 +53,11 @@ while (1) {
 		}
 		# Kill commands running for more than maxruntime, using CPU and not whitelisted run by a student
 		my $st = $p->start();
-		if (($st <= $maxruntime) && ($p->pctcpu+0 >= 0.98) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
+		if (($st <= $maxruntime) && ($p->pctcpu+0 >= $maxcpu) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
-			print(LOG "Will kill 98% process $fname ($pid) for user $student ($uid)\n");
+			print(LOG "Will kill process exceeding $maxcpu CPU $fname ($pid) for user $student ($uid)\n");
 			print(LOG "Start:$st maxruntime: $maxruntime\n");
 			print(LOG Dumper($p)."\n");
 		}
@@ -78,7 +83,7 @@ while (1) {
 			}
 			system("sudo pkill -KILL -U $s");
 			# Erase student dir as well
-			#system("{{ SCRIPTDIR }}/test-action.sh PURGE VOID $s");
+			system("{{ SCRIPTDIR }}/test-action.sh PURGE VOID $s");
 	}
 	# Do that every timeout value
 	sleep($loop);
