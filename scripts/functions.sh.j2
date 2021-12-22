@@ -246,78 +246,77 @@ generate_aruba_token() {
 	}' | jq -r '.access_token')
 	echos "csrftoken=$ret1"
 
+	 # Get customer /  Tenant ID
+        ret2=$(curl -s --location --request GET --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/customer_name=student$stdid" \
+                -H 'Content-Type: application/json' | jq -r .customers[]customer_id)
+        echo "Customer student$stdid  customer_id is $ret2"
+
+	
 	# Generate Authorization Code
-	ret2=$(curl -s "{{ ARUBA_AUTHENTICATION_USER_URL }}client_id={{ ARUBA_CLIENTID }}&response_type=code&scope=all HTTP/1.1" \
+	ret3=$(curl -s "{{ ARUBA_AUTHENTICATION_USER_URL }}client_id={{ ARUBA_CLIENTID }}&response_type=code&scope=all HTTP/1.1" \
 	-H 'Content-Type: application/json' \
 	-H Accept: application/json Cookie: “$ret1"" \
-	-d '{
-	 "customer_id": "xxxxx",
- 	}' | jq -r )
-	echo "authorization code is $ret2"
+	-d "{
+	\"customer_id\": $ret2,
+ 	}" | jq -r )
+	echo "authorization code is $ret3"
 
 	# Generate Aruba Token
-	ret3=$(curl -s --location --request POST {{ ARUBA_AUTHENTICATION_TOKEN_URL }}client_id={{ ARUBA_CLIENTID }}&client_secret={{ ARUBA_CLIENTSECRET }}&grant_type=authorization_code&code=$ret2 \
+	ret4=$(curl -s --location --request POST {{ ARUBA_AUTHENTICATION_TOKEN_URL }}client_id={{ ARUBA_CLIENTID }}&client_secret={{ ARUBA_CLIENTSECRET }}&grant_type=authorization_code&code=$ret3 \
 		-H 'Content-Type: application/json' | jq -r )
-	echo "Aruba Token is $ret3"
+	echo "Aruba Token is $ret4"
 
-	export aruba_token=$ret3
+	export aruba_token=$ret4
 	
 }
 
 # this function onboards an Aruba customer to Aruba Central
 onboard_aruba_customer() {
 
-	# Add a new customer (based on student name)
-	ret1=$(curl -s --location --request POST --header "Authorization: $aruba_token" {{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers \
-		-d '{
-		"customer_name": "$customer_name",
-		"description": "HPE Hackshack Tenant",
-	}')
-	echo "customer $custmer_name created"
 
-	# Get customer ID
-	ret2=$(curl -s --location --request GET --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/customer_name=$customer_name" \
+	# Get customer /  Tenant ID
+	ret2=$(curl -s --location --request GET --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/customer_name=student$stdid" \
 		-H 'Content-Type: application/json' | jq -r .customers[]customer_id)
-	echo "Customer $customer_name  customer_id is $ret2"
+	echo "Customer student$stdid  customer_id is $ret2"
 
 	# Add user to newly created customer (based on student name and email ID) (Additional header to use MSP evel token for tenant API call)
 	ret3=$(curl -s --location --request POST --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/platform/rbac/v1/users"
-		-H  'TenantID: “$ret2"'
-		-d '{
-		"username": "$customer_email",
-		"password": "HPE_hackshack_2021",
-		"description": "Hackshack student",
-		"name": {
-			"firstname": "Student$stdid",
-			"lastname": "$customer_name"
+		-H  "TenantID: $ret2"
+		-d "{
+		\"username\": \"student$stdid@hpedev.io\",
+		\"password\": \"$randompw\",
+		\"description\": \"Hackshack student\",
+		\"name\": {
+			\"firstname\": \"student$stdid\",
+			\"lastname\": \"student\"
 		},
-		"phone": "+1-9998880000",
-		"address": {
-			"street": "3333 Scott Blvd",
-			"city": "Santa Clara",
-			"state": "California",
-			"country": "US",
-			"zipcode": "95054"
+		\"phone\": \"+1-9998880000\",
+		\"address\": {
+			\"street\": \"3333 Scott Blvd\",
+			\"city\": \"Santa Clara\",
+			\"state\": \"California\",
+			\"country\": \"US\",
+			\"zipcode\": \"95054\"
 		}	,
-		"applications": [{
-				"name": "nms",
-				"info": [{
-					"role": "readwrite",
-					"scope": {
-						"groups": [
-							"allgroups"
+		\"applications\": [{
+				\"name\": \"nms\",
+				\"info\": [{
+					\"role\": \"readwrite\",
+					\"scope\": {
+						\"groups\": [
+							\"allgroups\"
 					]	
 					}
 				}]
 		},
 		{
-				"name": "account_setting",
-				"info": [{
-					"role": "readwrite"
+				\"name\": \"account_setting\",
+				\"info\": [{
+					\"role\": \"readwrite\"
 				}]
 		}
 	]
-	}')
+	}")
 
 	echo "Customer $customer_email Created"
 }
@@ -325,15 +324,16 @@ onboard_aruba_customer() {
 # This function deletes an Aruab Customer from Aruba Central
 delete_aruba_customer() {
 
-	# Get customer ID
-        ret1=$(curl -s --location --request GET --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/customer_name=$customer_name" \
+	# Get customer  /Tenant ID
+        ret1=$(curl -s --location --request GET --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/customer_name=student$stdid" \
                 -H 'Content-Type: application/json' | jq -r .customers[]customer_id)
-        echo "Customer $customer_name  customer_id is $ret1"
+        echo "Customer student$stdid  customer_id is $ret1"
 
 
-	# Delete customer (once customer (aka tenant) is deleted, student will no longer have an access)
-	ret2=$(curl -s --location --request DELETE --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/$ret1")
-	echo "$ret2 : Aruba Customer  for Student$stdid deleted"
+	# Delete Aruba User
+	#ret2=$(curl -s --location --request DELETE --header "Authorization: $aruba_token" "{{ ARUBA_AUTHENTICATION_TOKEN_URL }}/msp_api/v1/customers/$ret1")
+	
+	#echo "$ret2 : Aruba Customer  for Student$stdid deleted"
 
 }
 
@@ -422,7 +422,7 @@ get_wod_completion_ratio() {
 
 # Cleanup remaining processes for that student after the run
 cleanup_processes_student() {
-	ids=`ps auxww | grep /student$stdid | awk '{ print $2 }'`
+	ids=`ps auxww | grep /student$stdid | grep -v grep | awk '{ print $2 }'`
 	if [ _"$ids" != _"" ]; then
 		sudo kill $ids
 	fi
