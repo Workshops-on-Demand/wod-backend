@@ -508,6 +508,20 @@
         path: /usr/local/bin/.store
         state: absent
 
+    # Incorrect CentOS v6 package vs Ubuntu which provides /usr/bin/dotnet
+    - name: Ensure dotnet link is correct if needed
+      file:
+        src: /usr/share/dotnet/dotnet
+        dest: /usr/local/bin/dotnet
+        state: link
+        owner: jupyter
+        group: jupyter
+        mode: 0755
+        force: yes
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] == "7"
+
     - name: Ensure powershell is installed through dotnet
       command: dotnet tool install --tool-path /usr/local/bin powershell
 
