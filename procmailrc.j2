@@ -23,5 +23,5 @@ LOGFILE=$MAILDIR/from
 :0b
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
-* ^Subject: *PURGE \/student[1-9]+.*
+* ^Subject: *PURGE student\/[1-9]+.*
 | {{ SCRIPTDIR }}/procmail-action.sh PURGE $MATCH
