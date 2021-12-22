@@ -19,3 +19,9 @@ LOGFILE=$MAILDIR/from
 # \/ defines what will be matched in $MATCH
 * ^Subject: *RESET \/[1-9]+.*
 | {{ SCRIPTDIR }}/procmail-action.sh RESET $MATCH
+
+:0b
+#* ^From.*hpedev.hackshack@hpe.com.*
+# \/ defines what will be matched in $MATCH
+* ^Subject: *PURGE \/[1-9]+.*
+| {{ SCRIPTDIR }}/procmail-action.sh PURGE $MATCH
