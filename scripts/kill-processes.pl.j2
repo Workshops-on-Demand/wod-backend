@@ -20,7 +20,7 @@ my @whitelistcmd = (
 my $logf = "$ENV{'HOME'}/.mail/kill-processes.log";
 
 # Do not change below
-open(LOG,"> $logf") || die "Unable to create $logf";
+open(LOG,">> $logf") || die "Unable to create $logf";
 
 while (1) {
 
