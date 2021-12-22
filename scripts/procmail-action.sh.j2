@@ -53,17 +53,19 @@ shift
 
 JUPPROC=$HOME/jupyter-procmail
 export std0="$HOME/student0"
-export accessToken=`get_session_token`
-w=`get_workshop_name`
-# If that doesn't fail, then export the workshop name
-export w
-export wid=`get_workshop_id $w`
 export stddir="{{ STDDIR }}/student$stdid"
+export accessToken=`get_session_token`
 
+# for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
 	erase_student
     exit 0
 fi
+
+w=`get_workshop_name`
+# If that doesn't fail, then export the workshop name
+export w
+export wid=`get_workshop_id $w`
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
@@ -116,7 +118,7 @@ if [ $action != "RESET" ]; then
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
-		# Only for API Calls
+		# Only for API Calls 
 		dbstdid=$((stdid+{{ BASESTDID }}))
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
