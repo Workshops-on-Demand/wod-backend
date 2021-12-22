@@ -465,6 +465,8 @@
         insertafter: '^\s+logallrefupdates'
 
     - name: Ensure that required nbconvert directories exists
+      become: yes
+      become_user: root
       file:
         path: "{{ item }}"
         state: directory
