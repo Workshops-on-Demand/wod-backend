@@ -498,15 +498,18 @@
         mode: 0755
       when: kubectl_path.rc != 0
 
-    - name: Test pwsh presence
-      command: ls /usr/local/bin/pwsh
-      register: pwsh_path
-      ignore_errors: true
-      changed_when: false
+    - name: Remove pwsh to be sure a good one will be available
+      file:
+        path: /usr/local/bin/pwsh
+        state: absent
+
+    - name: Remove pwsh components to be sure a good one will be available
+      file:
+        path: /usr/local/bin/.store
+        state: absent
 
     - name: Ensure powershell is installed through dotnet
       command: dotnet tool install --tool-path /usr/local/bin powershell
-      when: pwsh_path.rc != 0
 
     - name: Ensure powershell scripts are installed
       command: "{{ SCRIPTDIR }}/install_PwshModules.sh"
