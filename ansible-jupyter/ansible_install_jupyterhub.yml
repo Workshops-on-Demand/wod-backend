@@ -307,14 +307,14 @@
     - name: Ensure all required pip packages are installed
       pip:
         name:
-        - jupyterhub
-        - jupyterlab
+        - jupyterhub>=2.0.1
+        - jupyterlab>=3.2.5
         - pyhpecfm==0.1.6
         - hpeOneView
-        - ansible-kernel
-        - bash_kernel
-        - sshkernel
-        - powershell_kernel
+        - ansible-kernel>=0.9.0
+        - bash_kernel>=0.7.2
+        - sshkernel>=0.11.1
+        - powershell_kernel>=0.1.4
         - redfish
         - jupyter-docx-bundler
         - requests

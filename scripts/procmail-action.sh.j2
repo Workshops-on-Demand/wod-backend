@@ -58,6 +58,10 @@ export accessToken=`get_session_token`
 
 # for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
+    curl --header "Authorization: token {{ JPHUBTOKEN }}" \
+            --location \
+            --request DELETE \
+            "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 	generate_randompwd
 	erase_student
     exit 0
