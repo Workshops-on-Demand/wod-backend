@@ -556,22 +556,81 @@
         path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
         state: absent
 
+    - name: Remove jupyterhub db
+      file:
+        path: "{{ JPHUB }}/lib/jupyterhub.sqlite"
+        state: absent
+
     - name: Generate jupyterhub configuration
       command: "{{ JPHUB }}/bin/jupyterhub --generate-config"
       args:
         chdir: "{{ JPHUB }}/etc/jupyterhub/"
+
+    - name: Existing token
+      debug:
+        msg: "Existing token: {{ JPHUBTOKEN }}"
 
     - name: Adapt jupyterhub configuration file
       blockinfile:
         path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
         block: |
           #####################################################################################
-          c.Authenticator.admin_users = {'jupyter'}
-          c.Authenticator.whitelist = {'jupyter'}
+          #c.Authenticator.admin_users = {'jupyter'}
           c.Spawner.default_url = '/lab'
           c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
           c.JupyterHub.shutdown_on_logout = True
           c.JupyterHub.redirect_to_server = True
+          c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+          c.JupyterHub.pid_file = 'jupyterhub.pid'
+          c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
+          c.JupyterHub.services = [
+                {
+                "name": "admintk",
+                "api_token": "{{ JPHUBTOKEN }}",
+                }
+                ]
+          c.JupyterHub.load_roles = [
+                  {
+            'name': 'jupyteradm',
+            'description': 'Elevated privileges (can do anything)',
+            'scopes': [
+                "admin:users",
+                "admin:groups",
+                "admin:servers",
+                'read:roles',
+                'tokens',
+                'list:users',
+                'list:services',
+                'read:services',
+                'read:hub',
+                'access:services',
+                'access:servers',
+                'proxy',
+                'shutdown',
+            ],
+            'users': ['jupyter'],
+                 },
+                {
+            'name': "jupyteradmin",
+            'scopes': [
+                "admin:users",
+                "admin:groups",
+                "admin:servers",
+                'read:roles',
+                'tokens',
+                'list:services',
+                'read:services',
+                'read:hub',
+                'access:services',
+                'access:servers',
+                'proxy',
+                'shutdown',
+                ],
+            'services': [
+                "admintk",
+                ]
+                }
+            ]
           #####################################################################################
 
     - name: Copy HPEDev service file as ansible template for variable expansion
@@ -595,49 +654,27 @@
     - name: Wait 5 seconds to let HPEDev services start
       shell: sleep 5
 
-    - name: Existing token
-      debug:
-        msg: "Existing token: {{ JPHUBTOKEN }}"
+    #- name: Setup jupyter account in jupyterhub
+      #uri:
+        #url: "{{ JPHUBAPISRV }}/hub/api/users"
+        #headers:
+          #Authorization: "token {{ JPHUBTOKEN }}"
+        #method: POST
+        #body_format: json
+        ## https://jupyterhub.readthedocs.io/en/stable/reference/rest-api.html
+        #body: '{ "usernames": [ "jupyter" ], "admin": true }'
+        #status_code: 201
 
-    - name: Test Jupyterhub token
-      get_url:
-        url: "{{ JPHUBAPISRV }}/hub/api/users/jupyter"
-        dest: "/tmp/result.{{ JPHUBTOKEN }}"
+    - name: Setup group admin in jupyterhub
+      uri:
+        url: "{{ JPHUBAPISRV }}/hub/api/groups/admingroup"
         headers:
           Authorization: "token {{ JPHUBTOKEN }}"
-      register: answer
-      ignore_errors: true
-      changed_when: false
-
-    - name: Remove temporary file
-      file:
-        path: "/tmp/result.{{ JPHUBTOKEN }}"
-        state: absent
-
-    - name: Build a new Jupyterhub token
-      shell: . '{{ JPHUB }}/bin/activate' && '{{ JPHUB }}/bin/jupyterhub' token jupyter -f '{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py' | tail -1
-      register: jup_token
-      ignore_errors: true
-      changed_when: false
-      when: answer.status_code >= 300
-
-    - name: Fix Jupyter token in conf file
-      lineinfile:
-        path: "{{ JUPPROC }}/ansible-jupyter/group_vars/{{ PBKDIR }}"
-        regexp: "^JPHUBTOKEN"
-        line: "JPHUBTOKEN: {{ jup_token.stdout_lines[0] }}"
-        state: present
-      when: answer.status_code >= 300
-
-    - name: Use new token
-      set_fact:
-        JPHUBTOKEN: "{{ jup_token.stdout_lines[0] }}"
-      when: answer.status_code >= 300
-
-    - name: New token
-      debug:
-        msg: "New token: {{ JPHUBTOKEN }}"
-      when: answer.status_code >= 300
+        method: POST
+        body_format: json
+        # https://jupyterhub.readthedocs.io/en/stable/reference/rest-api.html
+        body: '{ "users": [ "jupyter"], "roles": [ "jupyteradm" ], "name": "admingroup"}'
+        status_code: 201
 
     - name: Setup ansible configuration
       copy:

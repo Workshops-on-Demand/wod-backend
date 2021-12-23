@@ -3,7 +3,7 @@ JPHOST: jupyterhub5.etc.fr.comm.hpecorp.net
 JPIP: 172.17.70.15
 JPHOSTEXT: notebooks5.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
-JPHUBTOKEN: ee437ee1bc474e0a9104135f29c76186
+JPHUBTOKEN: df818dc0c39f4de3b51bfa1359212dd8
 BASESTDID: 4000
 #APIENDPOINT: https://hackshackondemand.hpedev.io/api
 APIENDPOINT: https://hackshackdevtest.hpedev.io/api
