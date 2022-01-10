@@ -5,8 +5,10 @@ if [ _"$v"  = _"" ] || [ $v -le 43 ]; then
 	chmod 755 /tmp/rust-init-$$.sh
 	/tmp/rust-init-$$.sh -y
 fi
-	. $HOME/.profile && cargo install cargo-script && cargo install evcxr_jupyter --no-default-features
-	cp ~/.cargo/bin/evcxr_jupyter $HOME/jupyter-procmail/
+. $HOME/.profile && cargo install cargo-script && cargo install evcxr_jupyter --no-default-features
+ansible-playbook $HOME/jupyter-procmail/ansible-jupyter/distrib.yml
+DISTRIB=`cat $HOME/.mail/distrib`
+cp ~/.cargo/bin/evcxr_jupyter $HOME/jupyter-procmail/evcxr_jupyter.$DISTRIB
 if [ _"$v"  = _"" ] || [ $v -le 43 ]; then
 	/tmp/rust-init-$$.sh self uninstall
 	rm -f /tmp/rust-init-$$.sh

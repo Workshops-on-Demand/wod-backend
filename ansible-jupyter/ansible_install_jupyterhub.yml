@@ -311,10 +311,9 @@
         - jupyterlab
         - pyhpecfm==0.1.6
         - hpeOneView
-        - ansible-kernel
-        - bash_kernel
-        - sshkernel
-        - powershell_kernel
+        - ansible-kernel>=0.9.0
+        - bash_kernel>=0.7.2
+        - sshkernel>=0.11.1
         - redfish
         - jupyter-docx-bundler
         - requests
@@ -434,7 +433,6 @@
       shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
         - bash_kernel
-        - powershell_kernel
         - ansible_kernel
       changed_when: False
 
@@ -526,6 +524,12 @@
 
     - name: Ensure powershell is installed through dotnet
       command: dotnet tool install --tool-path /usr/local/bin powershell
+
+    - name: Ensure dotnet interactive is installed through dotnet
+      command: dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
+
+    - name: Ensure dotnet kernel is installed
+      command: dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
 
     - name: Ensure powershell scripts are installed
       command: "{{ SCRIPTDIR }}/install_PwshModules.sh"
