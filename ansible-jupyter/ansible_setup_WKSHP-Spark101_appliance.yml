@@ -1,0 +1,7 @@
+---
+
+- name: Setup Playbook for WKSHP-Spark101 appliance
+  hosts: '{{ RTARGET }}'
+  tasks:
+    - name: Setup docker based appliance
+      include: ansible_setup_docker_based_appliance.yml
