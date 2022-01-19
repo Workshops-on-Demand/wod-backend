@@ -14,9 +14,9 @@ my @blacklistcmd = (
 		"packetcrypt",
 		"ethminer",
 );
-# Commands that are white listed/kept
+# Commands that are white listed/kept (truncated as $fname)
 my @whitelistcmd = (
-		"mlops",
+		"jupyterhub-sing",
 );
 my $logf = "$ENV{'HOME'}/.mail/kill-processes.log";
 
@@ -55,7 +55,7 @@ while (1) {
 		# Kill commands running for more than maxruntime, using CPU and not whitelisted run by a student
 		my $st = $p->start();
 		my $pcpu = $p->pctcpu;
-		if (($st <= $maxruntime) && ($pcpu+0 >= $maxcpu) && (not grep(/$fname/,@whitelistcmd )) && ($student =~ /student[0-9]+/) ) {
+		if (($st <= $maxruntime) && ($pcpu+0 >= $maxcpu) && (not grep(/$fname/,@whitelistcmd)) && ($student =~ /student[0-9]+/) ) {
 			push(@{$kill{$student}->{fname}},$fname);
 			push(@{$kill{$student}->{pid}},$pid);
 			$kill{$student}{uid} = $uid;
