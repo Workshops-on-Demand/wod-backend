@@ -186,7 +186,6 @@
         - patch
         - expect
         - netcat
-        - quota
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
@@ -685,31 +684,6 @@
         daemon_reload: yes
         enabled: yes
         name: fail2ban
-
-    - name: Modify fstab for quota support on /
-      become: yes
-      become_user: root
-      lineinfile:
-        path: /etc/fstab
-        backrefs: yes
-        regexp: '^(\S+\s+/\s+\S+\s+)(?!(?:\S*,)?usrquota(?:,\S*)?\s+)(\S+)(\s+.+)$'
-        line: '\1usrquota,\2\3'
-      register: fstab
-
-    - name: 'If / changed in fstab, remount'
-      become: yes
-      become_user: root
-      command: 'mount / -o remount'
-      when: fstab.changed
-
-    - name: Create aquota.user file if needed
-      become: yes
-      become_user: root
-        path: "/quota.user"
-        state: present
-        owner: jupyter
-        group: jupyter
-        mode: 0660
 
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the jupyter-notebook git repo
