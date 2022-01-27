@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Cleanup force before building - longer but safer
+rm -rf $HOME/.cargo
+
 v=`rustc --version | awk '{ print $2 }' | cut -d. -f2`
 if [ _"$v"  = _"" ] || [ $v -le 43 ]; then
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rust-init-$$.sh
