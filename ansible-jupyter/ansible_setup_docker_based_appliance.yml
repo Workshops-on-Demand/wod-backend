@@ -15,11 +15,11 @@
     become: yes
     become_user: root
     apt_repository:
-      repo: deb https://apt.dockerproject.org/repo debian-stretch main
+      repo: deb https://download.docker.com/linux/ubuntu/dists/ xenial main
       state: present
     when:
      - ansible_facts['distribution'] == "Ubuntu"
-     - ansible_facts['distribution_major_version'] == "20"
+     - ansible_facts['distribution_major_version'] >= "20"
 
   - name: Ensure no existing docker pkg is installed
     become: yes
@@ -42,7 +42,7 @@
       - docker-compose
     when:
      - ansible_facts['distribution'] == "Ubuntu"
-     - ansible_facts['distribution_major_version'] == "20"
+     - ansible_facts['distribution_major_version'] >= "20"
 
   - name: Add Docker GPG Key to RPM DB
     become: yes
@@ -66,6 +66,7 @@
       state: stopped
       enabled: no
       name: docker
+    ignore_errors: true
 
   - name: Disable Docker socket
     register: service_stop
@@ -78,6 +79,7 @@
       state: stopped
       enabled: no
       name: docker.socket
+    ignore_errors: true
 
   - name: Ensure there is no pre-existing docker.sock socket
     become: yes
