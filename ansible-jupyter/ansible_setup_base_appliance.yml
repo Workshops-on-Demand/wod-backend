@@ -26,7 +26,7 @@
       state: present
     when:
      - ansible_facts['distribution'] == "Ubuntu"
-     - ansible_facts['distribution_major_version'] == "20"
+     - ansible_facts['distribution_major_version'] >= "20"
 
   - name: Add EPEL repository into repo list
     become: yes

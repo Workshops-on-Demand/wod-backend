@@ -189,7 +189,7 @@
       when:
         - profile_path.rc != 0
         - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_facts['distribution_major_version'] >= "7"
 
     - name: Ensure vim is the default EDITOR
       lineinfile:

@@ -18,7 +18,7 @@
         state: present
       when:
         - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_facts['distribution_major_version'] >= "7"
 
     - name: Add conda GPG Key to APT
       become: yes
@@ -28,7 +28,7 @@
         state: present
       when:
        - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] == "20"
+       - ansible_facts['distribution_major_version'] >= "20"
 
       # TODO: Do it for EPEL if really needed
     - name: Add conda APT repository
@@ -39,7 +39,7 @@
         state: present
       when:
        - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] == "20"
+       - ansible_facts['distribution_major_version'] >= "20"
 
     - name: Add K8s GPG Key to APT
       become: yes
@@ -108,7 +108,7 @@
         deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
       when:
        - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] == "20"
+       - ansible_facts['distribution_major_version'] >= "20"
 
     - name: Setup MicroSoft repo for YUM
       become: yes
@@ -235,7 +235,7 @@
         - psacct
       when:
         - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_facts['distribution_major_version'] >= "7"
 
     - name: Ensure all required node.js packages are installed
       become: yes
@@ -302,7 +302,7 @@
         virtualenv_command: "{{ virtualenv_command }}"
       when:
         - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_facts['distribution_major_version'] >= "7"
 
     - name: Ensure all required pip packages are installed
       pip:
@@ -525,7 +525,7 @@
         force: yes
       when:
         - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_facts['distribution_major_version'] >= "7"
 
     - name: Ensure powershell is installed through dotnet
       command: dotnet tool install --tool-path /usr/local/bin powershell
