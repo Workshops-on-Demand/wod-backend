@@ -263,13 +263,20 @@ Last seat for speaker
 
 
 
-1551-1625 Docker 101
+1551-1580 Docker 101
 
-[1551-1575] challenges  Location :  Grenoble
+[1551-1580] workshops Location :  Mougins
 
-[1576-1624] workshops Location :  Mougins
+[1570] speaker for live sessions
+
+
+
+1581-1625 Ansible 101
+
+[1581-1625] workshops Location :  Mougins
 
 [1625] speaker for live sessions
+
 
 
 1626-1645 StackStorm 101
