@@ -50,7 +50,7 @@ VCENTERADMIN: "root"
 VCENTERPWD: "vmware"
 #
 # Used by Francois for Redfish notebooks
-REDFISHILO: "16.31.87.100 ilo5"
+REDFISHILO: "16.31.87.207 ilo5"
 REDFISHPWD: "'P@ssw0rd!'"
 
 # Virtual Machine containing Francois' OpenBMCs simulators
