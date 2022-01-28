@@ -1,7 +1,12 @@
 #!/bin/bash
-
+#
+# Ensure that apt install rustc librust-zmq-dev for Ubuntu platforms
+#
 # Cleanup force before building - longer but safer
+#
 rm -rf $HOME/.cargo
+
+mkdir -p $HOME/.mail
 
 v=`rustc --version | awk '{ print $2 }' | cut -d. -f2`
 if [ _"$v"  = _"" ] || [ $v -le 43 ]; then

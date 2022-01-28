@@ -1,10 +1,6 @@
-[jupyterhub]
-jupyterhub3.etc.fr.comm.hpecorp.net
-jupyterhub.etc.fr.comm.hpecorp.net
-jupyterhub2.hp.local
-jupyterhubtest.etc.fr.comm.hpecorp.net
-jupyterhubtest2.etc.fr.comm.hpecorp.net
-
+#
+# Place to your jupyterhub machine (FQDN) in a group used as PBKDIR name
+#
 [staging]
 jupyterhub3.etc.fr.comm.hpecorp.net
 
@@ -20,8 +16,8 @@ jupyterhub.etc.fr.comm.hpecorp.net
 [sandbox]
 jupyterhub2.hp.local
 
-[orock]
-jupyterhub7.orock.local
+[test3]
+jupyterhub7.etc.fr.comm.hpecorp.net
 
 [test]
 jupyterhubtest.etc.fr.comm.hpecorp.net
