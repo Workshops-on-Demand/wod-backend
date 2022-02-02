@@ -3,7 +3,7 @@ Description=JupyterHub service
 After=syslog.target network.target
 
 [Service]
-User=jupyter
+User=root
 WorkingDirectory={{ JPHUB }}/lib
 Environment="PATH={{ JPHUB }}/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
 ExecStart={{ JPHUB }}/bin/python3 {{ JPHUB }}/bin/jupyterhub -f {{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py

@@ -252,6 +252,7 @@
         name:
         - jupyterhub>=2.0.1
         - jupyterlab>=3.2.5
+        - jupyterhub-idle-culler
         - pyhpecfm==0.1.6
         - hpeOneView
         - ansible-kernel>=0.9.0
@@ -309,6 +310,7 @@
         name:
         - jupyterhub
         - jupyterlab
+        - jupyterhub-idle-culler
         - pyhpecfm==0.1.6
         - hpeOneView
         - ansible-kernel>=0.9.0
@@ -583,16 +585,15 @@
       blockinfile:
         path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
         block: |
-          #####################################################################################
-          #c.Authenticator.admin_users = {'jupyter'}
-          c.Spawner.default_url = '/lab'
-          c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
-          c.JupyterHub.shutdown_on_logout = True
-          c.JupyterHub.redirect_to_server = True
-          c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
-          c.JupyterHub.pid_file = 'jupyterhub.pid'
-          c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
-          c.JupyterHub.services = [
+         #######################################################################################
+         c.Spawner.default_url = '/lab'
+         c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
+         c.JupyterHub.shutdown_on_logout = True
+         c.JupyterHub.redirect_to_server = True
+         c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+         c.JupyterHub.pid_file = 'jupyterhub.pid'
+         c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
+         c.JupyterHub.services = [
                 {
                 "name": "admintk",
                 "api_token": "{{ JPHUBTOKEN }}",
@@ -641,7 +642,7 @@
                 }
             ]
           #####################################################################################
-
+   
     - name: Copy HPEDev service file as ansible template for variable expansion
       become: yes
       become_user: root
@@ -664,15 +665,14 @@
       shell: sleep 5
 
     #- name: Setup jupyter account in jupyterhub
-      #uri:
-        #url: "{{ JPHUBAPISRV }}/hub/api/users"
-        #headers:
-          #Authorization: "token {{ JPHUBTOKEN }}"
-        #method: POST
-        #body_format: json
-        ## https://jupyterhub.readthedocs.io/en/stable/reference/rest-api.html
-        #body: '{ "usernames": [ "jupyter" ], "admin": true }'
-        #status_code: 201
+    #  uri:
+    #    url: "{{ JPHUBAPISRV }}/hub/api/users"
+    #    headers:
+    #      Authorization: "token {{ JPHUBTOKEN }}"
+    #    method: POST
+    #    body_format: json
+    #    body: '{ "usernames": [ "jupyter" ], "admin": true }'
+    #    status_code: 201
 
     - name: Setup group admin in jupyterhub
       uri:
@@ -681,7 +681,6 @@
           Authorization: "token {{ JPHUBTOKEN }}"
         method: POST
         body_format: json
-        # https://jupyterhub.readthedocs.io/en/stable/reference/rest-api.html
         body: '{ "users": [ "jupyter"], "roles": [ "jupyteradm" ], "name": "admingroup"}'
         status_code: 201
 
