@@ -17,6 +17,8 @@ if [ _"$w" = _"" ]; then
 	echo "WORKSHOP is mandatory"
 	exit -1
 fi
+exec &> >(tee $HOME/.mail/setup-appliance-$w)
+
 shift
 echo "We are working on the setup of the $w appliance"
 
