@@ -1,0 +1,12 @@
+#!/bin/sh
+KEY={{ OPNSENSEKEY }}
+SECRET={{ OPNSENSESEC }}
+FWIP={{ OPNSENSEIP }}
+FWPORT={{ OPNSENSEPORT }}
+ALIAS="Fail2ban"
+if [ $1 = "ban" ]; then
+	TODO="add"
+elif [ $1 = "unban" ]; then
+	TODO="delete"
+fi
+curl -X POST -d '{"address":"'$2'"}' -H "Content-Type: application/json" -k -u $KEY:$SECRET https://$FWIP:$FWPORT/api/firewall/alias_util/$TODO/$ALIAS

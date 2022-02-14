@@ -676,6 +676,16 @@
         group: root
         mode: 0644
 
+    - name: Configure fail2ban action
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ JUPPROC }}/fail2ban.action"
+        dest: "/etc/fail2ban/action.d/jupyterhub.conf"
+        owner: root
+        group: root
+        mode: 0755
+
     - name: Enable fail2ban
       become: yes
       become_user: root

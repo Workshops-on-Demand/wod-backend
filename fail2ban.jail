@@ -5,3 +5,7 @@ port = 443
 filter = jupyterhub
 backend = systemd
 maxretry = 3
+banaction = jupyterhub
+#ignoreip = 127.0.0.1/8 16.31.85.200/22 
+#bantime = 10d
+#destemail = jupyter@localhost

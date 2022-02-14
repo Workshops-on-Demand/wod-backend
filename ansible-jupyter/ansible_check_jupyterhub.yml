@@ -349,15 +349,19 @@
         cron_file: cleanup-processes
         state: present
 
-    - name: Install the deliver script
+    - name: Install the check-template script
       become: yes
       become_user: root
       template:
-        src: "{{ SCRIPTDIR }}/deliver.j2"
-        dest: /usr/local/bin/deliver
+        src: "{{ SCRIPTDIR }}/{{ item }}.j2"
+        dest: /usr/local/bin/{{ item }}
         owner: root
         group: root
         mode: 0755
+      with_items:
+        - check-template
+        - deliver
+        - fail2ban-IP
 
     - name: Setup crontab for daily delivery of ansible instantiated files
       become: yes
@@ -370,16 +374,6 @@
         job: "/usr/local/bin/deliver"
         cron_file: deliver
         state: present
-
-    - name: Install the check-template script
-      become: yes
-      become_user: root
-      template:
-        src: "{{ SCRIPTDIR }}/check-template.j2"
-        dest: /usr/local/bin/check-template
-        owner: root
-        group: root
-        mode: 0755
 
     - name: Setup crontab for daily check of template in dev user home dir
       become: yes
