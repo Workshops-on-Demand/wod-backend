@@ -201,25 +201,7 @@ Last seat for speaker
 
 
 
-1276-1350 Stackstorm 101
-
-[1276-1295] challenges  Location :  Grenoble
-
-[1296-1349] workshops Location :  Mougins
-
-[1350] speaker for live sessions
-
- 
-
-
-1351-1425 FREE
-
-[1351-1375] challenges  Location :  Grenoble
-
-[1376-1424] workshops Location :  Mougins
-
-[1425] speaker for live sessions
-
+1276-1326  FREE
 
 
 
@@ -236,6 +218,15 @@ Last seat for speaker
 [1337-1347] workshops Location :  Mougins 
 
 [1337] Speakers SMES
+
+
+
+1351-1381 ML101
+
+[1351-1381] workshops Location :  Mougins
+
+[1381] speaker for live sessions
+
 
 
 1401-1420 Securing Microservice Communication with Envoy using X.509 SPIFFE IDs
