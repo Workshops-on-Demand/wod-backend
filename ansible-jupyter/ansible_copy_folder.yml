@@ -121,7 +121,7 @@
       become_user: root
       template:
         src: "{{ JUPPROC }}/lab-a511.jupyterlab-workspace.j2"
-        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/lab-a511.jupyterlab-workspace"
+        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: 0644
