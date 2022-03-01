@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#set -x
+
+echo "Prepare the ML101 container image"
+
+NAME=mllab
+
+mkdir -p $HOME/$NAME
+cd $HOME/$NAME
+
+DCKBASE="jupyter/all-spark-notebook"
+
+# Clean before
+docker container prune -f
+docker image prune -f
+docker rmi $DCKBASE
+docker pull $DCKBASE
