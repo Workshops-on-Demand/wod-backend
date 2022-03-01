@@ -599,7 +599,7 @@
                 "api_token": "{{ JPHUBTOKEN }}",
                 }
                 ]
-          c.JupyterHub.load_roles = [
+         c.JupyterHub.load_roles = [
                   {
             'name': 'jupyteradm',
             'description': 'Elevated privileges (can do anything)',
