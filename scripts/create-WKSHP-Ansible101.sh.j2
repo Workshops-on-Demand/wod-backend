@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -x
+
+source {{ SCRIPTDIR }}/functions.sh
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Ansible101'] }}
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+{{ SCRIPTDIR }}/reset-$w.sh
+{{ SCRIPTDIR }}/create-appliance.sh
+
+NAME=dockerlab
+TMPDIR=/tmp/$NAME.$stdid
+
+
+mkdir -p $TMPDIR
+
+# Define local variables
+echo wid=$wid
+APPMIN=`get_range_min $wid`
+echo stdid=$stdid
+echo APPMIN=$APPMIN
+sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Ansible101'] }}))
+
+
+# Adapt the ssh config for the student
+cat > $TMPDIR/config << EOF
+Host $RTARGET
+    Port $sshport
+EOF
+sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+
+
+# Copy content
+ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo cp /student/student$stdid/.ssh/authorized_keys $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo chmod 644 $TMPDIR/authorized_keys
+
+# Cleanup
+ssh -q {{ NOCHECKSSH }} $RTARGET rm -rf $TMPDIR
+rm -rf $TMPDIR
