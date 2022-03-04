@@ -149,13 +149,21 @@ if [ $action != "RESET" ]; then
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Keep completion status
-			get_wod_completion_ratio >> $HOME/.mail/completion.log
+			completion=`get_wod_completion_ratio`
+
+			# Update completion ratio figure in customer table
+			 curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+              			 --request PUT \
+              			 --data '{"completionPercentage": "'$completion'"}' \
+               			"$APIENDPOINT/customer/$userid"
+
 
 			#Delete Student jupyterhub dedicated server
 			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
 				--location \
 			--request DELETE \
                          "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $wid`" = _"false" ]; then
 				##Update student status to inactive
@@ -237,7 +245,7 @@ elif [ "$action" = "RESET" ]; then
 
 		while [ $j -ge $min ]; do
 			# API call
-			# Update customer status to inactive
+			# Update student status to unassigned
 			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"assigned":"false"}' \

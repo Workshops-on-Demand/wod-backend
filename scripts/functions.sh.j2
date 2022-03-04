@@ -315,7 +315,7 @@ onboard_aruba_customer() {
 					\"role\": \"readwrite\"
 				}]
 		}
-	]
+G	]
 	}")
 
 	echo "Customer $customer_email Created"
@@ -405,6 +405,7 @@ generate_randompwd() {
 	echo "student$stdid:$randompw" | sudo chpasswd
 }
 
+
 # This function calculates a completion ratio at the end of a  workshop-on-demand.
 get_wod_completion_ratio() {
 
@@ -416,7 +417,8 @@ get_wod_completion_ratio() {
 	missed=$(grep execution_count $what/*.ipynb  | grep null | wc -l)
 	done=$((total-missed))
 	completion=$((done*100/total))
-	echo "date:$when,user:$who,workshop:$what,completion:$completion%"
+	#echo "date:$when,user:$who,workshop:$what,completion:$completion%"
+	echo "$completion"
 }
 
 
