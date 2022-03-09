@@ -99,5 +99,6 @@ EOF
 # Clean before
 docker container prune -f
 docker image prune -f
+docker network prune -f
 docker rmi $DCKBASE ${NAME}:latest
 docker build -t $NAME .

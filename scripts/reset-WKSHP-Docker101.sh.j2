@@ -13,4 +13,5 @@ ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rm $NAME${s
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker container prune -f\' && /bin/true
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker image prune -f\' && /bin/true
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rmi $NAME$stdid\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker network prune -f\' && /bin/true
 exit 0
