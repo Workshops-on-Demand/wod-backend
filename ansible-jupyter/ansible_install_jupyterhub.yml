@@ -270,6 +270,7 @@
         - paramiko
         - pycentral
         - jwt
+        - determined
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -326,6 +327,7 @@
         - paramiko
         - pycentral
         - jwt
+        - determined
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
