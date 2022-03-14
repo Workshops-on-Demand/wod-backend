@@ -12,18 +12,14 @@ Last seat for speaker
 
 1-75 HPE CP API    
 
-[1-20] challenges  Location :  Grenoble 
+[21-51] workshops Location :  Mougins  
 
-[21-74] workshops Location :  Mougins  
-
-[75] speaker for live sessions 
+[52] speaker for live sessions 
 
   
 
 
 76-150 RedFishOverview 
-
-[76-95] challenges Location :  Grenoble 
 
 [96-149] workshops Location :  Mougins  
 
@@ -262,11 +258,11 @@ Last seat for speaker
 
 
 
-1581-1625 Ansible 101
+55-95 Ansible 101
 
-[1581-1625] workshops Location :  Mougins
+[55-95] workshops Location :  Mougins
 
-[1625] speaker for live sessions
+[95] speaker for live sessions
 
 
 
