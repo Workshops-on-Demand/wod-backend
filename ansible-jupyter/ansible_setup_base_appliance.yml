@@ -203,6 +203,15 @@
       name: nslcd
     when: LDAPSETUP == "1"
 
+  - name: Disable SELinux for now as our students are non-standard
+    become: yes
+    become_user: root
+    selinux:
+      policy: targeted
+      state: permissive
+    when:
+      - ansible_facts['distribution'] == "CentOS"
+
   - name: Ensure Linux students users home dir exist
     become: yes
     become_user: root
