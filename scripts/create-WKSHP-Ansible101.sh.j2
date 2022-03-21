@@ -31,7 +31,7 @@ sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh
 
 # Allow local ssh connection without passwd
 # on last line ($) of file authorized_keys, read (r) id_rsa
-sudo sed -i '$r /student/student'$stdid'/.ssh/id_rsa.pub' /student/student$stdid/.ssh/authorized_keys
+sudo install -m 0600 -o student$stdid /student/student$stdid/.ssh/id_rsa.pub /student/student$stdid/.ssh/authorized_keys
 
 # Cleanup
 rm -rf $TMPDIR
