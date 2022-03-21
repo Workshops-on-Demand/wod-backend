@@ -148,6 +148,11 @@ if [ $action != "RESET" ]; then
                      "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 
 		elif [ "$action" = "CLEANUP" ]; then
+			# Launch cleanup script if any
+			if [ -x "$JUPPROC/scripts/cleanup-$w.sh" ]; then
+				echo "Cleaning up workshop $w"
+				$JUPPROC/scripts/cleanup-$w.sh
+			fi
 			# Keep completion status
 			completion=`get_wod_completion_ratio`
 
