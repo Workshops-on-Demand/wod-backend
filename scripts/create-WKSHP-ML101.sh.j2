@@ -28,7 +28,7 @@ cat > $TMPDIR/dockerd-entrypoint.sh << EOF
 export HTTPPORT
 tini -g -- start-notebook.sh &
 sleep 3
-jupyter notebook list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/mltoken
+jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/mltoken
 sleep infinity
 EOF
 
@@ -64,7 +64,7 @@ services:
     build: .
     #privileged: true
     ports:
-      - "$httpport:80"
+      - "$httpport:8888"
       - "$mlport:4040"
       - "$mlport2:4041"
 #    volumes:
@@ -85,6 +85,8 @@ ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launc
 
 # ssh to get token from running container
 container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=$NAME$stdid")
+# We need time to let jupyterhub start before getting token
+sleep 5
 ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:/student/student$stdid/mltoken $TMPDIR"
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/mltoken $TMPDIR
 
