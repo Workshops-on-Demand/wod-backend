@@ -12,6 +12,7 @@ ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker exec $NAME$
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'mkdir -p $TMPDIR\'
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker cp $NAME${stdid}_$NAME${stdid}_1:/tmp/ipynb.tar $TMPDIR\'
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/ipynb.tar $TMPDIR
+chmod 755 $TMPDIR
 chmod 644 $TMPDIR/ipynb.tar
-sudo su - student$stdid -c "tar cf -C /student/student$stdid/$w $TMPDIR/ipynb.tar"
+sudo su - student$stdid -c "cd /student/student$stdid/$w ; tar xf $TMPDIR/ipynb.tar"
 exit 0
