@@ -33,7 +33,7 @@ sleep infinity
 EOF
 
 cat > $TMPDIR/Dockerfile << EOF
-FROM jupyter/scipy-notebook:b6fdd5dae6cb
+FROM ${NAME}:latest
 USER root
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
