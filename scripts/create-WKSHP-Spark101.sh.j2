@@ -28,12 +28,12 @@ cat > $TMPDIR/dockerd-entrypoint.sh << EOF
 export HTTPPORT
 tini -g -- start-notebook.sh &
 sleep 3
-jupyter notebook list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/sparktoken
+jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/sparktoken
 sleep infinity
 EOF
 
 cat > $TMPDIR/Dockerfile << EOF
-FROM jupyter/all-spark-notebook
+FROM ${NAME}:latest
 USER root
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
@@ -49,6 +49,7 @@ USER student$stdid
 ENV NB_USER student$stdid
 ENV NB_UID $stdid
 ENV HTTPPORT $httpport
+RUN git clone https://github.com/hpe-container-platform-community/Apache-Spark-Tutorials /student/student$stdid/
 EOF
 
 
@@ -83,22 +84,11 @@ ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/la
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
 
 # ssh to get token from running container
-container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=sparklab$stdid")
-# Please keep the redirection as without, launched from procmail, it doesn't work
-#ssh -q {{ NOCHECKSSH }} $RTARGET "docker exec $container_id jupyter notebook list > $TMPDIR/output"
-#scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/output $TMPDIR
-#echo "FILE content:"
-#cat $TMPDIR/output
-#jup_token=`cat $TMPDIR/output | cut -d'='  -f2 | cut -d' ' -f1 | grep -vi currently`
-#test fred
-#jup_tokentemp=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker exec -t $container_id jupyter notebook list | tail -1)
-#jup_token=$(cat $jup_tokentemp | cut -d'=' -f2 | cut -d' ' -f1)
-#jup_token=21105c84ef1acc6f88faf488e2453f64e11e8684b8d8e250
-# Same sleep time as inside the container
-sleep 3
+container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=$NAME$stdid")
+# We need time to let jupyterhub start before getting token
+sleep 5
 ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:/student/student$stdid/sparktoken $TMPDIR"
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/sparktoken $TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp /tmp/sparklab $container_id:/student/student$stdid"
 
 # ansible-vault to store it in the pass file creating a SPARKTOK ansible variable
 if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
@@ -108,5 +98,5 @@ ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyte
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
-#ssh -q {{ NOCHECKSSH }} $RTARGET rm -rf $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR

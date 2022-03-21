@@ -9,10 +9,15 @@ NAME=sparklab
 mkdir -p $HOME/$NAME
 cd $HOME/$NAME
 
-DCKBASE="jupyter/all-spark-notebook"
+DCKBASE="jupyter/all-spark-notebook:spark-3.2.1"
+
+cat > Dockerfile << EOF
+FROM $DCKBASE
+RUN pip install --no-cache-dir vdom==0.5 pyspark==3.2.1
+EOF
 
 # Clean before
 docker container prune -f
 docker image prune -f
-docker rmi $DCKBASE
-docker pull $DCKBASE
+docker rmi $DCKBASE ${NAME}:latest
+docker build -t $NAME .
