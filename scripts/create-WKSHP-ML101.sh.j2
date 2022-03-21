@@ -33,7 +33,7 @@ sleep infinity
 EOF
 
 cat > $TMPDIR/Dockerfile << EOF
-FROM jupyter/all-spark-notebook
+FROM jupyter/scipy-notebook:b6fdd5dae6cb
 USER root
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
@@ -49,6 +49,8 @@ USER student$stdid
 ENV NB_USER student$stdid
 ENV NB_UID $stdid
 ENV HTTPPORT $httpport
+RUN pip install --no-cache-dir vdom==0.5
+RUN git clone https://github.com/snowch/ml-101 /student/student$stdid/
 EOF
 
 
@@ -63,7 +65,7 @@ services:
     build: .
     #privileged: true
     ports:
-      - "$httpport:8888"
+      - "$httpport:80"
       - "$mlport:4040"
       - "$mlport2:4041"
 #    volumes:
