@@ -8,7 +8,8 @@ TMPDIR=/tmp/$NAME.$stdid.ret
 
 mkdir -p $TMPDIR
 # Retrieve *.ipynb files to compute completion ratio
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker exec $NAME${stdid}_$NAME${stdid}_1 tar cf . /tmp/ipynb.tar\'
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker exec $NAME${stdid}_$NAME${stdid}_1 tar cf /tmp/ipynb.tar .\'
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'mkdir -p $TMPDIR\'
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker cp $NAME${stdid}_$NAME${stdid}_1:/tmp/ipynb.tar $TMPDIR\'
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/ipynb.tar $TMPDIR
 chmod 644 $TMPDIR/ipynb.tar
