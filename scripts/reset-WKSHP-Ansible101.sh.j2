@@ -5,12 +5,4 @@ set -x
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Ansible101'] }}
 {{ SCRIPTDIR }}/reset-appliance.sh
 
-NAME=dockerlab
-
-# Stop/Remove existing content first - these commands could fail so protect with true from set -e
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker stop $NAME${stdid}_$NAME${stdid}_1\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rm $NAME${stdid}_$NAME${stdid}_1\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker container prune -f\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker image prune -f\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rmi $NAME$stdid\' && /bin/true
 exit 0

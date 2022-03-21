@@ -20,13 +20,11 @@ echo wid=$wid
 APPMIN=`get_range_min $wid`
 echo stdid=$stdid
 echo APPMIN=$APPMIN
-sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Ansible101'] }}))
-
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
 Host $RTARGET
-    Port $sshport
+    StrictHostKeyChecking no
 EOF
 sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
 
