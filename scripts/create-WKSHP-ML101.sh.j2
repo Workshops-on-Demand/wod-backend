@@ -49,7 +49,6 @@ USER student$stdid
 ENV NB_USER student$stdid
 ENV NB_UID $stdid
 ENV HTTPPORT $httpport
-RUN pip install --no-cache-dir vdom==0.5
 RUN git clone https://github.com/snowch/ml-101 /student/student$stdid/
 EOF
 
@@ -85,22 +84,9 @@ ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/la
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
 
 # ssh to get token from running container
-container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=mllab$stdid")
-# Please keep the redirection as without, launched from procmail, it doesn't work
-#ssh -q {{ NOCHECKSSH }} $RTARGET "docker exec $container_id jupyter notebook list > $TMPDIR/output"
-#scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/output $TMPDIR
-#echo "FILE content:"
-#cat $TMPDIR/output
-#jup_token=`cat $TMPDIR/output | cut -d'='  -f2 | cut -d' ' -f1 | grep -vi currently`
-#test fred
-#jup_tokentemp=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker exec -t $container_id jupyter notebook list | tail -1)
-#jup_token=$(cat $jup_tokentemp | cut -d'=' -f2 | cut -d' ' -f1)
-#jup_token=21105c84ef1acc6f88faf488e2453f64e11e8684b8d8e250
-# Same sleep time as inside the container
-sleep 3
+container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=$NAME$stdid")
 ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:/student/student$stdid/mltoken $TMPDIR"
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/mltoken $TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp /tmp/mllab $container_id:/student/student$stdid"
 
 # ansible-vault to store it in the pass file creating a MLTOK ansible variable
 if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then

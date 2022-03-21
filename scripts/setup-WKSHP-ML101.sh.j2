@@ -11,8 +11,13 @@ cd $HOME/$NAME
 
 DCKBASE="jupyter/scipy-notebook:b6fdd5dae6cb"
 
+cat > Dockerfile << EOF
+FROM $DCKBASE
+RUN pip install --no-cache-dir vdom==0.5
+EOF
+
 # Clean before
 docker container prune -f
 docker image prune -f
-docker rmi $DCKBASE
-docker pull $DCKBASE
+docker rmi $DCKBASE ${NAME}:latest
+docker build -t $NAME .
