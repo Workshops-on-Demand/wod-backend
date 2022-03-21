@@ -5,6 +5,7 @@ scripts/cleanup-users.sh
 scripts/cleanup-processes.sh
 scripts/reset-*.sh
 scripts/create-*.sh
+scripts/cleanup-*.sh
 scripts/setup-*.sh
 scripts/post-*.sh
 scripts/*.shc
