@@ -23,7 +23,7 @@ echo APPMIN=$APPMIN
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
-Host $RTARGET
+Host *
     StrictHostKeyChecking no
 EOF
 sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
