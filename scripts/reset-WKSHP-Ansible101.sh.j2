@@ -5,4 +5,7 @@ set -x
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Ansible101'] }}
 {{ SCRIPTDIR }}/reset-appliance.sh
 
+# Cleanup
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'rm -rf /student/student$stdid/.??* /student/student$stdid/*\'
+
 exit 0
