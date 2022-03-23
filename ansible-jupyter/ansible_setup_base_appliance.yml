@@ -53,6 +53,7 @@
       pkg:
       - vim
       - ntp
+      - rsync
 
   - name: Ensure that directory /student exists
     become: yes
