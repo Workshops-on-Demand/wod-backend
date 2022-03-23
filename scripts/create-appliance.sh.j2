@@ -19,8 +19,14 @@ if [ _"$HOMEDIR" != _"" ]; then
 	# Avoid changing passwd in case of LDAP
 	[ -z ${LDAPSETUP+x} ] && ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	# Preventive cleanup
-	ssh $RTARGET sudo su - student$stdid -c \'rm -rf $HOMEDIR/.??* $HOMEDIR/*\'
-	ssh $RTARGET sudo su - student$stdid -c \'cp -a /etc/skel/.??* $HOMEDIR/\'
+    cat > $TMPDIR/preventive-cleanup << EOF
+#!/bin/bash
+rm -rf $HOMEDIR/.??* $HOMEDIR/*
+rsync -av /etc/skel/ $HOMEDIR/
+EOF
+    scp $TMPDIR/preventive-cleanup $RTARGET:$TMPDIR/
+	ssh $RTARGET chmod 755 $TMPDIR/preventive-cleanup
+	ssh $RTARGET sudo su - student$stdid -c $TMPDIR/preventive-cleanup
 	# SSH setup
 	ssh $RTARGET sudo install -d -m 0700 -o student$stdid $HOMEDIR/.ssh
 	ssh $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
