@@ -51,11 +51,6 @@ kubectl config current-context
 kubectl delete services/kubernetes-bootcamp-student$stdid
 kubectl delete deployment/kubernetes-bootcamp-student$stdid
 
-kubectl delete services/kubernetes-bootcamp-$studentId
-kubectl delete deployment/kubernetes-bootcamp-$studentId
-
-
-
 
 #Closing the session
 curl -k -i -s --request DELETE "https://${controller_endpoint}/api/v2/session/${SessionId}" \
