@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd
 cd /student/student$stdid/$w
 echo " This script resets the WKSHP-K8s101 Workshop content for:" student$stdid
 # associated to studentXY.
@@ -10,7 +11,7 @@ echo "Setting  environment variables to help cleanup"
 studentId="student$stdid" 
 password="$randompw" 
 
-tenantname="K8sHackTenant" #case sensitive
+tenantname="K8s101" #case sensitive
 
 # fixed environment variables setup by the HPE ECP lab administrator - Please DO NOT MODIFY!!
 
@@ -49,6 +50,12 @@ kubectl config current-context
 #Delete services and deployments
 kubectl delete services/kubernetes-bootcamp-student$stdid
 kubectl delete deployment/kubernetes-bootcamp-student$stdid
+
+kubectl delete services/kubernetes-bootcamp-$studentId
+kubectl delete deployment/kubernetes-bootcamp-$studentId
+
+
+
 
 #Closing the session
 curl -k -i -s --request DELETE "https://${controller_endpoint}/api/v2/session/${SessionId}" \
