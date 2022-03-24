@@ -47,8 +47,8 @@ curl -k -s --request GET "https://${controller_endpoint}/api/v2/k8skubeconfig" \
 kubectl config current-context
 
 #Delete services and deployments
-kubectl delete services/kubernetes-bootcamp-student$tdid
-kubectl delete deployment/kubernetes-bootcamp-student$stid
+kubectl delete services/kubernetes-bootcamp-student$stdid
+kubectl delete deployment/kubernetes-bootcamp-student$stdid
 
 #Closing the session
 curl -k -i -s --request DELETE "https://${controller_endpoint}/api/v2/session/${SessionId}" \
