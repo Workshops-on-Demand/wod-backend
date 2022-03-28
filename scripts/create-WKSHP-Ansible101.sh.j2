@@ -27,11 +27,13 @@ Host *
     StrictHostKeyChecking no
 EOF
 sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
-
-
 # Allow local ssh connection without passwd
-# on last line ($) of file authorized_keys, read (r) id_rsa
 sudo install -m 0600 -o student$stdid /student/student$stdid/.ssh/id_rsa.pub /student/student$stdid/.ssh/authorized_keys
+
+# Setup Remote appliance account
+ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/config $RTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
 
 # Cleanup
 rm -rf $TMPDIR
