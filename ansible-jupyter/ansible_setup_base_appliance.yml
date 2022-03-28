@@ -222,14 +222,12 @@
     when:
       - ansible_facts['distribution'] == "CentOS"
 
-  - name: Ensure Linux students users home dir exist
+  - name: Ensure Linux students users home dir exist with correct mode
     become: yes
     become_user: root
     file:
       path: "/student/{{ 'student%s' | format(item) }}"
-      owner: "{{ 'student%s' | format(item) }}"
-      group: "{{ 'student%s' | format(item) }}"
-      mode: 0750
+      mode: '0750'
       state: directory
     loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
     # Do it in all cases LDAP or not as mode needs to be confirmed for ssh login

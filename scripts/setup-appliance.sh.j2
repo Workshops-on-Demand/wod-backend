@@ -55,7 +55,7 @@ if [ -x "$JUPPROC/scripts/setup-$w.sh" ]; then
 	TMPDIR=/tmp/sa.$$
 	ssh $RTARGET mkdir -p $TMPDIR
 	scp $JUPPROC/scripts/setup-$w.sh $RTARGET:$TMPDIR/
-        ssh $RTARGET "$TMPDIR/setup-$w.sh"
+    ssh $RTARGET "$TMPDIR/setup-$w.sh"
 	ssh $RTARGET rm -rf $TMPDIR
 	echo "End of Appliance setup for Workshop $w at `date`"
 fi

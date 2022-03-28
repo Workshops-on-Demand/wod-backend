@@ -19,5 +19,8 @@ if [ -f "$JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml" ]; then
 	ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
 fi
 
+# Fix for CentOS where ansible seems buggy (user directory modes not setup correctly)
+ssh $RTARGET sudo chmod 750 '/student/student*'
+
 echo "Final script setup phase for $w on remote appliance $RTARGET"
 exit 0
