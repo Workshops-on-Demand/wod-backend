@@ -742,6 +742,28 @@
         enabled: yes
         name: fail2ban
 
+    # On CentOS 7 we need to remove strict mode for sshd to work with our conf (mode 770 needed for user home dirs)
+    - name: Fix sshd conf on CentOS
+      lineinfile:
+        path: "/etc/ssh/sshd_config"
+        line: 'StrictModes no'
+        state: present
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] == "7"
+
+    - name: restart sshd service
+      become: yes
+      become_user: root
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+        name: sshd
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] == "7"
+
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the jupyter-notebook git repo
       git:

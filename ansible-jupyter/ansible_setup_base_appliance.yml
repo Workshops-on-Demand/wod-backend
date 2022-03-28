@@ -111,15 +111,6 @@
     loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
     when: LDAPSETUP != "1"
 
-  - name: Ensure Linux students home dir are restricted correctly
-    become: yes
-    become_user: root
-    file:
-      path: "/student/{{ 'student%s' | format(item) }}"
-      mode: '0750'
-    loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
-    when: LDAPSETUP != "1"
-
   - name: Configure LDAP client 1/3
     become: yes
     become_user: root
@@ -222,12 +213,16 @@
     when:
       - ansible_facts['distribution'] == "CentOS"
 
+    # Do it in all cases LDAP or not as mode needs to be confirmed for ssh login
+    # However, that doesn't seem to work on CentOS as dirs remains with mode 770
+    # However, for rsync to work, we need to keep 770 !!
   - name: Ensure Linux students users home dir exist with correct mode
     become: yes
     become_user: root
     file:
       path: "/student/{{ 'student%s' | format(item) }}"
+      owner: "{{ 'student%s' | format(item) }}"
+      group: "{{ 'student%s' | format(item) }}"
       mode: '0750'
       state: directory
     loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
-    # Do it in all cases LDAP or not as mode needs to be confirmed for ssh login
