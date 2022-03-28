@@ -111,6 +111,15 @@
     loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
     when: LDAPSETUP != "1"
 
+  - name: Ensure Linux students home dir are restricted correctly
+    become: yes
+    become_user: root
+    file:
+      path: "/student/{{ 'student%s' | format(item) }}"
+      mode: '0750'
+    loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+    when: LDAPSETUP != "1"
+
   - name: Configure LDAP client 1/3
     become: yes
     become_user: root
