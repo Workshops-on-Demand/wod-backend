@@ -3,7 +3,7 @@
 # This script creates the BMC simulators in the VMs
 # associated to the student. 
 
-# Version 0.31
+# Version 0.32
 
 KITPATH=/usr/kits
 KITPATHVM=$KITPATH/VMs/OpenBMC
@@ -35,7 +35,11 @@ ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/Redfish
 
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/rmc $KITPATH/VMs/RedfishMockups/student$stdid-rmc
 
+# Modify SDF mockup: switch from https to http and generate internal server error when creating user
+# to avoid mockup server to hang.
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }}  sed -i -e "s?http://localhost:8000?https://{{ JPHOSTEXT }}:${FWDPORTRFSDF}?g"  $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist/index.js
+
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "sed -i -e 's?post\((./redfish/v1/AccountService/Accounts.\)?get\1?'"  $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist/index.js
 
 # Start Obmc, ilo5 and SDF simulators
 ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
