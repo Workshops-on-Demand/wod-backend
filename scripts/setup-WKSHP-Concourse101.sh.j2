@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#set -x
+
+echo "Prepare the Concourse101 container compose yml file"
+
+NAME=concourselab
+
+mkdir -p $HOME/$NAME
+cd $HOME/$NAME
+
+
+# Clean before
+docker container prune -f
+docker image prune -f
