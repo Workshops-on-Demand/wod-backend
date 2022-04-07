@@ -10,13 +10,19 @@ Last seat for speaker
 
   
 
-1-75 HPE CP API    
+21-54 HPE CP API    
 
-[21-51] workshops Location :  Mougins  
+[21-53] workshops Location :  Mougins  
 
-[52] speaker for live sessions 
+[54] speaker for live sessions 
 
   
+55-75 Ansible 101
+
+[55-75] workshops Location :  Mougins
+
+[75] speaker for live sessions
+
 
 
 76-150 RedFishOverview 
@@ -60,12 +66,17 @@ Last seat for speaker
 
   
 
+376-395 Concourse 101
 
-376-450  API 101 
+[376-401] workshops Location : Mougins 
 
-[376-395] challenges 
+[401] speakers SMES 
 
-[396-449] workshops Location :  Mougins   
+
+
+401-450  API 101 
+
+[401-449] workshops Location :  Mougins   
 
 [450] speakers SMES 
 
