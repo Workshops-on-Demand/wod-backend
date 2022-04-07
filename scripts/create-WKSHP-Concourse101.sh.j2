@@ -31,43 +31,48 @@ services:
     image: postgres
     environment:
       - POSTGRES_DB=concourse
-      - POSTGRES_PASSWORD=$NAME$stdid_pass
-      - POSTGRES_USER=$NAME$stdid_user
+      - POSTGRES_PASSWORD=$NAME${stdid}_pass
+      - POSTGRES_USER=$NAME${stdid}_user
       - PGDATA=/database
 
   concourse:
-    image: concourse/concourse
+    image: concourse/concourse:7.7.1-ubuntu
     command: quickstart
     privileged: true
     depends_on: [$NAME-db-$stdid]
     ports: ["$httpport:8080"]
     environment:
-      - CONCOURSE_POSTGRES_HOST=concourse-db
-      - CONCOURSE_POSTGRES_USER=$NAME$stdid_user
-      - CONCOURSE_POSTGRES_PASSWORD=$NAME$stdid_pass
+      - CONCOURSE_POSTGRES_HOST=$NAME${stdid}_$NAME-db-${stdid}_1
+      - CONCOURSE_POSTGRES_USER=$NAME${stdid}_user
+      - CONCOURSE_POSTGRES_PASSWORD=$NAME${stdid}_pass
       - CONCOURSE_POSTGRES_DATABASE=concourse
-      - CONCOURSE_EXTERNAL_URL
+      - CONCOURSE_EXTERNAL_URL=http://$RTARGET:8080
       - CONCOURSE_ADD_LOCAL_USER=student$stdid:$randompw
       - CONCOURSE_MAIN_TEAM_LOCAL_USER=admin
 
 EOF
+
+
 cat > $TMPDIR/launch-$NAME << EOF
 #!/bin/bash
 cd $TMPDIR
-docker-compose up --build -d
+docker-compose up -d
+
 EOF
 
 # Copy content and start container
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
-scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $RTARGET:$TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $RTARGET:$TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME 
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
 
 # ansible-vault to store it in the pass file creating a CONCOURSETOK ansible variable
 if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
 	mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
+fi
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
+#ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR
+
