@@ -50,6 +50,7 @@ ENV NB_USER student$stdid
 ENV NB_UID $stdid
 ENV HTTPPORT $httpport
 RUN git clone https://github.com/snowch/ml-101 /student/student$stdid/
+RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
 EOF
 
 
