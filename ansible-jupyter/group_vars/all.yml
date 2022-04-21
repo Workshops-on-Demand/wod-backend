@@ -11,7 +11,7 @@ GIDBASE: 2000
 UIDBASE: 2000
 VAULTPWD: ceciestunmotdepassecompliquenomdenom!!!!!123
 SURVEYURL: http://bit.ly/hackshack-survey
-SURVEYCHALURL: http://bit.ly/hackshack-challenge-survey
+SURVEYCHALURL: http://bit.ly/hpe-discover-2022-sw-challenges
 TEMPTOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJuYW1lIjoiRGlkaWVyIExhbGxpIiwiZW1haWwiOiJkaWRpZXIubGFsbGlAaHBlLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJHl0RGdZRHN0LjFoZXpPcWszcDRyVnVlR2NISjhDVW5vZ3pJSXE2RWVCNDJESm85T2w4aWVXIiwiY29tcGFueSI6ImhwZSIsInJvbGUiOiJ1c2VyIiwiYWN0aXZlIjp0cnVlLCJjcmVhdGVkQXQiOiIyMDIxLTAxLTE0VDIwOjIwOjA3LjcxOFoiLCJ1cGRhdGVkQXQiOiIyMDIxLTAxLTE0VDIwOjIwOjA3LjcxOFoifSwiaWF0IjoxNjEwNjU1NzQwfQ.gx4onTcPil6ezBkjLg_quWQb05eHXKOF3wr5dDGb08U
 NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 GREENLAKE_IAM_API_URL: https://iam.us1.greenlake-hpe.com
@@ -31,4 +31,6 @@ ARUBA_CLIENTID: xxxxxx
 ARUBA_CLIENTSECRET: yyyyyyyy
 ARUBA_TOKEN_USERNAME: hpe.hackshack@protonmail.com
 ARUBA_TOKEN_PASSWORD: Aruba@100
-
+# Painful Brranding !!
+BRANDING: HPE Developer
+BRANDINGWOD: HPE Developer
