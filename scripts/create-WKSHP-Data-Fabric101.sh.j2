@@ -9,7 +9,7 @@ if [ _"`get_ldap_status $wid`" != _"false" ]; then
 fi
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Data-Fabric101'] }}
 # Start by cleaning up stuff - do it early as after we setup .ssh content
-{{ SCRIPTDIR }}/reset-$w.sh
+{{ SCRIPTDIR }}/reset-$ws.sh
 {{ SCRIPTDIR }}/create-appliance.sh
 
 # Setup sec-student for ssh connection
