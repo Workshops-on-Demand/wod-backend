@@ -13,7 +13,7 @@ if ($@) {
 print("Hash is:\n");
 print(Dumper($maptable));
 
-my %maptable = %$maptable;
+my @maptable = @$maptable;
 
 my $dirname = $ARGV[0];
 
@@ -46,9 +46,11 @@ sub recurse1 {
    }
    $/ = $sep;
    # subsitute using external hash  
-   foreach my $key (keys %maptable) {
-      #print "Substitue string **$key** by **$maptable{$key}**\n";
-      $text =~ s/$key/$maptable{$key}/g;
+   foreach my $elt (@maptable) {
+      foreach my $key (keys %$elt) {
+        #print "Substitue string **$key** by **$elt->{$key}**\n";
+        $text =~ s/$key/$elt->{$key}/g;
+      }
    }
    open(FILE, "> $filename") || (print "could not write into $filename: $!" && return);
    print FILE $text;
