@@ -32,5 +32,7 @@ ARUBA_CLIENTSECRET: yyyyyyyy
 ARUBA_TOKEN_USERNAME: hpe.hackshack@protonmail.com
 ARUBA_TOKEN_PASSWORD: Aruba@100
 # Painful Brranding !!
-BRANDING: HPE Developer
-BRANDINGWOD: HPE Developer
+BRANDING: "HPE Developer"
+BRANDINGWOD: "HPE Developer"
+BRANDINGLOGO: "![HPEDEVlogo](Pictures/hpe-dev-logo.png)"
+BRANDINGURL: "https://hpedev.io"
