@@ -41,6 +41,47 @@
        - ansible_facts['distribution'] == "Ubuntu"
        - ansible_facts['distribution_major_version'] >= "20"
 
+    - name: Add Hashicorp GPG Key to APT
+      become: yes
+      become_user: root
+      apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+      when:
+       - ansible_facts['distribution'] == "Ubuntu"
+       - ansible_facts['distribution_major_version'] >= "20"
+
+    - name: Add Hashicorp APT repository
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: deb [arch=amd64] https://apt.releases.hashicorp.com stable main
+        state: present
+      when:
+       - ansible_facts['distribution'] == "Ubuntu"
+       - ansible_facts['distribution_major_version'] >= "20"
+
+    - name: Add Hashicorp GPG Key to RPM DB
+      become: yes
+      become_user: root
+      rpm_key:
+        key: https://rpm.releases.hashicorp.com/gpg
+        state: present
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
+    - name: Add Hashicorp YUM repository
+      become: yes
+      become_user: root
+      yum_repository:
+        name: hashicorp
+        baseurl: "https://rpm.releases.hashicorp.com/RHEL/{{ ansible_facts['distribution_major_version'] }}/x86_64/stable"
+        description: "Upstream Hashicorp Yum repository"
+        enabled: yes
+        state: present
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+
     - name: Add K8s GPG Key to APT
       become: yes
       become_user: root
@@ -186,6 +227,7 @@
         - patch
         - expect
         - netcat
+        - terraform
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
