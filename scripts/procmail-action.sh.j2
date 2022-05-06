@@ -78,6 +78,7 @@ else
 fi
 # If that doesn't fail, then export the workshop name
 export w
+export ws
 export wid=`get_workshop_id $w`
 
 # Handle CREATE and CLEANUP first
@@ -117,15 +118,15 @@ if [ $action != "RESET" ]; then
 			if [ _"$compile" != _"" ]; then
 				ansible-playbook $JUPPROC/ansible-jupyter/ansible_compile_scripts.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
 			fi
-			if [ -x "$JUPPROC/scripts/create-$w.sh" ]; then
+			if [ -x "$JUPPROC/scripts/create-$ws.sh" ]; then
 				echo "Setup workshop $w Backend"
-				$JUPPROC/scripts/create-$w.sh
+				$JUPPROC/scripts/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
-			if [ -x "$JUPPROC/scripts/post-copy-$w.sh" ]; then
+			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			if [ -x "$JUPPROC/scripts/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
-				$JUPPROC/scripts/post-copy-$w.sh
+				$JUPPROC/scripts/post-copy-$ws.sh
 			fi
 			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml
 		fi
@@ -157,9 +158,9 @@ if [ $action != "RESET" ]; then
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Launch cleanup script if any
-			if [ -x "$JUPPROC/scripts/cleanup-$w.sh" ]; then
+			if [ -x "$JUPPROC/scripts/cleanup-$ws.sh" ]; then
 				echo "Cleaning up workshop $w"
-				$JUPPROC/scripts/cleanup-$w.sh
+				$JUPPROC/scripts/cleanup-$ws.sh
 			fi
 			# Keep completion status
 			completion=`get_wod_completion_ratio`
@@ -248,12 +249,12 @@ elif [ "$action" = "RESET" ]; then
 		done
 
 		# Get Workshop backend reset status
-		if [ ! -x "$JUPPROC/scripts/reset-$w.sh" ]; then
+		if [ ! -x "$JUPPROC/scripts/reset-$ws.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
 			echo "Reseting workshop $w Backend"
-			$JUPPROC/scripts/reset-$w.sh
+			$JUPPROC/scripts/reset-$ws.sh
 		fi
 
 		while [ $j -ge $min ]; do

@@ -13,7 +13,7 @@ KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
 if [ _"$USER" != _"jupyter" ]; then
 	script="{{ STDDIR }}/$USER/reset-globalbmc.shc.x"
 else
-	script="{{ SCRIPTDIR }}/reset-$w.sh"
+	script="{{ SCRIPTDIR }}/reset-$ws.sh"
 fi
 echo "Re-launching simulators for id $stdid"
 FWDPORTSSH=$(({{ SSHOBMCBASEPORT }}+$stdid))

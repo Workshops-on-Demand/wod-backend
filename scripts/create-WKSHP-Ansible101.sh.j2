@@ -6,7 +6,7 @@ source {{ SCRIPTDIR }}/functions.sh
 
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Ansible101'] }}
 # Start by cleaning up stuff - do it early as after we setup .ssh content
-{{ SCRIPTDIR }}/reset-$w.sh
+{{ SCRIPTDIR }}/reset-$ws.sh
 {{ SCRIPTDIR }}/create-appliance.sh
 
 NAME=ansiblelab
