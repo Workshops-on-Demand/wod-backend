@@ -786,6 +786,8 @@
 
     # On CentOS 7 we need to remove strict mode for sshd to work with our conf (mode 770 needed for user home dirs)
     - name: Fix sshd conf on CentOS
+      become: yes
+      become_user: root
       lineinfile:
         path: "/etc/ssh/sshd_config"
         line: 'StrictModes no'
