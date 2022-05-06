@@ -7,7 +7,7 @@ source {{ SCRIPTDIR }}/functions.sh
 # Change to its own appliance when in production
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Notebooks-CCPE'] }}
 # Start by cleaning up stuff - do it early as after we setup .ssh content
-{{ SCRIPTDIR }}/reset-$ws.sh
+{{ SCRIPTDIR }}/reset-$w.sh
 {{ SCRIPTDIR }}/create-appliance.sh
 
 NAME=ccpelab
