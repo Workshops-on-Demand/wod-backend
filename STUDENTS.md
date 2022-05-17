@@ -142,7 +142,16 @@ Last seat for speaker
   
 
 
-826-900 HPE CP  ML OPS  
+
+826-845 HPE ECP  DELTA LAKE
+
+[826-845] workshop  Location :  Mougins
+
+[836-845] challenge Location : Mougins
+
+
+
+846-900 HPE CP  ML OPS  
 
 [826-845] challenges  Location :  Grenoble 
 
@@ -293,14 +302,47 @@ Last seat for speaker
 
 
 
-1701-1735 GreenLake VMAAS API 101
+1701-1725 GreenLake VMAAS API 101
 
-[1701-1735] workshops Location :  Greenlake
+[1701-1725] workshops Location :  Greenlake
 
-[1735] speaker for live sessions
+[1725] speaker for live sessions
 
 
-1736-1775 GreenLake VMAAS API Advanced
+
+1726-1736 GreenLake Terraform Provider 101
+
+[1726-1736] workshops Location :  Greenlake
+
+[1736] speaker for live sessions
+
+
+
+1737-1747 GreenLake Terraform Provider 101 Challenge
+
+[1737-1747] Challenge Location :  Greenlake
+
+[1747] speaker for live sessions
+
+
+
+1747-1757 Dataspaces Challenge
+
+[1747-1757] Challenge Location :  Greenlake
+
+[1757] speaker for live sessions
+
+
+
+1758-1775 Dataspaces Workshop
+
+[1758-1775] Workshop Location :  Greenlake
+
+[1775] speaker for live sessions
+
+
+
+1748-1775 GreenLake VMAAS API Advanced
 
 [1736-1775] workshops Location :  Greenlake
 
@@ -308,13 +350,25 @@ Last seat for speaker
 
 
 
-1776-1850 HPE Cray CCPE 101
+1776-1799 HPE Cray CCPE 101
 
-[1776-1795] challenges  Location :  Greenlake
 
-[1796-1849] workshops Location :  Greenlake
+[1776-1799] workshops Location :  Greenlake
 
-[1850] speaker for live sessions
+[1799] speaker for live sessions
+
+
+1800-1825 DeterminedAI 101
+
+[1800-1810] challenges  Location :  Greenlake
+
+[1811-1825] workshops Location :  Greenlake
+
+[1825] speaker for live sessions
+
+
+1826-1850 Free
+
 
 
 1851-1925 Data Fabric 201
