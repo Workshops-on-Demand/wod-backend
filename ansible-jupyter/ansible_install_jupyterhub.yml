@@ -55,7 +55,7 @@
       become: yes
       become_user: root
       apt_repository:
-        repo: deb [arch=amd64] https://apt.releases.hashicorp.com stable main
+        repo: deb [arch=amd64] https://apt.releases.hashicorp.com focal main
         state: present
       when:
        - ansible_facts['distribution'] == "Ubuntu"
