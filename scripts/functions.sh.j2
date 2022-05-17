@@ -375,7 +375,7 @@ get_workshop_name() {
 		echo "Missing workshop name in the e-mail body"
 		exit -1
 	fi
-   ws=`echo $w |sed 's/CHLG/WKSHP/'`
+    ws=`echo $w |sed 's/CHLG/WKSHP/'`
 	if [ ! -d "$std0/$ws" ]; then
 		echo "Non-existant workshop $ws"
 		exit -1
