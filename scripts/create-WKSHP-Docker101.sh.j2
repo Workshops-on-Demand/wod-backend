@@ -25,18 +25,18 @@ httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Docke
 
 cat > $TMPDIR/Dockerfile << EOF
 FROM ${NAME}:latest
-RUN mkdir -p /student/student$stdid
-RUN useradd student$stdid -G docker -d /student/student$stdid
+RUN mkdir -p {{ STUDDIR }}/student$stdid
+RUN useradd student$stdid -G docker -d {{ STUDDIR }}/student$stdid
 # Used: perl -e 'use Crypt::PasswdMD5; print crypt("Redfish@TSS19", "\$6\$rl1WNGdr\$"),"\n"' to create the Password
 # Unlock the account
 RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
 RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
-WORKDIR /student/student$stdid
+WORKDIR {{ STUDDIR }}/student$stdid
 RUN mkdir .ssh
 RUN chmod 700 .ssh
 COPY authorized_keys .ssh
 RUN chmod 600 .ssh/authorized_keys
-RUN chown -R student$stdid:docker /student/student$stdid
+RUN chown -R student$stdid:docker {{ STUDDIR }}/student$stdid
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/sbin/sshd && /usr/sbin/vsftpd /etc/vsftpd/vsftpd.conf && /usr/local/bin/dockerd-entrypoint.sh
 # Would require dind-rootless but with that one I'm unable to install with apk packages. To be looked at.
@@ -48,7 +48,7 @@ cat > $TMPDIR/config << EOF
 Host $RTARGET
     Port $sshport
 EOF
-sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+sudo install -m 0600 -o student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
 
 # Look at https://stackoverflow.com/questions/34264348/docker-inside-docker-container
 # and http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
@@ -74,7 +74,7 @@ EOF
 
 # Copy content and start container
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo cp /student/student$stdid/.ssh/authorized_keys $TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo cp {{ STUDDIR }}/student$stdid/.ssh/authorized_keys $TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo chmod 644 $TMPDIR/authorized_keys
 scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME {{ SCRIPTDIR }}/dockerd-entrypoint.sh $RTARGET:$TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR

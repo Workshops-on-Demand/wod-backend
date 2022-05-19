@@ -66,19 +66,19 @@ EOF
 i=$STDMIN
 if [ $ACTION = "PDF" ]; then
 	source "{{ JPHUB }}/bin/activate"
-	for nb in /student/student$i/$WKSHP/*.ipynb; do
+	for nb in {{ STUDDIR }}/student$i/$WKSHP/*.ipynb; do
 		jupyter nbconvert --to pdf $nb
 	done
-	chmod 644 /student/student$i/$WKSHP/*.pdf
+	chmod 644 {{ STUDDIR }}/student$i/$WKSHP/*.pdf
 	exit 0
 fi
 if [ $ACTION = "WORD" ]; then
 	source "{{ JPHUB }}/bin/activate"
-	for nb in /student/student$i/$WKSHP/*.ipynb; do
+	for nb in {{ STUDDIR }}/student$i/$WKSHP/*.ipynb; do
 		nbo=`basename $nb .ipynb`
 		jupyter nbconvert --to=docx $nb --output $nbo.docx
 	done
-	chmod 644 /student/student$i/$WKSHP/*.docx
+	chmod 644 {{ STUDDIR }}/student$i/$WKSHP/*.docx
 	exit 0
 fi
 

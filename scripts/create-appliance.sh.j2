@@ -5,7 +5,7 @@ set -x
 ### copy ssh keys on the Appliance server
 TMPDIR=/tmp/app.$$
 sudo mkdir -p $TMPDIR
-sudo cp {{ STDDIR }}/student$stdid/.ssh/id_rsa.pub $TMPDIR
+sudo cp {{ STUDDIR }}/student$stdid/.ssh/id_rsa.pub $TMPDIR
 sudo chown -R $USER $TMPDIR
 
 if [ _"$RTARGET" = _"" ]; then

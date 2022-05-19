@@ -20,7 +20,7 @@ if [ $ret -ne 0 ]; then
 	git checkout -b student$stdid
 fi
 cd HPEECPGPU.$stdid
-sudo cp /student/student$stdid/$w/Code/NYCTaxi/* .
+sudo cp {{ STUDDIR }}/student$stdid/$w/Code/NYCTaxi/* .
 git add *
 git commit -m 'update values'
 if [ $ret -eq 0 ]; then

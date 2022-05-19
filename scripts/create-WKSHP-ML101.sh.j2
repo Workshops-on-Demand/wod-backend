@@ -28,7 +28,7 @@ cat > $TMPDIR/dockerd-entrypoint.sh << EOF
 export HTTPPORT
 tini -g -- start-notebook.sh &
 sleep 3
-jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/mltoken
+jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > {{ STUDDIR }}/student$stdid/mltoken
 sleep infinity
 EOF
 
@@ -37,20 +37,20 @@ FROM ${NAME}:latest
 USER root
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
-RUN mkdir -p /student/student$stdid
-RUN useradd student$stdid -u $stdid -g 100 -d /student/student$stdid
-RUN chown student$stdid:users /student/student$stdid
+RUN mkdir -p {{ STUDDIR }}/student$stdid
+RUN useradd student$stdid -u $stdid -g 100 -d {{ STUDDIR }}/student$stdid
+RUN chown student$stdid:users {{ STUDDIR }}/student$stdid
 # Unlock the account
 RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
 # In case we need sudo
 #RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
-WORKDIR /student/student$stdid
+WORKDIR {{ STUDDIR }}/student$stdid
 USER student$stdid
 ENV NB_USER student$stdid
 ENV NB_UID $stdid
 ENV HTTPPORT $httpport
-RUN git clone https://github.com/snowch/ml-101 /student/student$stdid/
-RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
+RUN git clone https://github.com/snowch/ml-101 {{ STUDDIR }}/student$stdid/
+RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace {{ STUDDIR }}/student$stdid/*.ipynb
 EOF
 
 
@@ -88,7 +88,7 @@ ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launc
 container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=$NAME$stdid")
 # We need time to let jupyterhub start before getting token
 sleep 5
-ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:/student/student$stdid/mltoken $TMPDIR"
+ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:{{ STUDDIR }}/student$stdid/mltoken $TMPDIR"
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/mltoken $TMPDIR
 
 # ansible-vault to store it in the pass file creating a MLTOK ansible variable

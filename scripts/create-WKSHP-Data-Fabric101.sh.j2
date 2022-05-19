@@ -32,5 +32,5 @@ Host sec-appliance
     Hostname $RTARGET
     User sec-student$stdid
 EOF
-sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+sudo install -m 0600 -o student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
 rm -rf $TMPDIR
