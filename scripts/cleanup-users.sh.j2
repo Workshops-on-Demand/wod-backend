@@ -19,6 +19,6 @@ echo "This script will empty home folders of students from $startrange to $endra
 source {{ SCRIPTDIR }}/functions.sh
 
 for stdid in $(seq $startrange $endrange); do 
-	stddir="/student/student$stdid"
+	stddir="{{ STUDDIR }}/student$stdid"
 	erase_student
 done

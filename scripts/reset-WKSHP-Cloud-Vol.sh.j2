@@ -3,7 +3,7 @@
 set -x
 
 echo " This script resets the Managing HPE Cloud Volumes through API calls Workshop content for: student$stdid"
-cd /student/student$stdid
+cd {{ STUDDIR }}/student$stdid
 
 # we will use cloud_vol-$stdid-*
 CloudVolumeID=cloud_vol-$stdid
@@ -17,7 +17,7 @@ if [ -x "./get-cloudvol-token.shc.x" ]; then
 	TOKEN=`./get-cloudvol-token.shc.x`
 	echo ${TOKEN}
 else
-	echo "Unable to find get-cloudvol-token.shc.x under /student/student$stdid/$w"
+	echo "Unable to find get-cloudvol-token.shc.x under {{ STUDDIR }}/student$stdid/$w"
 	echo "Please cleanup account manually"
 	exit -1
 fi
