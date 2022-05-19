@@ -5,7 +5,7 @@ use Data::Dumper;
 use File::Find;
 
 our $maptable;
-eval { require "$ENV{'HOME'}/jupyter-procmail/scripts/mapping.cfg.pl"; };
+eval { require "{{ SCRIPTDIR }}/scripts/mapping.cfg.pl"; };
 if ($@) {
     print("Config file not found: mapping.cfg.pl\n");
     exit(-1);
