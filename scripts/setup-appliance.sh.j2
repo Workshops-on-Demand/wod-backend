@@ -35,7 +35,7 @@ echo "Prepare environment variables for Workshop $w at `date`"
 export APIENDPOINT={{ APIENDPOINT }}
 export APIUSER={{ APIUSER }}
 export APIPWD={{ APIPWD }}
-export std0="$HOME/student0"
+export std0={{ JUPNOBO }}
 export accessToken=`get_session_token`
 # If that doesn't fail, then export the workshop name
 export wid=`get_workshop_id $w`

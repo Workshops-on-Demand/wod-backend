@@ -108,14 +108,14 @@
       become: yes
       become_user: root
       file:
-        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         state: absent
  
     - name: Create workspace directory for jupyter
       become: yes
       become_user: root
       file:
-        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces"
+        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces"
         state: directory
         owner: student{{ STDID }}
         group: student{{ STDID }}
@@ -127,15 +127,15 @@
       become_user: root
       template:
         src: "{{ JUPPROC }}/lab-a511.jupyterlab-workspace.j2"
-        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
+        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: 0644
 
-    - name: Synchronize target students with student0 Workshop content
+    - name: Synchronize target students with Notebooks Workshop content
       ansible.posix.synchronize:
         src: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
-        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts: 
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
 
@@ -146,12 +146,12 @@
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(JUPNOBO, STDDIR + '/student' + STDID) }}"
+        dest: "{{ item.path | regex_replace(JUPNOBO, STUDDIR + '/student' + STDID) }}"
       with_items: "{{ notebooks.files }}"
 
     - name: Create a checkpoint directory
       file:
-        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints"
+        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints"
         state: directory
         owner: jupyter
         group: jupyter
@@ -162,15 +162,15 @@
       become_user: root
       copy:
         src: "{{ JUPPROC }}/scripts/generate-pdf.sh"
-        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/generate-pdf.sh"
+        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: 0755
 
     - name: Create a checkpoint file for the user
       copy:
-        src: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
-        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
+        src: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
+        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
         owner: jupyter
         group: jupyter
         mode: 0644
@@ -179,7 +179,7 @@
       become: yes
       become_user: root
       file:
-        path: '{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
+        path: '{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
         owner: student{{ STDID }}
         group: student{{ STDID }}
         recurse: yes
@@ -189,7 +189,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: yes
         entity: jupyter
         etype: user
@@ -200,7 +200,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: yes
         entity: jupyter
         etype: user

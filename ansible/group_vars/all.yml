@@ -1,5 +1,5 @@
 ---
-STDDIR: "{{ ansible_env.STUDDIR }}"
+STUDDIR: "{{ ansible_env.STUDDIR }}"
 JUPNOBO: "{{ ansible_env.JUPNOBO }}"
 JUPPROC: "{{ ansible_env.JUPPROC }}"
 JUPPRIV: "{{ ansible_env.JUPPRIV }}"

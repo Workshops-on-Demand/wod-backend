@@ -37,7 +37,7 @@
       become: yes
       become_user: root
       file:
-        path: "/student/{{ 'sec-student%s' | format(item) }}"
+        path: "{{ STUDDIR }}/{{ 'sec-student%s' | format(item) }}"
         owner: "{{ 'sec-student%s' | format(item) }}"
         group: "{{ 'sec-student%s' | format(item) }}"
         mode: 0750

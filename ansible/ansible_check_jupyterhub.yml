@@ -394,11 +394,11 @@
         - jupyterhub
         - kill-processes
 
-    - name: Ensure that directory /student exists
+    - name: Ensure that directory {{ STUDDIR }} exists
       become: yes
       become_user: root
       file:
-        path: "/student"
+        path: "{{ STUDDIR }}"
         state: directory
         owner: jupyter
         group: jupyter
@@ -495,7 +495,7 @@
         name: "{{ 'student%s' | format(item) }}"
         state: present
         create_home: true
-        home: "/student/{{ 'student%s' | format(item) }}"
+        home: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
         comment: "{{ 'student%s' | format(item) }}"
         shell: /bin/bash
         uid: "{{ item + UIDBASE }}"
@@ -512,7 +512,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "/student/{{ 'student%s' | format(item) }}"
+        path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
         recursive: yes
         entity: jupyter
         etype: user
@@ -525,7 +525,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "/student/{{ 'student%s' | format(item) }}"
+        path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
         recursive: yes
         entity: jupyter
         etype: user
