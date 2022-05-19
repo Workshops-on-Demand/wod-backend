@@ -3,6 +3,7 @@ scripts/test-action.sh
 scripts/functions.sh
 scripts/cleanup-users.sh
 scripts/cleanup-processes.sh
+scripts/wod.sh
 scripts/reset-*.sh
 scripts/create-*.sh
 scripts/cleanup-*.sh
