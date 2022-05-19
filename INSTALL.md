@@ -31,7 +31,7 @@ setup jupyter account (or rename previous one) as above
 # Now you're ready to install a jupyterhub env !
 
 # If you have write commit access
-GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:Workshops-on-Demand/wod-backend.git
 check that this line is in .git/config: sshCommand = ssh -i ~/.ssh/id_jupproc -F /dev/null
 # If you don't
 git clone https://github.com/Workshops-on-Demand/wod-backend.git
