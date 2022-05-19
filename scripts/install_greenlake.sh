@@ -25,7 +25,7 @@ export ftp_proxy=""
 systemctl stop NetworkManager
 systemctl disable NetworkManager
 
-PKG="yum"
+#PKG="yum"
 PKG="apt"
 # Update system²
 $PKG update -y

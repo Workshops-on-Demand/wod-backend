@@ -1,7 +1,8 @@
 ---
 STDDIR: /student
-STD0DIR: "{{ ansible_env.HOME }}/wod-notebooks"
-JUPPROC: "{{ ansible_env.HOME }}/wod-backend"
+JUPNOBO: "{{ ansible_env.JUPNOBO }}"
+JUPPROC: "{{ ansible_env.JUPPROC }}"
+JUPPRIV: "{{ ansible_env.JUPPRIV }}"
 SCRIPTDIR: "{{ JUPPROC }}/scripts"
 JPHUB: /opt/jupyterhub
 CLEAN: false

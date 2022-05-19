@@ -4,7 +4,9 @@
 
 TEMPLATE=WKSHP-Template
 
+source {{ SCRIPTDIR }}/wod.sh
+
 for u in `grep /home /etc/passwd | grep -vE 'syslog|jupyter' | cut -d: -f1`; do
-	rsync -av "{{ ansible_env.HOME }}/student0/$TEMPLATE" /home/$u
+	rsync -av "{{ ansible_env.JUPNOBO }}/$TEMPLATE" /home/$u
 	chown $u:$u /home/$u/$TEMPLATE
 done

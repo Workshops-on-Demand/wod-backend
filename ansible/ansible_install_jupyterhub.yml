@@ -811,8 +811,7 @@
         - ansible_facts['distribution_major_version'] == "7"
 
     # For this to work, you need to have a key used in deploy key of the projects
-    - name: Checkout notebooks from the jupyter-notebook git repo
+    - name: Checkout notebooks from the wod-notebooks git repo
       git:
-        repo: git@github.com:HPEDevCom/jupyter-notebooks.git
-        dest: "{{ ansible_env.HOME }}/student0"
-        key_file: "{{ ansible_env.HOME }}/.ssh/id_student0"
+        repo: https://github.com/Workshops-on-Demand/wod-notebooks.git
+        dest: "{{ JUPNOBO  }}"
