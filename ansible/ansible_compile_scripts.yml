@@ -23,7 +23,7 @@
       become_user: root
       copy:
         src: "{{ item }}"
-        dest: "{{ item | regex_replace(SCRIPTDIR, STDDIR + '/student' + STDID) }}"
+        dest: "{{ item | regex_replace(SCRIPTDIR, STUDDIR + '/student' + STDID) }}"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: 0700
@@ -34,7 +34,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "{{ item | regex_replace(SCRIPTDIR, STDDIR + '/student' + STDID) }}"
+        path: "{{ item | regex_replace(SCRIPTDIR, STUDDIR + '/student' + STDID) }}"
         recursive: no
         entity: jupyter
         etype: user
