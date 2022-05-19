@@ -1,29 +1,5 @@
 #
 # Place to your jupyterhub machine (FQDN) in a group used as PBKDIR name
 #
-[staging]
-jupyterhub3.etc.fr.comm.hpecorp.net
-
-[greenlake]
-jupyterhub4.etc.fr.comm.hpecorp.net
-
-[greenlaketest]
-jupyterhub5.etc.fr.comm.hpecorp.net
-
-[prod]
-jupyterhub.etc.fr.comm.hpecorp.net
-
-[sandbox]
-jupyterhub2.hp.local
-
-[test3]
-jupyterhub7.etc.fr.comm.hpecorp.net
-
-[test]
-jupyterhubtest.etc.fr.comm.hpecorp.net
-
-[test2]
-jupyterhubtest2.etc.fr.comm.hpecorp.net
-
-[localhost]
+[production]
 127.0.0.1  ansible_connection=local
