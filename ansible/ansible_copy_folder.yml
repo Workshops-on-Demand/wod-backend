@@ -63,7 +63,7 @@
     # find all notebooks
     - name: find jupyter notebooks
       find:
-        paths: "{{ STD0DIR }}/{{ DIR }}/{{ WORKSHOP }}"
+        paths: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
         # Add other file types to process them as ansible templates
         patterns: 
@@ -134,7 +134,7 @@
 
     - name: Synchronize target students with student0 Workshop content
       ansible.posix.synchronize:
-        src: "{{ STD0DIR }}/{{ DIR }}/{{ WORKSHOP }}/"
+        src: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts: 
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
@@ -146,7 +146,7 @@
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(STD0DIR, STDDIR + '/student' + STDID) }}"
+        dest: "{{ item.path | regex_replace(JUPNOBO, STDDIR + '/student' + STDID) }}"
       with_items: "{{ notebooks.files }}"
 
     - name: Create a checkpoint directory

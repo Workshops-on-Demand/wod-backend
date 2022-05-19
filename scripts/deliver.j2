@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source {{ SCRIPTDIR }}/wod.sh
+
 # Git doesn't collect file rights and we need to have correct ones here so forcing
 cd {{ JUPPROC }}/skel
 find . -type f | xargs chmod 600
