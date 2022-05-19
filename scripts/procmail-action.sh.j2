@@ -11,6 +11,8 @@
 set -e
 set -x
 
+# Defines JUPPROC
+source {{ SCRIPTDIR }}/wod.sh
 source {{ SCRIPTDIR }}/random.sh
 source {{ SCRIPTDIR }}/functions.sh
 #
@@ -50,7 +52,6 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
-export JUPPROC=$HOME/jupyter-procmail
 export std0="$HOME/student0"
 export stddir="{{ STDDIR }}/student$stdid"
 export accessToken=`get_session_token`

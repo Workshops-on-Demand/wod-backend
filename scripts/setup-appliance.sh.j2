@@ -22,6 +22,7 @@ exec &> >(tee $HOME/.mail/setup-appliance-$w)
 shift
 echo "We are working on the setup of the $w appliance"
 
+source {{ SCRIPTDIR }}/wod.sh
 source {{ SCRIPTDIR }}/functions.sh
 #
 # Main part
@@ -34,7 +35,6 @@ echo "Prepare environment variables for Workshop $w at `date`"
 export APIENDPOINT={{ APIENDPOINT }}
 export APIUSER={{ APIUSER }}
 export APIPWD={{ APIPWD }}
-export JUPPROC=$HOME/jupyter-procmail
 export std0="$HOME/student0"
 export accessToken=`get_session_token`
 # If that doesn't fail, then export the workshop name
