@@ -53,7 +53,7 @@ fi
 shift
 
 export std0="$JUPNOBO"
-export stddir="{{ STDDIR }}/student$stdid"
+export stddir="{{ STUDDIR }}/student$stdid"
 export accessToken=`get_session_token`
 
 # for PURGE we just need stddir and stdid
@@ -266,7 +266,7 @@ elif [ "$action" = "RESET" ]; then
 				--data '{"assigned":"false"}' \
 				"$APIENDPOINT/student/$j"
 			stdid=$((j-{{ BASESTDID }}))
-			stddir="{{ STDDIR }}/student$stdid"
+			stddir="{{ STUDDIR }}/student$stdid"
 			erase_student
 			cleanup_processes_student
 			((j=j-1))
