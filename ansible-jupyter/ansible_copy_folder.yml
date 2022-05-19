@@ -3,7 +3,7 @@
 - hosts: all
   gather_facts: true
   vars:
-    VARDIR: "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}"
+    VARDIR: "{{ JUPPROC }}/ansible/{{ PBKDIR }}"
 
   tasks: 
     - fail:

@@ -83,10 +83,10 @@ ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launc
 
 
 # ansible-vault to store it in the pass file creating a SPARKTOK ansible variable
-if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
-	mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
+if [ ! -d "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass" ]; then
+	mkdir -p "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass"
 fi
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR

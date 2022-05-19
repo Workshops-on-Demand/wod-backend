@@ -115,14 +115,14 @@ if [ $action != "RESET" ]; then
                                 compile=""
                         fi
 			if [ _"$compile" != _"" ]; then
-				ansible-playbook $JUPPROC/ansible-jupyter/ansible_compile_scripts.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
+				ansible-playbook $JUPPROC/ansible/ansible_compile_scripts.yml -i $JUPPROC/ansible/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
 			fi
 			if [ -x "$JUPPROC/scripts/create-$ws.sh" ]; then
 				echo "Setup workshop $w Backend"
 				$JUPPROC/scripts/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			ansible-playbook $JUPPROC/ansible/ansible_copy_folder.yml -i $JUPPROC/ansible/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
 			if [ -x "$JUPPROC/scripts/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				$JUPPROC/scripts/post-copy-$ws.sh

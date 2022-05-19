@@ -17,7 +17,7 @@ scripts/*.pl
 scripts/*.py
 *.service
 jupyterhub.sqlite
-ansible-jupyter/*/pass/variables_*.yml
-ansible-jupyter/*/variables_*.yml
+ansible/*/pass/variables_*.yml
+ansible/*/variables_*.yml
 */pass/variables_*.yml
 *.sw?

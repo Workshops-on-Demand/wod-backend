@@ -379,8 +379,8 @@
       with_fileglob: [ '{{ SCRIPTDIR }}/reset-*.sh*.j2', '{{ SCRIPTDIR }}/create-*.sh*.j2', '{{ SCRIPTDIR }}/setup-*.sh*.j2', '{{ SCRIPTDIR }}/cleanup-*.sh*.j2', '{{ SCRIPTDIR }}/post-*.sh*.j2' , '{{ SCRIPTDIR }}/*.py.j2', '{{ SCRIPTDIR }}/*.pl.j2', '{{ SCRIPTDIR }}/procmail-action.sh.j2', '{{ SCRIPTDIR }}/test-action.sh.j2', '{{ SCRIPTDIR }}/functions.sh.j2', '{{ SCRIPTDIR }}/get-cloudvol-token.shc.j2']
 
     - name: Deliver variables files as ansible template for variable expansion
-      template: src={{ item }} dest={{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-      with_fileglob: [ '{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/*.yml.j2' ]
+      template: src={{ item }} dest={{ JUPPROC }}/ansible/{{ PBKDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+      with_fileglob: [ '{{ JUPPROC }}/ansible/{{ PBKDIR }}/*.yml.j2' ]
 
     - name: Enable HPEDev services
       become: yes
@@ -422,15 +422,15 @@
         group: jupyter
         mode: 0750
 
-    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible-jupyter/ exists
+    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible/ exists
       lineinfile:
-        path: "{{ JUPPROC }}/ansible-jupyter/vault_secret"
+        path: "{{ JUPPROC }}/ansible/vault_secret"
         regexp: '^{{ VAULTPWD }}$'
         line: '{{ VAULTPWD }}'
 
-    - name: Fix modes for {{ JUPPROC }}/ansible-jupyter/vault_secret
+    - name: Fix modes for {{ JUPPROC }}/ansible/vault_secret
       file:
-        path: "{{ JUPPROC }}/ansible-jupyter/vault_secret"
+        path: "{{ JUPPROC }}/ansible/vault_secret"
         mode: 0600
 
     - name: Fix git config for future commit on student0

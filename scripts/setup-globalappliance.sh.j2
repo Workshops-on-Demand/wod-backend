@@ -13,10 +13,10 @@ else
 fi
 
 echo "Use ansible to setup generic remote appliance at $RTARGET"
-ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
-if [ -f "$JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml" ]; then
+ansible-playbook $JUPPROC/ansible/ansible_setup_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
+if [ -f "$JUPPROC/ansible/ansible_setup_${w}_appliance.yml" ]; then
 	echo "Use ansible to setup specificities for $w on remote appliance $RTARGET"
-	ansible-playbook $JUPPROC/ansible-jupyter/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
+	ansible-playbook $JUPPROC/ansible/ansible_setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
 fi
 
 echo "Final script setup phase for $w on remote appliance $RTARGET"
