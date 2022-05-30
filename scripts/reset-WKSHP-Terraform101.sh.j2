@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -x
+source {{ SCRIPTDIR }}/functions.sh
+
+generate_greenlake_reset_token
+
+echo "Getting Studentid"
+echo "student id is" $stdid
+
+cd /student/student$stdid/$w
+echo " This script resets the $w Workshop content for:" student$stdid
+
+##
+echo "Setting  environment variables to help cleanup"
+##
+source ./student.src
+
+##
+echo "Cleaning up now"
+##
+terraform destroy  -input=false -auto-approve
+
+# Deleting Student Users
+echo "Deleting Student api client"
+
+generate_greenlake_token
+sleep 5
+delete_greenlake_student_api_client
+
