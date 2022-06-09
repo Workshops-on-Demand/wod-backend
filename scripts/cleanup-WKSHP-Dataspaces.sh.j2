@@ -2,8 +2,8 @@
 
 set -x
 
-export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-ML101'] }}
-export NAME=mllab
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
+export NAME=dataspaceslab
 export TMPDIR=/tmp/$NAME.$stdid.ret
 
 $JUPPROC/scripts/cleanup-container-ratio.sh
