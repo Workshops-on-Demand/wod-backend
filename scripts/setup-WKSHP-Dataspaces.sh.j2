@@ -1,0 +1,288 @@
+#!/bin/bash
+
+
+#set -x
+
+echo "Prepare the Dataspaces container compose yml file"
+
+NAME=dataspaceslab
+
+mkdir -p $HOME/$NAME
+
+#extension setup
+#git clone CMF plugin first
+cd $HOME/$NAME
+rm -rf hpe-dataspace-jupyter-cmf-plugin
+git clone git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
+
+
+#setup backend Dataspaces (Glynn)
+
+# Dataspaces Backend
+
+cat > $HOME/$NAME/ds7.env << EOF
+KEYCLOAK_SERVICE_HOST="dataspaces-7.labs.hpecorp.net"
+KEYCLOAK_SERVICE_PORT= "8443"
+KEYCLOAK_VERIFY_SSL="False"
+KAFKA_SERVERS="dspc-kafka:9092"
+KAFKA_LISTENER="False"
+POSTGRES_USER="dspc_db"
+POSTGRES_PASSWORD="letmein123"
+POSTGRES_SERVICE_HOST="dspc-postgres"
+POSTGRES_SERVICE_PORT="5432"
+PLUGIN_DIRECTORY="/app/plugins"
+PYTHONUNBUFFERED=1
+
+EOF
+
+#setup dataspaces infra 
+mkdir -p $HOME/$NAME/sql
+
+cat > $HOME/$NAME/sql/create_databases.sh << EOF
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    CREATE DATABASE keycloak;
+    GRANT ALL PRIVILEGES ON DATABASE keycloak TO $POSTGRES_USER;
+    CREATE DATABASE dspc_metadata;
+    GRANT ALL PRIVILEGES ON DATABASE dspc_metadata TO $POSTGRES_USER;
+    CREATE DATABASE dspc_projects;
+    GRANT ALL PRIVILEGES ON DATABASE dspc_projects TO $POSTGRES_USER;
+EOSQL
+EOF
+
+cat > $HOME/$NAME/sql/create_client_databases.sh << EOF
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    CREATE DATABASE clientdata;
+    GRANT ALL PRIVILEGES ON DATABASE clientdata TO $POSTGRES_USER;
+EOSQL
+EOF
+
+chmod +x $HOME/$NAME/sql/*.sh
+
+
+cat > $HOME/$NAME/docker-compose.yml << EOF
+version: '2'
+services:
+  dspc-meta-service:
+    image: bowdengl/dspc-meta-rest-service:v0.1
+    container_name: dspc-meta-rest-service
+    env_file:
+      - ds7.env
+    ports:
+      - 8180:8180
+    volumes:
+      - /dspc-plugins:/app/plugins 
+    networks:
+      - dataspaces-net
+
+  dspc-project-service:
+    image: bowdengl/dspc-project-rest-service:v0.1
+    container_name: dspc-project-rest-service
+    env_file:
+      - ds7.env
+    ports:
+      - 8010:8010
+    volumes:
+      - /dspc-plugins:/app/plugins
+    networks:
+      - dataspaces-net
+
+  dspc-inspect-service:
+    image: bowdengl/dspc-inspect-rest-service:v0.1
+    container_name: dspc-inspect-rest-service
+    env_file:
+      - ds7.env
+    ports:
+      - 8190:8190
+    volumes:
+      - /dspc-plugins:/app/plugins
+    networks:
+      - dataspaces-net 
+
+  postgres:
+    image: postgres:latest
+    container_name: dspc-postgres
+    environment:
+      POSTGRES_USER: dspc_db
+      POSTGRES_PASSWORD: letmein123
+    ports:
+      - 5432:5432
+    volumes: 
+      - dspc-postgres-data:/var/lib/postgresql/data
+      - ./sql/create_databases.sh:/docker-entrypoint-initdb.d/create_databases.sh
+    networks:
+      - dataspaces-net
+
+  postgres_client:
+    image: postgres:latest
+    container_name: dspc-postgres-client
+    environment:
+      POSTGRES_USER: dspc_customer
+      POSTGRES_PASSWORD: letmein123
+    ports:
+      - 5433:5432
+    volumes:
+    - dspc-postgres-client-data:/var/lib/postgresql/data
+    - ./sql/create_client_databases.sh:/docker-entrypoint-initdb.d/create_databases.sh
+    networks:
+      - dataspaces-net
+    command:
+      - postgres
+      - -c
+      - log_statement=all
+      - -c
+      - log_directory=pg_log
+      - -c
+      - log_filename=postgresql-%Y-%m-%d_%H%M%S.log
+      - -c
+      - logging_collector=on
+
+  keycloak:
+    image: bowdengl/dspc-keycloak:v2.2
+    container_name: dspc-keycloak
+    ports:
+     - 8443:8443
+    networks:
+      - dataspaces-net
+    environment:
+      PROXY_ADDRESS_FORWARDING: 'true'
+    depends_on:
+      - postgres
+ 
+  neo4j:
+    image: neo4j:latest
+    container_name: dspc-neo4j
+    networks:
+      - dataspaces-net
+    environment:
+      NEO4J_AUTH: neo4j/Password1
+    ports:
+      - 7687:7687
+ 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: dspc-zookeeper
+    networks:
+      - dataspaces-net
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+ 
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: dspc-kafka
+    networks:
+      - dataspaces-net
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_HOST
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+ 
+  minio:
+    image: minio/minio
+    container_name: dspc-minio
+    networks:
+      - dataspaces-net
+    environment:
+      MINIO_ROOT_USER: dspcminio
+      MINIO_ROOT_PASSWORD: Passw0rd
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ~/dataspaces/minio/data/:/data
+    command:
+      - server
+      - /data
+      - --console-address
+      - ":9001"
+
+volumes:
+  dspc-postgres-data:
+  dspc-postgres-client-data:
+
+networks:
+  dataspaces-net:
+
+EOF
+
+echo "running docker-compose for docker-compose.yml"
+docker-compose -f docker-compose.yml down
+
+sleep 5
+
+docker-compose -f docker-compose.yml up -d --build
+
+
+echo "Prepare the jupyter notebook  container image"
+DCKBASE="jupyter/tensorflow-notebook"
+
+cat > Dockerfile <<EOF
+FROM $DCKBASE
+EOF
+cat >> Dockerfile <<'EOF'
+#USER root
+
+
+#Following: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/recipes.html#
+# name your environment and choose the python version
+ENV CONDA_DIR "/opt/conda"
+ENV conda_env "python37"
+ENV py_ver "3.7"
+
+# you can add additional libraries you want mamba to install by listing them below the first line and ending with "
+RUN mamba create --quiet --yes -p "${CONDA_DIR}/envs/${conda_env}" python=${py_ver} ipython ipykernel && \
+    mamba clean --all -f -y
+
+# create Python kernel and link it to jupyter
+USER root
+RUN chown -R jovyan /usr/local
+USER jovyan
+RUN "${CONDA_DIR}/envs/${conda_env}/bin/python" -m ipykernel install --name="${conda_env}"
+
+# if you want this environment to be the default one, uncomment the following line:
+RUN echo "conda activate ${conda_env}" >> "/home/jovyan/.bashrc"
+
+RUN "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --quiet --no-cache-dir 'flake8==3.9.2'
+RUN    mkdir /home/jovyan/cmflib/
+
+COPY hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/Requirements.txt /home/jovyan/cmflib/
+RUN "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --no-cache-dir --requirement /home/jovyan/cmflib/Requirements.txt
+
+COPY hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/cmflib /home/jovyan/cmflib/cmflib
+COPY hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/setup.py /home/jovyan/cmflib/setup.py
+RUN cd /home/jovyan/cmflib && "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --no-cache . 
+
+COPY  hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/example-get-started /home/jovyan/example-get-started
+
+
+RUN pip install jupyter
+RUN pip install jupyter_contrib_nbextensions
+RUN mkdir /opt/conda/lib/python3.10/site-packages/jupyter_contrib_nbextensions/nbextensions/CMF_plugin
+ADD hpe-dataspace-jupyter-cmf-plugin/plugin_working/CMF_plugin /opt/conda/lib/python3.10/site-packages/jupyter_contrib_nbextensions/nbextensions/CMF_plugin
+RUN jupyter contrib nbextensions install
+EOF
+
+# Clean before
+docker container prune -f
+docker image prune -f
+
+#docker rmi $DCKBASE ${NAME}:latest
+docker build -t $NAME . 
+
+

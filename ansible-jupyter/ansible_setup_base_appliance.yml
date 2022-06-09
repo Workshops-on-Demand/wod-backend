@@ -54,6 +54,8 @@
       - vim
       - ntp
       - rsync
+      - unzip
+      - git
 
   - name: Ensure that directory /student exists
     become: yes

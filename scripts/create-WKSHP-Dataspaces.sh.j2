@@ -1,0 +1,151 @@
+#!/bin/bash
+
+set -x
+
+source {{ SCRIPTDIR }}/functions.sh
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+{{ SCRIPTDIR }}/reset-$ws.sh
+{{ SCRIPTDIR }}/create-appliance.sh
+
+NAME=dataspaceslab
+TMPDIR=/tmp/$NAME.$stdid
+
+
+mkdir -p $TMPDIR
+
+# Define local variables
+echo wid=$wid
+APPMIN=`get_range_min $wid`
+echo stdid=$stdid
+echo APPMIN=$APPMIN
+httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Dataspaces'] }}))
+dataspacesport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATASPACESPORT-WKSHP-Dataspaces'] }}))
+dataspacesport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATASPACESPORT2-WKSHP-Dataspaces'] }}))
+
+cat > $TMPDIR/dockerd-entrypoint.sh << EOF
+export HTTPPORT
+tini -g -- start-notebook.sh &
+sleep 3
+jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/mltoken
+sleep infinity
+EOF
+
+
+# Docker file creation
+cat > $TMPDIR/Dockerfile << EOF
+USER root
+COPY dockerd-entrypoint.sh /usr/local/bin/
+ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
+RUN mkdir -p /student/student$stdid
+RUN useradd student$stdid -u $stdid -g 100 -d /student/student$stdid
+RUN chown student$stdid:users /student/student$stdid
+# Unlock the account
+RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
+# In case we need sudo
+#RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+WORKDIR /student/student$stdid
+USER student$stdid
+ARG NB_USER student$stdid
+ARG NB_UID $stdid
+ENV HTTPPORT $httpport
+RUN chmod +x ${WORKDIR}/runJupyter.sh
+#ENTRYPOINT ["sh","/home/jovyan/runJupyter.sh"]
+
+#RUN git clone https://github.com/snowch/ml-101 /student/student$stdid/
+#RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
+EOF
+
+
+# Docker-compose file creation
+# Look at https://stackoverflow.com/questions/34264348/docker-inside-docker-container
+# and http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
+# For security consider using https://github.com/nestybox/sysbox
+cat > $TMPDIR/docker-compose.yml << EOF
+#Following https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html
+#And https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html#docker-options
+version: '3.8'
+services:
+  jupyter-cmf-notebook:
+    build:
+      dockerfile: Dockerfile
+
+      context: ./
+    container_name: jupyter-cmf-notebook_extension_test
+    hostname: jupyter-cmf-notebook_extension_test
+    volumes:
+      - $HOME/workspace:/home/jovyan/workspace
+      - $HOME/dvc_remote:/home/jovyan/dvc_remote
+      - $HOME/.ssh:/home/jovyan/.ssh
+    ports:
+      - "9898:8888"
+      - "9999:8899"
+    user: root
+    environment:
+      - NB_USER=$USER
+      - NB_GROUP=$GROUP
+      - NB_UID=$UID
+      - NB_GID=$GID
+      - CHOWN_HOME=yes
+      - CHOWN_HOME_OPTS= -R
+      - GRANT_SUDO=yes
+      - DOCKER_STACKS_JUPYTER_CMD=lab
+      - JUPYTER_TOKEN=docker
+      - JUPYTER_ENABLE_LAB=yes
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} # from .env file 
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} #from .env file
+      - DVC_REMOTE_URL=${DVC_REMOTE_URL} #from .env file
+      - GIT_USER_NAME=${GIT_USER_NAME} # from .env file 
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL} #from .env file
+      - GIT_REMOTE_URL=${GIT_REMOTE_URL} #from .env file
+      - GIT_BRANCH=${GIT_BRANCH} #from .env file
+      - DB_URL=mysql://db:33060
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD} #from .env file
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER_NAME=${NEO4J_USER_NAME} #from .env file
+      - NEO4J_PASSWD=${NEO4J_PASSWD} #from .env file
+      - HTTP_PROXY=${HTTP_PROXY} #from .env file
+      - HTTPS_PROXY=${HTTPS_PROXY} #from .env file
+    depends_on:
+      - neo4j
+  neo4j:
+    image: neo4j:4.4
+    container_name: neo4j
+    hostname: neo4j
+    ports:
+      - 7475:7474
+      - 7688:7687
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER_NAME}/${NEO4J_PASSWD}
+EOF
+cat > $TMPDIR/launch-$NAME << EOF
+#!/bin/bash
+cd $TMPDIR
+docker-compose up --build -d
+EOF
+
+# Copy content and start container
+ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/dockerd-entrypoint.sh $RTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR $TMPDIR/dockerd-entrypoint.sh
+ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/Dockerfile
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
+
+# ssh to get token from running container
+container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=$NAME$stdid")
+# We need time to let jupyterhub start before getting token
+sleep 5
+ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:/student/student$stdid/mltoken $TMPDIR"
+scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/mltoken $TMPDIR
+
+# ansible-vault to store it in the pass file creating a MLTOK ansible variable
+if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
+	mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
+fi
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+
+# Cleanup
+#ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
+rm -rf $TMPDIR
+
