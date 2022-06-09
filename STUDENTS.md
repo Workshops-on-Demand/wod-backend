@@ -162,9 +162,9 @@ Last seat for speaker
   
 
 
-901-975 HPE CP APPS Automation 
+901-975 dataspaces
 
-[901-920] challenges  Location :  Grenoble 
+[901-920] challenges  Location :  Mougins
 
 [921-974] workshops Location :  Mougins  
 
@@ -217,7 +217,13 @@ Last seat for speaker
 
 
 
-1276-1326  FREE
+1276-1326  Objetc-Store 101
+
+[1276-1295] Challenges location Mougins / Greenlake
+
+[1296-1319] Workshops Location Mougins / Greenlake
+
+[1320] speaker
 
 
 
