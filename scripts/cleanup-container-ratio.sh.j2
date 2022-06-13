@@ -2,6 +2,7 @@
 
 set -x
 
+# Caller must define TMPDIR, RTARGET and NAME so this script works correctly
 mkdir -p $TMPDIR
 # Retrieve *.ipynb files to compute completion ratio
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker exec $NAME${stdid}_$NAME${stdid}_1 tar cf /tmp/ipynb.tar .\'
