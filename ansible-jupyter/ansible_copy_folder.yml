@@ -15,6 +15,10 @@
       when: WORKSHOP is not defined
 
     - fail:
+        msg: CHALLENGE variable is empty ! Fat fingers ?!?
+      when: CHALLENGE is not defined
+
+    - fail:
         msg: PBKDIR variable is empty ! Fat fingers ?!?
       when: PBKDIR is not defined
 
@@ -28,12 +32,12 @@
 
     - name: check variables file exists
       stat:
-        path: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
+        path: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
       ignore_errors: true
       register: variables_file
 
     - include_vars:
-        file: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
+        file: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
       when: variables_file.stat.exists
 
     - name: check GreenLake API CLient variables file exists
@@ -48,12 +52,12 @@
 
     - name: check password file exists
       stat:
-        path: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
+        path: "{{ VARDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       ignore_errors: true
       register: pass_file
  
     - include_vars:
-        file: "{{ VARDIR }}/pass/variables_{{ WORKSHOP }}_{{ STDID }}.yml"
+        file: "{{ VARDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       when: pass_file.stat.exists
    
     # find all notebooks

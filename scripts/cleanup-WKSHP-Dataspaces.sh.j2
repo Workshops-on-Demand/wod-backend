@@ -4,6 +4,6 @@ set -x
 
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
 export NAME=dataspaceslab
-export TMPDIR=/tmp/$NAME.$stdid.ret
+export TMPDIR=/tmp/$stidid/$NAME/$NAME.$stdid.ret
 
 $JUPPROC/scripts/cleanup-container-ratio.sh

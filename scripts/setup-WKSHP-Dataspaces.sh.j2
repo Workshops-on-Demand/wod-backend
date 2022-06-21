@@ -5,6 +5,8 @@
 
 echo "Prepare the Dataspaces container compose yml file"
 
+dataspacesport2=$(({{ hostvars[inventory_hostname]['DATASPACESPORT2-WKSHP-Dataspaces'] }}))
+
 NAME=dataspaceslab
 
 mkdir -p $HOME/$NAME
@@ -21,7 +23,7 @@ git clone git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
 # Dataspaces Backend
 
 cat > $HOME/$NAME/ds7.env << EOF
-KEYCLOAK_SERVICE_HOST="dataspaces-7.labs.hpecorp.net"
+KEYCLOAK_SERVICE_HOST="dspc-keycloak"
 KEYCLOAK_SERVICE_PORT= "8443"
 KEYCLOAK_VERIFY_SSL="False"
 KAFKA_SERVERS="dspc-kafka:9092"
@@ -38,7 +40,7 @@ EOF
 #setup dataspaces infra 
 mkdir -p $HOME/$NAME/sql
 
-cat > $HOME/$NAME/sql/create_databases.sh << EOF
+cat > $HOME/$NAME/sql/create_databases.sh << 'EOF'
 #!/bin/bash
 set -e
 
@@ -52,7 +54,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 EOSQL
 EOF
 
-cat > $HOME/$NAME/sql/create_client_databases.sh << EOF
+cat > $HOME/$NAME/sql/create_client_databases.sh << 'EOF'
 #!/bin/bash
 set -e
 
@@ -74,7 +76,7 @@ services:
     env_file:
       - ds7.env
     ports:
-      - 8180:8180
+      - $dataspacesport2:8180
     volumes:
       - /dspc-plugins:/app/plugins 
     networks:
@@ -223,6 +225,7 @@ EOF
 
 echo "running docker-compose for docker-compose.yml"
 docker-compose -f docker-compose.yml down
+docker volume rm dataspaceslab_dspc-postgres-client-data  dataspaceslab_dspc-postgres-data
 
 sleep 5
 

@@ -10,7 +10,7 @@ export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
 {{ SCRIPTDIR }}/create-appliance.sh
 
 NAME=dataspaceslab
-TMPDIR=/tmp/$NAME.$stdid
+TMPDIR=/tmp/$stdid/$NAME
 
 
 mkdir -p $TMPDIR
@@ -22,12 +22,13 @@ echo stdid=$stdid
 echo APPMIN=$APPMIN
 httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Dataspaces'] }}))
 dataspacesport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATASPACESPORT-WKSHP-Dataspaces'] }}))
-dataspacesport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATASPACESPORT2-WKSHP-Dataspaces'] }}))
+dataspacesport2=$(({{ hostvars[inventory_hostname]['DATASPACESPORT2-WKSHP-Dataspaces'] }}))
 
 cat > $TMPDIR/dockerd-entrypoint.sh << EOF
 export HTTPPORT
-tini -g -- start-notebook.sh &
-sleep 3
+jupyter notebook --ip 0.0.0.0 --port 8899
+#tini -g -- start-notebook.sh &
+#sleep 3
 #jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/dataspacetoken
 sleep infinity
 EOF
@@ -65,16 +66,18 @@ cat > $TMPDIR/docker-compose.yml << EOF
 #And https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html#docker-options
 version: '3.5'
 services:
-  jupyter-cmf-notebook:
+  jupyter-cmf-notebook-$stdid:
     build:
       dockerfile: Dockerfile
       context: ./
-    container_name: jupyter-cmf-notebook_extension
-    hostname: jupyter-cmf-notebook_extension
+    container_name: jup_cmf_nbext_$stdid
+    hostname: jup_cmf_nbext_$stdid
     volumes:
-      - $HOME/workspace:/home/jovyan/workspace
-      - $HOME/dvc_remote:/home/jovyan/dvc_remote
-      - $HOME/.ssh:/home/jovyan/.ssh
+      - $HOME/workspace:/student/student$stdid/workspace
+      - $HOME/dvc_remote:/student/student$stdid/dvc_remote
+      - $HOME/.ssh:/student/student$stdid/.ssh
+    networks:
+      - dataspaces-net
     ports:
       - "$httpport:8888"
       - "$dataspacesport:8899"
@@ -84,27 +87,18 @@ services:
       - DOCKER_STACKS_JUPYTER_CMD=lab
       - JUPYTER_TOKEN=$randompw
       - JUPYTER_ENABLE_LAB=yes
-      - DVC_REMOTE_URL=/home/jovyan/dvc_remote
+      #- DVC_REMOTE_URL=/home/jovyan/dvc_remote
+      - DVC_REMOTE_URL=/student/student$stdid/dvc_remote
       #- GIT_USER_NAME=${GIT_USER_NAME} # from .env file 
       #- GIT_USER_EMAIL=${GIT_USER_EMAIL} #from .env file
       #- GIT_REMOTE_URL=${GIT_REMOTE_URL} #from .env file
       #- GIT_BRANCH=${GIT_BRANCH} #from .env file
       #- DB_URL=mysql://db:33060
       #- DB_PASSWORD=${MYSQL_ROOT_PASSWORD} #from .env file
-      - NEO4J_URI=bolt://neo4j44:7688
-      - NEO4J_USER_NAME=neo4j
-      - NEO4J_PASSWD=neo4j123
-    depends_on:
-      - neo4j44
-  neo4j44:
-    image: neo4j:4.4
-    container_name: neo4j
-    hostname: neo4j
-    ports:
-      - 7475:7474
-      - 7688:7687
-    environment:
-      - NEO4J_AUTH=${NEO4J_USER_NAME}/${NEO4J_PASSWD}
+    networks:
+      - dataspaces-net
+networks:
+  dataspaces-net:
 EOF
 cat > $TMPDIR/launch-$NAME << EOF
 #!/bin/bash
@@ -131,6 +125,8 @@ if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
 	mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
 fi
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport --name "'DATASPACESPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport2 --name "'DATASPACESPORT2'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 #ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR

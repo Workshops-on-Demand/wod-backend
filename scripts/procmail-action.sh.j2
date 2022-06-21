@@ -23,7 +23,6 @@ source {{ SCRIPTDIR }}/functions.sh
 export APIENDPOINT={{ APIENDPOINT }}
 APIUSER={{ APIUSER }}
 APIPWD={{ APIPWD }}
-PBKDIR={{ PBKDIR }}
 export USER=$LOGNAME
 
 # Main of script
@@ -51,7 +50,7 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
-JUPPROC=$HOME/jupyter-procmail
+export JUPPROC=$HOME/jupyter-procmail
 export std0="$HOME/student0"
 export stddir="{{ STDDIR }}/student$stdid"
 export accessToken=`get_session_token`
@@ -123,12 +122,13 @@ if [ $action != "RESET" ]; then
 				$JUPPROC/scripts/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
 			if [ -x "$JUPPROC/scripts/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				$JUPPROC/scripts/post-copy-$ws.sh
 			fi
-			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml
+			# $w on purpose as stdid is unique, so name is not important
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml $JUPPROC/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table

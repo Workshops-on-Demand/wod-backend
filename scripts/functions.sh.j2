@@ -75,7 +75,8 @@ get_ldap_status() {
 }
 
 
-# This function returns the status of the need of Var Pass setup for the workshop id given as parameter
+# This function returns the status of the need of Var Pass setup for the workshop id given as parameter 
+# it provides the PASSSTU variable through vault for the Notebook
 get_varpass_status() {
 
 	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.varpass'`
@@ -361,10 +362,10 @@ EOF
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
-	if [ ! -d "{{ JUPPROC }}/ansible-jupyter/$PBKDIR/pass" ]; then
-		mkdir -p {{ JUPPROC }}/ansible-jupyter/$PBKDIR/pass
+	if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
+		mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
 	fi
-	ansible-vault encrypt_string --vault-password-file {{ JUPPROC }}/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > {{ JUPPROC }}/ansible-jupyter/$PBKDIR/pass/variables_${ws}_${stdid}.yml
+	ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $randompw --name "'PASSSTU'" > "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 }
 
 # This function retuns the workshop name from the mail body

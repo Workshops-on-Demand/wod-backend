@@ -35,13 +35,12 @@ export APIENDPOINT={{ APIENDPOINT }}
 export APIUSER={{ APIUSER }}
 export APIPWD={{ APIPWD }}
 export JUPPROC=$HOME/jupyter-procmail
-export PBKDIR={{ PBKDIR }}
 export std0="$HOME/student0"
 export accessToken=`get_session_token`
 # If that doesn't fail, then export the workshop name
 export wid=`get_workshop_id $w`
 #export WKSHP=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`
-export RTARGET=`grep IP-$w $JUPPROC/ansible-jupyter/group_vars/$PBKDIR | cut -d: -f2 | sed 's/[ 	]*//'`
+export RTARGET=`grep IP-$w $JUPPROC/ansible-jupyter/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
 export APPMIN=`get_range_min $wid`
 max=`get_range_max $wid`
 export APPMAX=$(($max+1))
