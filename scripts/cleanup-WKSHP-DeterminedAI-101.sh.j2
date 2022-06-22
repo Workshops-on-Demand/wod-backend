@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set -x
+
+source {{ SCRIPTDIR }}/functions.sh
+
+
+env
+$JUPPROC/scripts/cleanup-container-ratio.sh
+
+# Change  student password  on determinedAI backend 
+
+# Define local variables
+echo stdid=$stdid
+UserName="student$stdid"
+
+# Define env variables
+gateway_host="{{ HPEECPGWNAME }}"
+
+## Define the Det Master service endpoint for the Determined AI environment on Ezmeral Runtime STAGING
+detMaster="http://$gateway_host:13022"
+echo $detMaster
+
+#Login as admin user and get token
+token=$(curl -i -s -X 'POST' \
+  "${detMaster}/api/v1/auth/login" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "username": "admin",
+  "password": "password123"
+}' | grep token | awk '{print $1}' | tr -d '\r')
+echo $token
+MyToken=$(echo $token | cut -d':' -f 2 | cut -d',' -f 1 | tr -d '"') # extract token value and remove trailing quotes
+echo $MyToken
+
+
+# get Student Determeined AI id:
+detstudentid=$(curl -X 'GET' \
+  "${detMaster}/api/v1/users" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $MyToken"| jq '.users[] | select(.username=="'$UserName'") | .id' | tr -d '"')
+
+echo " the determined AI $UserName id is : $detstudentid"
+
+
+# Set password for an existing user account
+#change password for user
+echo "Change password for user account $UserName"
+curl -X 'POST' \
+  "${detMaster}/api/v1/users/${detstudentid}/password" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $MyToken" \
+  -d '"'${randompw}'"'
+
+
