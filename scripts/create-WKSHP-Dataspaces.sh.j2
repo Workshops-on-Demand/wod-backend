@@ -32,13 +32,16 @@ dataspacesport4=$(({{ hostvars[inventory_hostname]['DATASPACESPORT4-WKSHP-Datasp
 cat > $TMPDIR/dockerd-entrypoint.sh << EOF
 export DATASPACESHTTPPORT
 cd /student/student$stdid/workspace
-sh /home/jovyan/workspace/initialize.sh
+source ../.bashrc
+export PATH="/opt/conda/envs/python37/bin:$PATH"
+sh ./initialize.sh
 jupyter notebook --ip 0.0.0.0 --port 8899
 #tini -g -- start-notebook.sh &
 #sleep 3
 #jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/dataspacetoken
 sleep infinity
 EOF
+
 
 
 # Docker file creation
