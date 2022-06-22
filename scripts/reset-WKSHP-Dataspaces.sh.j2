@@ -8,10 +8,14 @@ export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
 NAME=dataspaceslab
 
 # Stop/Remove existing content first - these commands could fail so protect with true from set -e
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker stop jup_cmf_nbext_${stdid}\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rm jup_cmf_nbext_${stdid}\' && /bin/true
+#ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker stop ${NAME}_${NAME}${stdid}_1\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rm -f ${NAME}_${NAME}${stdid}_1\' && /bin/true
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker container prune -f\' && /bin/true
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker image prune -f\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rmi ${NAME}_jupyter-cmf-notebook-${stdid}\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker rmi ${NAME}_${NAME}${stdid}\' && /bin/true
 #ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'docker network prune -f\' && /bin/true
+
+
+#ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'rm -rf /tmp/${stdid}/${NAME}/' && /bin/true
+
 exit 0

@@ -2,8 +2,21 @@
 
 set -x
 
+source {{ SCRIPTDIR }}/functions.sh
+
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
 export NAME=dataspaceslab
 export TMPDIR=/tmp/$stidid/$NAME/$NAME.$stdid.ret
+dataspacesport3=$(({{ hostvars[inventory_hostname]['DATASPACESPORT3-WKSHP-Dataspaces'] }}))
 
+env
 $JUPPROC/scripts/cleanup-container-ratio.sh
+
+# Delete student on dspc-project container
+cat > $TMPDIR/unregister_user << EOF
+curl -X POST -H "Content-Type: application/json" --data '{"email":"student$stdid@hpedev.io"}' --location  http://$RTARGET:$dataspacesport3/project/v1alpha1/remove_user/
+EOF
+chmod 755 $TMPDIR/unregister_user
+ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/unregister_user ${RTARGET}:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET $TMPDIR/unregister_user

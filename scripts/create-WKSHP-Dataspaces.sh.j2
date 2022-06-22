@@ -5,6 +5,8 @@ set -x
 source {{ SCRIPTDIR }}/functions.sh
 
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
+export JPHOSTEXT={{ hostvars[inventory_hostname]['JPHOSTEXT'] }}
+
 # Start by cleaning up stuff - do it early as after we setup .ssh content
 {{ SCRIPTDIR }}/reset-$ws.sh
 {{ SCRIPTDIR }}/create-appliance.sh
@@ -20,12 +22,17 @@ echo wid=$wid
 APPMIN=`get_range_min $wid`
 echo stdid=$stdid
 echo APPMIN=$APPMIN
-httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Dataspaces'] }}))
+dataspaceshttpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Dataspaces'] }}))
+dataspaceshttpport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT2-WKSHP-Dataspaces'] }}))
 dataspacesport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATASPACESPORT-WKSHP-Dataspaces'] }}))
 dataspacesport2=$(({{ hostvars[inventory_hostname]['DATASPACESPORT2-WKSHP-Dataspaces'] }}))
+dataspacesport3=$(({{ hostvars[inventory_hostname]['DATASPACESPORT3-WKSHP-Dataspaces'] }}))
+dataspacesport4=$(({{ hostvars[inventory_hostname]['DATASPACESPORT4-WKSHP-Dataspaces'] }}))
 
 cat > $TMPDIR/dockerd-entrypoint.sh << EOF
-export HTTPPORT
+export DATASPACESHTTPPORT
+cd /student/student$stdid/workspace
+sh /home/jovyan/workspace/initialize.sh
 jupyter notebook --ip 0.0.0.0 --port 8899
 #tini -g -- start-notebook.sh &
 #sleep 3
@@ -37,12 +44,19 @@ EOF
 # Docker file creation
 cat > $TMPDIR/Dockerfile << EOF
 FROM ${NAME}:latest
+# In order to be able to perform copies
 USER root
 COPY dockerd-entrypoint.sh /usr/local/bin/
 ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
-RUN mkdir -p /student/student$stdid
+RUN mkdir -p /student/student$stdid/workspace/custom_libs
+RUN mkdir -p /student/student$stdid/dvc_remote
 RUN useradd student$stdid -u $stdid -g 100 -d /student/student$stdid
-RUN chown student$stdid:users /student/student$stdid
+RUN cp -r /home/jovyan/workspace/* /student/student$stdid/workspace/
+RUN cp /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py /student/student$stdid/workspace/custom_libs/
+RUN cp /home/jovyan/workspace/custom_libs/getConnStr.py /student/student$stdid/workspace/custom_libs/
+# Remove hard coded values
+RUN perl -pi -e "s|http://dataspaces-7.labs.hpecorp.net|http://notebooks3.hpedev.io:20002|" /student/student$stdid/workspace/custom_libs/getConnStr.py
+RUN chown -R student$stdid:users /student/student$stdid
 # Unlock the account
 RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
 # In case we need sudo
@@ -51,8 +65,12 @@ WORKDIR /student/student$stdid
 USER student$stdid
 ARG NB_USER student$stdid
 ARG NB_UID $stdid
-ENV HTTPPORT $httpport
-#RUN chmod +x ${WORKDIR}/runJupyter.sh
+ARG GIT_USER_NAME student$stdid
+ARG GIT_USER_EMAIL student$stdid@hpedev.io
+ARG DVC_REMOTE_URL /student/student$stdid/dvc_remote
+#ARG GIT_REMOTE_URL=git@github.hpe.com:jabali-searcot-karanam/cmf_notebook_dspc7.git
+#ARG GIT_BRANCH=master
+ENV HTTPPORT $dataspaceshttpport
 #RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
 EOF
 
@@ -66,45 +84,41 @@ cat > $TMPDIR/docker-compose.yml << EOF
 #And https://jupyter-docker-stacks.readthedocs.io/en/latest/using/common.html#docker-options
 version: '3.5'
 services:
-  jupyter-cmf-notebook-$stdid:
+  $NAME$stdid:
     build:
       dockerfile: Dockerfile
       context: ./
-    container_name: jup_cmf_nbext_$stdid
-    hostname: jup_cmf_nbext_$stdid
     volumes:
-      - $HOME/workspace:/student/student$stdid/workspace
-      - $HOME/dvc_remote:/student/student$stdid/dvc_remote
-      - $HOME/.ssh:/student/student$stdid/.ssh
+#      - /student/student$stdid/workspace:/student/student$stdid/workspace
+      - /student/student$stdid/dvc_remote:/student/student$stdid/dvc_remote
+      - /student/student$stdid/.ssh:/student/student$stdid/.ssh
     networks:
       - dataspaces-net
     ports:
-      - "$httpport:8888"
-      - "$dataspacesport:8899"
+      - "$dataspaceshttpport:8888"
+      - "$dataspaceshttpport2:8899"
     #user: root
     environment:
       #- GRANT_SUDO=yes
       - DOCKER_STACKS_JUPYTER_CMD=lab
       - JUPYTER_TOKEN=$randompw
       - JUPYTER_ENABLE_LAB=yes
-      #- DVC_REMOTE_URL=/home/jovyan/dvc_remote
-      - DVC_REMOTE_URL=/student/student$stdid/dvc_remote
-      #- GIT_USER_NAME=${GIT_USER_NAME} # from .env file 
-      #- GIT_USER_EMAIL=${GIT_USER_EMAIL} #from .env file
-      #- GIT_REMOTE_URL=${GIT_REMOTE_URL} #from .env file
-      #- GIT_BRANCH=${GIT_BRANCH} #from .env file
       #- DB_URL=mysql://db:33060
       #- DB_PASSWORD=${MYSQL_ROOT_PASSWORD} #from .env file
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
 networks:
   dataspaces-net:
+
 EOF
 cat > $TMPDIR/launch-$NAME << EOF
 #!/bin/bash
 cd $TMPDIR
 docker-compose up --build -d
 EOF
+
 
 # Copy content and start container
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
@@ -124,11 +138,24 @@ sleep 5
 if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
 	mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
 fi
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspaceshttpport2 --name "'DATASPACESHTTPPORT2'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspaceshttpport --name "'DATASPACESHTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport --name "'DATASPACESPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport2 --name "'DATASPACESPORT2'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport4 --name "'DATASPACESPORT4'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+
+#create user on dscp-project container
+cat > $TMPDIR/register_user << EOF
+#!/bin/bash
+curl -X POST -H "Content-Type: application/json" --data '{"email":"student$stdid@hpedev.io","first_name":"$stdid","last_name":"Student","password":"$randompw"}' --location  http://$RTARGET:$dataspacesport3/project/v1alpha1/register_user/
+EOF
+#chmod 755 $TMPDIR/register_user
+scp -q {{ NOCHECKSSH }} $TMPDIR/register_user ${RTARGET}:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR/register_user
+ssh -q {{ NOCHECKSSH }} $RTARGET $TMPDIR/register_user
+
+
 
 # Cleanup
 #ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR
-

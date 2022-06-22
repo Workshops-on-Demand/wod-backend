@@ -1,21 +1,63 @@
 #!/bin/bash
 
-
 #set -x
+
+# Define local variables
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Dataspaces'] }}
+export JPHOSTEXT={{ hostvars[inventory_hostname]['JPHOSTEXT'] }}
 
 echo "Prepare the Dataspaces container compose yml file"
 
+dataspacesport=$(({{ hostvars[inventory_hostname]['DATASPACESPORT-WKSHP-Dataspaces'] }}))
 dataspacesport2=$(({{ hostvars[inventory_hostname]['DATASPACESPORT2-WKSHP-Dataspaces'] }}))
+dataspacesport3=$(({{ hostvars[inventory_hostname]['DATASPACESPORT3-WKSHP-Dataspaces'] }}))
+dataspacesport4=$(({{ hostvars[inventory_hostname]['DATASPACESPORT4-WKSHP-Dataspaces'] }}))
+httpport=$(({{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Dataspaces'] }}))
 
 NAME=dataspaceslab
+
+
+# import realm:
+
+
+
+
+
+
 
 mkdir -p $HOME/$NAME
 
 #extension setup
 #git clone CMF plugin first
+#Using an alias that points to the second repo ; dspc-webui - As one cannot use the same ssh key for both git repos - using here id_webui_rsa
 cd $HOME/$NAME
 rm -rf hpe-dataspace-jupyter-cmf-plugin
-git clone git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
+git clone -b Sprint4_integrated git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
+
+
+#Prepare DSPC-WEBUI Docker Container
+
+echo "Prepare the DSPC WEBUI container image"
+#git clone repo  first
+rm -rf hpe-dataspace-dspc-webui
+git clone git@github.com-webui:HPEDevCom/hpe-dataspace-dspc-webui.git
+
+# Overwrite the environment for external web browser access.
+cat > $HOME/$NAME/hpe-dataspace-dspc-webui/.env << EOF
+REACT_APP_API_PROJECT_METHOD=http
+REACT_APP_API_PROJECT_HOST=$JPHOSTEXT
+REACT_APP_API_PROJECT_PORT=$dataspacesport3
+REACT_APP_API_DATASOURCE_METHOD=http
+REACT_APP_API_DATASOURCE_HOST=$JPHOSTEXT
+REACT_APP_API_DATASOURCE_PORT=$dataspacesport2
+REACT_APP_KEYCLOAK_METHOD=https
+REACT_APP_KEYCLOAK_HOST=$JPHOSTEXT
+REACT_APP_KEYCLOAK_PORT=$dataspacesport
+REACT_APP_KEYCLOAK_REALM=dataspaces
+REACT_APP_KEYCLOAK_CLIENTID=web-ui
+EOF
+
 
 
 #setup backend Dataspaces (Glynn)
@@ -23,19 +65,65 @@ git clone git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
 # Dataspaces Backend
 
 cat > $HOME/$NAME/ds7.env << EOF
-KEYCLOAK_SERVICE_HOST="dspc-keycloak"
-KEYCLOAK_SERVICE_PORT= "8443"
-KEYCLOAK_VERIFY_SSL="False"
-KAFKA_SERVERS="dspc-kafka:9092"
-KAFKA_LISTENER="False"
-POSTGRES_USER="dspc_db"
-POSTGRES_PASSWORD="letmein123"
-POSTGRES_SERVICE_HOST="dspc-postgres"
-POSTGRES_SERVICE_PORT="5432"
-PLUGIN_DIRECTORY="/app/plugins"
+KEYCLOAK_SERVICE_HOST=$JPHOSTEXT
+KEYCLOAK_SERVICE_PORT=$dataspacesport
+KEYCLOAK_VERIFY_SSL=False
+KAFKA_SERVERS=dspc-kafka:9092
+KAFKA_LISTENER=False
+POSTGRES_USER=dspc_db
+POSTGRES_PASSWORD=letmein123
+POSTGRES_SERVICE_HOST=dspc-postgres
+POSTGRES_SERVICE_PORT=5432
+PLUGIN_DIRECTORY=/app/plugins
 PYTHONUNBUFFERED=1
 
 EOF
+
+
+#Prepare Dockerfile.webui
+DCKBASE="node:16.15.0-alpine"
+
+cat > $HOME/$NAME/Dockerfile.webui <<EOF
+FROM $DCKBASE as builder
+EOF
+cat >> $HOME/$NAME/Dockerfile.webui <<'EOF'
+ENV LANG C.UTF-8
+ENV NPM_CONFIG_LOGLEVEL warn
+ENV PATH /app/node_modules/.bin:$PATH
+
+WORKDIR /app
+
+COPY . .
+RUN npm install --legacy-peer-deps
+RUN npm run build
+
+# => Run container
+FROM nginx:1.15.2-alpine
+
+RUN rm -rf /etc/nginx/conf.d/*
+COPY nginx-app.conf /etc/nginx/conf.d/default.conf
+COPY nginx-gzip.conf /etc/nginx/conf.d/gzip.conf
+
+RUN apk add --no-cache bash
+
+# Static build
+COPY --from=builder /app/build /usr/share/nginx/html/
+
+WORKDIR /usr/share/nginx/html
+#check localhost
+COPY ./env-config.sh .
+COPY .env .
+
+# Make our shell script executable
+RUN chmod +x env-config.sh
+
+
+EXPOSE 80 443
+
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/env-config.sh && nginx -g \"daemon off;\""]
+
+EOF
+
 
 #setup dataspaces infra 
 mkdir -p $HOME/$NAME/sql
@@ -71,28 +159,32 @@ cat > $HOME/$NAME/docker-compose.yml << EOF
 version: '2'
 services:
   dspc-meta-service:
-    image: bowdengl/dspc-meta-rest-service:v0.1
+    image: bowdengl/dspc-meta-rest-service:v0.3
     container_name: dspc-meta-rest-service
     env_file:
       - ds7.env
     ports:
       - $dataspacesport2:8180
-    volumes:
-      - /dspc-plugins:/app/plugins 
+#    volumes:
+#      - /dspc-plugins:/app/plugins 
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
 
   dspc-project-service:
-    image: bowdengl/dspc-project-rest-service:v0.1
+    image: bowdengl/dspc-project-rest-service:v0.3
     container_name: dspc-project-rest-service
     env_file:
       - ds7.env
     ports:
-      - 8010:8010
+      - $dataspacesport3:8010
     volumes:
       - /dspc-plugins:/app/plugins
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
 
   dspc-inspect-service:
     image: bowdengl/dspc-inspect-rest-service:v0.1
@@ -105,6 +197,8 @@ services:
       - /dspc-plugins:/app/plugins
     networks:
       - dataspaces-net 
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
 
   postgres:
     image: postgres:latest
@@ -119,6 +213,8 @@ services:
       - ./sql/create_databases.sh:/docker-entrypoint-initdb.d/create_databases.sh
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
 
   postgres_client:
     image: postgres:latest
@@ -133,6 +229,8 @@ services:
     - ./sql/create_client_databases.sh:/docker-entrypoint-initdb.d/create_databases.sh
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
     command:
       - postgres
       - -c
@@ -145,22 +243,35 @@ services:
       - logging_collector=on
 
   keycloak:
-    image: bowdengl/dspc-keycloak:v2.2
+    image: bowdengl/dspc-keycloak:v3.3
     container_name: dspc-keycloak
     ports:
-     - 8443:8443
+     - $dataspacesport:8443
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
+    volumes:
+      - ./dspc-realm.json:/opt/keycloak/data/import/dspc-realm.json
     environment:
       PROXY_ADDRESS_FORWARDING: 'true'
+      KC_HOSTNAME: $JPHOSTEXT
+      KC_HOSTNAME_PORT: $dataspacesport
+      KC_PROXY: passthrough
     depends_on:
       - postgres
+    entrypoint:
+      - /opt/keycloak/bin/kc.sh
+      - start
+      - --import-realm
  
   neo4j:
     image: neo4j:latest
     container_name: dspc-neo4j
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
     environment:
       NEO4J_AUTH: neo4j/Password1
     ports:
@@ -171,6 +282,8 @@ services:
     container_name: dspc-zookeeper
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -182,14 +295,16 @@ services:
     container_name: dspc-kafka
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
     depends_on:
       - zookeeper
     ports:
       - 9092:9092
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://localhost:9092
+      KAFKA_ZOOKEEPER_CONNECT: dscp-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://$JPHOSTEXT:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_HOST
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -200,6 +315,8 @@ services:
     container_name: dspc-minio
     networks:
       - dataspaces-net
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
     environment:
       MINIO_ROOT_USER: dspcminio
       MINIO_ROOT_PASSWORD: Passw0rd
@@ -214,6 +331,19 @@ services:
       - --console-address
       - ":9001"
 
+  webui:
+    image: "dspc-webui"
+    build: 
+      context: $HOME/$NAME/hpe-dataspace-dspc-webui
+      dockerfile: $HOME/$NAME/Dockerfile.webui
+    restart: always 
+    ports:
+      - $dataspacesport4:80
+    networks:
+    - dataspaces-net  
+    extra_hosts:
+      - "$JPHOSTEXT:$RTARGET"
+    
 volumes:
   dspc-postgres-data:
   dspc-postgres-client-data:
@@ -252,32 +382,41 @@ ENV py_ver "3.7"
 RUN mamba create --quiet --yes -p "${CONDA_DIR}/envs/${conda_env}" python=${py_ver} ipython ipykernel && \
     mamba clean --all -f -y
 
-# create Python kernel and link it to jupyter
+# By default this image uses user jovyan
 USER root
 RUN chown -R jovyan /usr/local
 USER jovyan
+
+# create Python kernel and link it to jupyter
 RUN "${CONDA_DIR}/envs/${conda_env}/bin/python" -m ipykernel install --name="${conda_env}"
 
 # if you want this environment to be the default one, uncomment the following line:
 RUN echo "conda activate ${conda_env}" >> "/home/jovyan/.bashrc"
 
 RUN "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --quiet --no-cache-dir 'flake8==3.9.2'
-RUN    mkdir /home/jovyan/cmflib/
+RUN mkdir -p /home/jovyan/cmflib/ /home/jovyan/workspace/ /home/jovyan/workspace/custom_libs
+RUN chmod 755 /home/jovyan/cmflib/ /home/jovyan/workspace/ /home/jovyan/workspace/custom_libs 
 
-COPY hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/Requirements.txt /home/jovyan/cmflib/
+COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/Requirements.txt /home/jovyan/cmflib/
 RUN "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --no-cache-dir --requirement /home/jovyan/cmflib/Requirements.txt
 
-COPY hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/cmflib /home/jovyan/cmflib/cmflib
-COPY hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/setup.py /home/jovyan/cmflib/setup.py
+COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/cmflib /home/jovyan/cmflib/cmflib
+COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/setup.py /home/jovyan/cmflib/setup.py
+COPY hpe-dataspace-jupyter-cmf-plugin/jupyter_to_dataspace_sync.py /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py
+COPY hpe-dataspace-jupyter-cmf-plugin/getConnStr.py /home/jovyan/workspace/custom_libs/getConnStr.py
+COPY hpe-dataspace-jupyter-cmf-plugin/preset_books /home/jovyan/workspace/
+COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/example-get-started/initialize.sh /home/jovyan/workspace/initialize.sh
 RUN cd /home/jovyan/cmflib && "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --no-cache . 
-
-COPY  hpe-dataspace-jupyter-cmf-plugin/plugin_working/cmflib/example-get-started /home/jovyan/example-get-started
-
+COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/example-get-started /home/jovyan/example-get-started
+RUN chmod 644 /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py /home/jovyan/workspace/custom_libs/getConnStr.py /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py /home/jovyan/workspace/preset_books
+RUN chmod 755 /home/jovyan/workspace/initialize.sh
 
 RUN pip install jupyter
 RUN pip install jupyter_contrib_nbextensions
+RUN pip install kafka-python
+RUN pip install --upgrade acryl-datahub
 RUN mkdir /opt/conda/lib/python3.10/site-packages/jupyter_contrib_nbextensions/nbextensions/CMF_plugin
-ADD hpe-dataspace-jupyter-cmf-plugin/plugin_working/CMF_plugin /opt/conda/lib/python3.10/site-packages/jupyter_contrib_nbextensions/nbextensions/CMF_plugin
+ADD hpe-dataspace-jupyter-cmf-plugin/CMF_plugin /opt/conda/lib/python3.10/site-packages/jupyter_contrib_nbextensions/nbextensions/CMF_plugin
 RUN jupyter contrib nbextensions install
 EOF
 
@@ -285,7 +424,9 @@ EOF
 docker container prune -f
 docker image prune -f
 
+#Build Jupyter Notebook Docker Container
 #docker rmi $DCKBASE ${NAME}:latest
-docker build -t $NAME . 
+docker build -t $NAME .
+
 
 
