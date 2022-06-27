@@ -12,7 +12,7 @@ export JPHOSTEXT={{ hostvars[inventory_hostname]['JPHOSTEXT'] }}
 {{ SCRIPTDIR }}/create-appliance.sh
 
 NAME=dataspaceslab
-TMPDIR=/tmp/$stdid/$NAME
+TMPDIR=/tmp/$NAME.$stdid
 
 
 mkdir -p $TMPDIR
@@ -125,11 +125,16 @@ cd $TMPDIR
 docker-compose up --build -d
 EOF
 
+#create user on dscp-project container
+cat > $TMPDIR/register_user << EOF
+#!/bin/bash
+curl -X POST -H "Content-Type: application/json" --data '{"email":"student$stdid@hpedev.io","first_name":"$stdid","last_name":"Student","password":"$randompw"}' --location  http://$RTARGET:$dataspacesport3/project/v1alpha1/register_user/
+EOF
 
 # Copy content and start container
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
-scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/dockerd-entrypoint.sh $RTARGET:$TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR $TMPDIR/dockerd-entrypoint.sh
+scp -q {{ NOCHECKSSH }} $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/dockerd-entrypoint.sh $TMPDIR/register_user $RTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR $TMPDIR/dockerd-entrypoint.sh $TMPDIR/register_user
 ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/Dockerfile
 # we need the .ssh dir of the student in the build context
 sudo cp -a /student/student$stdid/.ssh $TMPDIR
@@ -138,6 +143,7 @@ scp -q {{ NOCHECKSSH }} -rp $TMPDIR/.ssh ${RTARGET}:$TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo chown -R student$stdid $TMPDIR/.ssh
 # Launch the full stuff !
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
+ssh -q {{ NOCHECKSSH }} $RTARGET $TMPDIR/register_user
 
 # ansible-vault to store it in the pass file creating a MLTOK ansible variable
 if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
@@ -148,17 +154,6 @@ ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyte
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport --name "'DATASPACESPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport2 --name "'DATASPACESPORT2'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport4 --name "'DATASPACESPORT4'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-
-#create user on dscp-project container
-cat > $TMPDIR/register_user << EOF
-#!/bin/bash
-curl -X POST -H "Content-Type: application/json" --data '{"email":"student$stdid@hpedev.io","first_name":"$stdid","last_name":"Student","password":"$randompw"}' --location  http://$RTARGET:$dataspacesport3/project/v1alpha1/register_user/
-EOF
-#chmod 755 $TMPDIR/register_user
-scp -q {{ NOCHECKSSH }} $TMPDIR/register_user ${RTARGET}:$TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET chmod 755 $TMPDIR/register_user
-ssh -q {{ NOCHECKSSH }} $RTARGET $TMPDIR/register_user
-
 
 # Cleanup
 #ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
