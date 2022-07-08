@@ -81,12 +81,12 @@
       name: docker.socket
     ignore_errors: true
 
-  - name: Ensure there is no pre-existing docker.sock socket
-    become: yes
-    become_user: root
-    file:
-      path: /var/run/docker.sock
-      state: absent
+#  - name: Ensure there is no pre-existing docker.sock socket
+#    become: yes
+#    become_user: root
+#    file:
+#      path: /var/run/docker.sock
+#      state: absent
 
   - name: Ensure all RPM required packages are installed
     become: yes
