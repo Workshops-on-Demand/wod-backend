@@ -1,5 +1,6 @@
 PBKDIR: prod
 JPHOST: jupyterhub.etc.fr.comm.hpecorp.net
+JPHOSTIP: 77.158.163.131
 JPIP: 16.31.85.200
 JPHOSTEXT: notebooks.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
