@@ -33,7 +33,7 @@ mkdir -p $HOME/$NAME
 #Using an alias that points to the second repo ; dspc-webui - As one cannot use the same ssh key for both git repos - using here id_webui_rsa
 cd $HOME/$NAME
 rm -rf hpe-dataspace-jupyter-cmf-plugin
-git clone -b Sprint4_integrated git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
+git clone -b discover_demo git@github.com:HPEDevCom/hpe-dataspace-jupyter-cmf-plugin.git
 
 
 #Prepare DSPC-WEBUI Docker Container
@@ -41,14 +41,14 @@ git clone -b Sprint4_integrated git@github.com:HPEDevCom/hpe-dataspace-jupyter-c
 echo "Prepare the DSPC WEBUI container image"
 #git clone repo  first
 rm -rf hpe-dataspace-dspc-webui
-git clone git@github.com-webui:HPEDevCom/hpe-dataspace-dspc-webui.git
+git clone -b discover23-06 git@github.com-webui:HPEDevCom/hpe-dataspace-dspc-webui.git
 
 # Overwrite the environment for external web browser access.
 cat > $HOME/$NAME/hpe-dataspace-dspc-webui/.env << EOF
-REACT_APP_API_PROJECT_METHOD=http
+REACT_APP_API_PROJECT_METHOD=https
 REACT_APP_API_PROJECT_HOST=$JPHOSTEXT
 REACT_APP_API_PROJECT_PORT=$dataspacesport3
-REACT_APP_API_DATASOURCE_METHOD=http
+REACT_APP_API_DATASOURCE_METHOD=https
 REACT_APP_API_DATASOURCE_HOST=$JPHOSTEXT
 REACT_APP_API_DATASOURCE_PORT=$dataspacesport2
 REACT_APP_KEYCLOAK_METHOD=https
@@ -243,7 +243,7 @@ services:
       - logging_collector=on
 
   keycloak:
-    image: bowdengl/dspc-keycloak:v3.3
+    image: bowdengl/dspc-keycloak:v3.4
     container_name: dspc-keycloak
     ports:
      - $dataspacesport:8443
@@ -252,7 +252,8 @@ services:
     extra_hosts:
       - "$JPHOSTEXT:$RTARGET"
     volumes:
-      - ./dspc-realm.json:/opt/keycloak/data/import/dspc-realm.json
+      - ./hpe-dataspace-dspc-webui/dspc-realm.json:/opt/keycloak/data/import/dspc-realm.json
+      - ./cert:/opt/keycloak/data/cert
     environment:
       PROXY_ADDRESS_FORWARDING: 'true'
       KC_HOSTNAME: $JPHOSTEXT
@@ -262,7 +263,12 @@ services:
       - postgres
     entrypoint:
       - /opt/keycloak/bin/kc.sh
+      - --spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true
       - start
+      - --https-certificate-file=/opt/keycloak/data/cert/notebooks3.hpedev.io.crt
+      - --https-certificate-key-file=/opt/keycloak/data/cert/notebooks3.hpedev.io.key
+      - --proxy
+      - reencrypt
       - --import-realm
  
   neo4j:
@@ -361,6 +367,10 @@ sleep 5
 
 docker-compose -f docker-compose.yml up -d --build
 
+sleep 5
+# requiered action from Glyn .... quick and dirty patch
+docker exec -it dspc-project-rest-service ./manage.py migrate
+docker exec -it dspc-meta-rest-service ./manage.py migrate
 
 echo "Prepare the jupyter notebook  container image"
 DCKBASE="jupyter/tensorflow-notebook"
@@ -385,6 +395,7 @@ RUN mamba create --quiet --yes -p "${CONDA_DIR}/envs/${conda_env}" python=${py_v
 # By default this image uses user jovyan
 USER root
 RUN chown -R jovyan /usr/local
+RUN apt-get update; apt-get install -y libpq-dev python-dev
 USER jovyan
 
 # create Python kernel and link it to jupyter
@@ -400,17 +411,21 @@ RUN chmod 755 /home/jovyan/cmflib/ /home/jovyan/workspace/ /home/jovyan/workspac
 COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/Requirements.txt /home/jovyan/cmflib/
 RUN "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --no-cache-dir --requirement /home/jovyan/cmflib/Requirements.txt
 
+
+COPY hpe-dataspace-jupyter-cmf-plugin/Getting_Started /home/jovyan/workspace/Getting_Started
+
+
 COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/cmflib /home/jovyan/cmflib/cmflib
 COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/setup.py /home/jovyan/cmflib/setup.py
 COPY hpe-dataspace-jupyter-cmf-plugin/jupyter_to_dataspace_sync.py /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py
 COPY hpe-dataspace-jupyter-cmf-plugin/getConnStr.py /home/jovyan/workspace/custom_libs/getConnStr.py
-COPY hpe-dataspace-jupyter-cmf-plugin/preset_books /home/jovyan/workspace/
 COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/example-get-started/initialize.sh /home/jovyan/workspace/initialize.sh
 RUN cd /home/jovyan/cmflib && "${CONDA_DIR}/envs/${conda_env}/bin/pip" install --no-cache . 
 COPY hpe-dataspace-jupyter-cmf-plugin/cmflib/example-get-started /home/jovyan/example-get-started
-RUN chmod 644 /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py /home/jovyan/workspace/custom_libs/getConnStr.py /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py /home/jovyan/workspace/preset_books
+USER root
+RUN chmod 644 /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py /home/jovyan/workspace/custom_libs/getConnStr.py /home/jovyan/workspace/custom_libs/jupyter_to_dataspace_sync.py
 RUN chmod 755 /home/jovyan/workspace/initialize.sh
-
+USER jovyan
 RUN pip install jupyter
 RUN pip install jupyter_contrib_nbextensions
 RUN pip install kafka-python
@@ -427,6 +442,3 @@ docker image prune -f
 #Build Jupyter Notebook Docker Container
 #docker rmi $DCKBASE ${NAME}:latest
 docker build -t $NAME .
-
-
-
