@@ -34,6 +34,7 @@ sudo install -m 0600 -o student$stdid /student/student$stdid/.ssh/id_rsa.pub /st
 ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
 scp -q {{ NOCHECKSSH }} $TMPDIR/config $RTARGET:$TMPDIR
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/config /student/student$stdid/.ssh/
+ssh -q {{ NOCHECKSSH }} $RTARGET sudo htpasswd -b /etc/httpd/conf/htpasswd student$stdid $randompw
 
 # Cleanup
 rm -rf $TMPDIR

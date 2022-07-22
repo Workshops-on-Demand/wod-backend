@@ -1,0 +1,13 @@
+# You need something like this to authenticate users
+{% set max2 = APPMAX|int + 1 %}
+{% for s in range( APPMIN|int, max2|int )|list %}
+Alias /student{{ s|string }} "/var/www/student/student{{ s|string }}"
+
+<Directory "/var/www/student/student{{ s|string }}">
+    AuthType Basic
+    AuthName "Ansible"
+    AuthUserFile /etc/httpd/conf/htpasswd
+    Require user student{{ s|string }}
+</Directory>
+
+{% endfor %}

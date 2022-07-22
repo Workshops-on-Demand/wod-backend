@@ -45,6 +45,12 @@ export APPMIN=`get_range_min $wid`
 max=`get_range_max $wid`
 export APPMAX=$(($max+1))
 
+if [ -x "$JUPPROC/scripts/setup-pre-$w.sh" ]; then
+	echo "Setup Appliance for Workshop $w by executing $JUPPROC/scripts/setup-pre-$w.sh at `date`"
+    $JUPPROC/scripts/setup-pre-$w.sh
+	echo "End of Appliance pre setup for Workshop $w at `date`"
+fi
+
 echo "Setup Global Appliance for Workshop $w at `date`"
 $JUPPROC/scripts/setup-globalappliance.sh
 echo "End of Global Appliance setup for Workshop $w at `date`"
@@ -54,7 +60,7 @@ if [ -x "$JUPPROC/scripts/setup-$w.sh" ]; then
 	TMPDIR=/tmp/sa.$$
 	ssh $RTARGET mkdir -p $TMPDIR
 	scp $JUPPROC/scripts/setup-$w.sh $RTARGET:$TMPDIR/
-    ssh $RTARGET "$TMPDIR/setup-$w.sh"
+	ssh $RTARGET "$TMPDIR/setup-$w.sh"
 	ssh $RTARGET rm -rf $TMPDIR
 	echo "End of Appliance setup for Workshop $w at `date`"
 fi
