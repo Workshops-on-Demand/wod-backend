@@ -4,7 +4,8 @@
 # This first part is distribution specific and should be adapted based on its nature
 
 # Base packages required
-apt install -y ansible git openssh-server
+apt install -y ansible git openssh-server jq
 
 # Create the jupyter user
+userdel -f -r jupyter
 useradd -U -m jupyter 
