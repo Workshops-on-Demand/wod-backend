@@ -1,23 +1,61 @@
 #!/bin/bash
+#
+# Script to be called to setup an appliance needed for a certain workshop
+#
+# (c) Bruno Cornec <bruno.cornec@hpe.com>, Hewlett Packard Development
+# (c) Frederic Passeron <frederic.passeron@hpe.com>, Hewlett Packard Development
+#
+# Released under the GPLv2 License
+## API Call to update determinedAI user  creds on detmaster
 
-#set -x
+set -x
 
-echo "Prepare the DeterminedAi-FSI  container image"
+source {{ SCRIPTDIR }}/functions.sh
 
-NAME=fsilab
 
-mkdir -p $HOME/$NAME
-cd $HOME/$NAME
+# Define local variables
+echo wid=$wid
+APPMIN=`get_range_min $wid`
+APPMAX=`get_range_max $wid`
+echo stdid=$stdid
+echo APPMIN=$APPMIN
+echo APPMAX=$APPMAX
 
-DCKBASE="jupyter/scipy-notebook:b6fdd5dae6cb"
+# Define local variables
+UserName="student$stdid"
 
-cat > Dockerfile << EOF
-FROM $DCKBASE
-RUN pip install --no-cache-dir vdom==0.5
-EOF
 
-# Clean before
-docker container prune -f
-docker image prune -f
-docker rmi $DCKBASE ${NAME}:latest
-docker build -t $NAME .
+## Define the Det Master service endpoint for the Determined AI environment on Ezmeral Runtime STAGING
+detMaster="https://determinedai2.hpedev.io"
+echo $detMaster
+
+#Login as admin user and get token
+token=$(curl -i -s -X 'POST' \
+  "${detMaster}/api/v1/auth/login" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "username": "admin",
+  "password": "CloudSystem2022*!"
+}' | grep token | awk '{print $1}' | tr -d '\r')
+echo $token
+MyToken=$(echo $token | cut -d':' -f 2 | cut -d',' -f 1 | tr -d '"') # extract token value and remove trailing quotes
+echo $MyToken
+
+
+## Create student on determined AI Master node using api calls and APPMIN APPMAX
+
+for i in {$APPMIN..$APPMAX}; do
+ curl -X 'POST' \
+   'https://determinedai2.hpedev.io/api/v1/users' \
+   -H 'accept: application/json' \
+   -H "Authorization: Bearer $MyToken" \
+   -d '{
+   "user": {
+     "username": "student'$i'",
+     "admin": false,
+     "active": true
+    },
+    "password": "DetaidefP@SSWD2022*"
+ }' 
+done
