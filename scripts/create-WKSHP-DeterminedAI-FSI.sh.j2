@@ -1,0 +1,181 @@
+#!/bin/bash
+#
+# Script to be called to setup an appliance needed for a certain workshop
+#
+# (c) Bruno Cornec <bruno.cornec@hpe.com>, Hewlett Packard Development
+# (c) Frederic Passeron <frederic.passeron@hpe.com>, Hewlett Packard Development
+#
+# Released under the GPLv2 License
+## API Call to update determinedAI user  creds on detmaster
+
+set -x
+
+source {{ SCRIPTDIR }}/functions.sh
+
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-DeterminedAI-FSI'] }}
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+{{ SCRIPTDIR }}/reset-$ws.sh
+{{ SCRIPTDIR }}/create-appliance.sh
+
+NAME=fsilab
+TMPDIR=/tmp/$NAME.$stdid
+
+
+mkdir -p $TMPDIR
+
+# Define local variables
+echo wid=$wid
+APPMIN=`get_range_min $wid`
+echo stdid=$stdid
+echo APPMIN=$APPMIN
+#mlport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['MLPORT-WKSHP-ML101'] }}))
+#mlport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['MLPORT2-WKSHP-ML101'] }}))
+httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-DeterminedAI-FSI'] }}))
+httpport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT2-WKSHP-DeterminedAI-FSI'] }}))
+
+cat > $TMPDIR/dockerd-entrypoint.sh << EOF
+export HTTPPORT
+tini -g -- start-notebook.sh &
+sleep 3
+jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/mltoken
+sleep infinity
+EOF
+
+cat > $TMPDIR/Dockerfile << EOF
+FROM ${NAME}:latest
+USER root
+COPY dockerd-entrypoint.sh /usr/local/bin/
+ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
+RUN mkdir -p /student/student$stdid
+RUN useradd student$stdid -u $stdid -g 100 -d /student/student$stdid
+RUN chown student$stdid:users /student/student$stdid
+# Unlock the account
+RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
+# In case we need sudo
+#RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+WORKDIR /student/student$stdid
+USER student$stdid
+ENV NB_USER student$stdid
+ENV NB_UID $stdid
+ENV HTTPPORT $httpport
+RUN git clone https://github.com/snowch/ml-101 /student/student$stdid/
+RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
+EOF
+
+
+# Look at https://stackoverflow.com/questions/34264348/docker-inside-docker-container
+# and http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
+# For security consider using https://github.com/nestybox/sysbox
+cat > $TMPDIR/docker-compose.yml << EOF
+version: '3.5'
+services:
+  $NAME$stdid:
+    image: $NAME$stdid
+    build: .
+    #privileged: true
+    ports:
+      - "$httpport:8888"
+      - "$mlport:4040"
+      - "$mlport2:4041"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+EOF
+cat > $TMPDIR/launch-$NAME << EOF
+#!/bin/bash
+cd $TMPDIR
+docker-compose up --build -d
+EOF
+
+# Define local variables
+echo stdid=$stdid
+UserName="student$stdid"
+
+# Define env variables
+gateway_host=192.168.10.208
+
+## Define the Det Master service endpoint for the Determined AI environment on Ezmeral Runtime STAGING
+detMaster="http://$gateway_host:8080"
+echo $detMaster
+
+#Login as admin user and get token
+token=$(curl -i -s -X 'POST' \
+  "${detMaster}/api/v1/auth/login" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "username": "admin",
+  "password": "CloudSystem2022*!"
+}' | grep token | awk '{print $1}' | tr -d '\r')
+echo $token
+MyToken=$(echo $token | cut -d':' -f 2 | cut -d',' -f 1 | tr -d '"') # extract token value and remove trailing quotes 
+echo $MyToken
+
+
+# get Student Determeined AI id:
+detstudentid=$(curl -X 'GET' \
+  "${detMaster}/api/v1/users" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $MyToken"| jq '.users[] | select(.username=="'$UserName'") | .id' | tr -d '"')
+
+echo " the determined AI $UserName id is : $detstudentid"
+
+
+# Set password for an existing user account
+#change password for user 
+echo "Change password for user account $UserName"
+curl -X 'POST' \
+  "${detMaster}/api/v1/users/${detstudentid}/password" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $MyToken" \
+  -d '"'${randompw}'"'
+
+
+
+
+# Define local variables
+echo stdid=$stdid
+UserName="student$stdid"
+
+# Define env variables
+gateway_host=192.168.10.208
+
+## Define the Det Master service endpoint for the Determined AI environment on Ezmeral Runtime STAGING
+detMaster="http://$gateway_host:8080"
+echo $detMaster
+
+#Login as admin user and get token
+token=$(curl -i -s -X 'POST' \
+  "${detMaster}/api/v1/auth/login" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "username": "admin",
+  "password": "CloudSystem2022*!"
+}' | grep token | awk '{print $1}' | tr -d '\r')
+echo $token
+MyToken=$(echo $token | cut -d':' -f 2 | cut -d',' -f 1 | tr -d '"') # extract token value and remove trailing quotes
+echo $MyToken
+
+
+# get Student Determeined AI id:
+detstudentid=$(curl -X 'GET' \
+  "${detMaster}/api/v1/users" \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $MyToken"| jq '.users[] | select(.username=="'$UserName'") | .id' | tr -d '"')
+
+echo " the determined AI $UserName id is : $detstudentid"
+
+
+# Set password for an existing user account
+#change password for user
+echo "Change password for user account $UserName"
+curl -X 'POST' \
+  "${detMaster}/api/v1/users/${detstudentid}/password" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $MyToken" \
+  -d '"'${randompw}'"'
+
+
