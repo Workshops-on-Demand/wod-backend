@@ -518,6 +518,7 @@
         etype: user
         permissions: rwx
         state: present
+        recalculate_mask: no_mask
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Setup default ACL for students with jupyter account
@@ -531,4 +532,5 @@
         permissions: rwx
         default: yes
         state: present
+        recalculate_mask: no_mask
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
