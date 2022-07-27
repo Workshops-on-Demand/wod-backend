@@ -28,8 +28,8 @@ EOF
 	ssh $RTARGET chmod 755 $TMPDIR/preventive-cleanup
 	ssh $RTARGET sudo su - student$stdid -c $TMPDIR/preventive-cleanup
 	# SSH setup
-	ssh $RTARGET sudo install -d -m 0700 -o student$stdid $HOMEDIR/.ssh
-	ssh $RTARGET sudo install -m 0600 -o student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
+	ssh $RTARGET sudo install -d -m 0700 -o student$stdid -g student$stdid $HOMEDIR/.ssh
+	ssh $RTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
 	EXITVAL=0
 else
 	echo "student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
