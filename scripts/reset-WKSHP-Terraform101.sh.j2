@@ -8,7 +8,7 @@ generate_greenlake_reset_token
 echo "Getting Studentid"
 echo "student id is" $stdid
 
-cd /student/student$stdid/$w
+cd /student/student$stdid/$ws
 echo " This script resets the $w Workshop content for:" student$stdid
 
 ##
@@ -19,7 +19,7 @@ source ./student.src
 ##
 echo "Cleaning up now"
 ##
-terraform destroy  -input=false -auto-approve
+terraform destroy  -input=false -auto-approve -lock=false
 
 # Deleting Student Users
 echo "Deleting Student api client"
