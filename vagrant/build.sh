@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 # Automate Wod server creation
 # By default work with CentOS 7 - 
 # Change the link to the Vagrantfile to point to an Ubuntu one

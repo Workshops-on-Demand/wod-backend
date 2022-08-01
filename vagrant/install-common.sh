@@ -3,13 +3,15 @@
 # This is the second part of the installation process that is called by a specific installation script for a distribution
 # Run as root
 
+set -e
+
 # Get content for WoD - now in private mode
 su - jupyter -c "rm -rf wod-backend.git .ssh"
 token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
-cat >> ~jupyter/wod-backend/inventory << EOF
+cat >> ~jupyter/wod-backend/ansible/inventory << EOF
 
-[wod-$woddistrib]
+[wod]
 wod-$woddistrib 
 EOF
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
