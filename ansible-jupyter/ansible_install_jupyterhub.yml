@@ -386,8 +386,8 @@
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
 
-    - name: Ensure Go kernel is installed
-      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+#    - name: Ensure Go kernel is installed
+#      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
 
     - name: Ensure required directories under /usr/local are owned by jupyter
       become: yes
@@ -404,20 +404,20 @@
         - /usr/local/share/powershell
         - /usr/local/share/powershell/Modules
 
-    - name: Make gophernotes available under /usr/local/bin
-      copy:
-        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
-        dest: /usr/local/bin/gophernotes
-        owner: jupyter
-        group: jupyter
-        mode: 0755
+#    - name: Make gophernotes available under /usr/local/bin
+#      copy:
+#        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
+#        dest: /usr/local/bin/gophernotes
+#        owner: jupyter
+#        group: jupyter
+#        mode: 0755
 
-    - name: Cleanup intermediate go directory
-      become: yes
-      become_user: root
-      file:
-        path: '{{ ansible_env.HOME }}/go'
-        state: absent
+#    - name: Cleanup intermediate go directory
+#      become: yes
+#      become_user: root
+#      file:
+#        path: '{{ ansible_env.HOME }}/go'
+#        state: absent
 
     - name: Make kernel_python available under /usr/local/bin
       copy:
