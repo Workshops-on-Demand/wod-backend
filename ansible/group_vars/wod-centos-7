@@ -1,4 +1,4 @@
-PBKDIR: wod-centos-7
+PBKDIR: production
 JPHOST: wod-centos-7
 JPHOSTIP: 127.0.0.1
 JPHOSTEXT: localhost
