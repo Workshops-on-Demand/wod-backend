@@ -1,12 +1,13 @@
 - hosts: all
   gather_facts: true
-  vars_files:
-    - "group_vars/{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}.yml"
   vars:
     IJAVAVER: "1.3.0"
     KUBECTLVER: "1.21.6"
 
   tasks:
+    - name: Include variables for the underlying distribution
+      include_vars: "{{ ansible_env.JUPPROC }}/ansible/group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+
     - name: Base setup for a JupyterHub environment server or appliance
       include: ansible_setup_base_appliance.yml
 
@@ -17,8 +18,8 @@
         name: centos-release-scl-rh
         state: present
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Add conda GPG Key to APT
       become: yes
@@ -27,8 +28,8 @@
         url: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
         state: present
       when:
-       - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] >= "20"
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version >= "20"
 
       # TODO: Do it for EPEL if really needed
     - name: Add conda APT repository
@@ -38,8 +39,8 @@
         repo: deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main
         state: present
       when:
-       - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] >= "20"
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version >= "20"
 
     - name: Add Hashicorp GPG Key to APT
       become: yes
@@ -48,8 +49,8 @@
         url: https://apt.releases.hashicorp.com/gpg
         state: present
       when:
-       - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] >= "20"
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version >= "20"
 
     - name: Add Hashicorp APT repository
       become: yes
@@ -58,8 +59,8 @@
         repo: deb [arch=amd64] https://apt.releases.hashicorp.com focal main
         state: present
       when:
-       - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] >= "20"
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version >= "20"
 
     - name: Add Hashicorp GPG Key to RPM DB
       become: yes
@@ -68,19 +69,19 @@
         key: https://rpm.releases.hashicorp.com/gpg
         state: present
       when:
-        - ansible_facts['distribution'] == "CentOS"
+        - ansible_distribution == "CentOS"
 
     - name: Add Hashicorp YUM repository
       become: yes
       become_user: root
       yum_repository:
         name: hashicorp
-        baseurl: "https://rpm.releases.hashicorp.com/RHEL/{{ ansible_facts['distribution_major_version'] }}/x86_64/stable"
+        baseurl: "https://rpm.releases.hashicorp.com/RHEL/{{ ansible_distribution_major_version }}/x86_64/stable"
         description: "Upstream Hashicorp Yum repository"
         enabled: yes
         state: present
       when:
-        - ansible_facts['distribution'] == "CentOS"
+        - ansible_distribution == "CentOS"
 
     - name: Add K8s GPG Key to APT
       become: yes
@@ -89,7 +90,7 @@
         url: https://packages.cloud.google.com/apt/doc//apt-key.gpg.asc
         state: present
       when:
-       - ansible_facts['os_family'] == "Debian"
+       - ansible_os_family == "Debian"
 
     - name: Add K8s GPG Key to RPM DB
       become: yes
@@ -101,7 +102,7 @@
         - https://packages.cloud.google.com/yum/doc/yum-key.gpg
         - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
       when:
-        - ansible_facts['distribution'] == "CentOS"
+        - ansible_distribution == "CentOS"
 
     - name: Add K8s APT repository
       become: yes
@@ -110,20 +111,20 @@
         repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
         state: present
       when:
-       - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] == "20"
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version == "20"
 
     - name: Add K8s YUM repository
       become: yes
       become_user: root
       yum_repository:
         name: k8s
-        baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el{{ ansible_facts['distribution_major_version'] }}-$basearch"
+        baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el{{ ansible_distribution_major_version }}-$basearch"
         description: "Upstream K8s Yum repository"
         enabled: yes
         state: present
       when:
-        - ansible_facts['distribution'] == "CentOS"
+        - ansible_distribution == "CentOS"
 
     - name: Remove Microsoft repo file just in case
       become: yes
@@ -132,7 +133,7 @@
         path: /etc/apt/sources.list.d/microsoft-prod.list
         state: absent
       when:
-       - ansible_facts['os_family'] == "Debian"
+       - ansible_os_family == "Debian"
 
     - name: Remove MicroSoft repo package
       become: yes
@@ -148,17 +149,17 @@
       apt:
         deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
       when:
-       - ansible_facts['distribution'] == "Ubuntu"
-       - ansible_facts['distribution_major_version'] >= "20"
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version >= "20"
 
     - name: Setup MicroSoft repo for YUM
       become: yes
       become_user: root
       yum:
-        name: "https://packages.microsoft.com/config/centos/{{ ansible_facts['distribution_major_version'] }}/packages-microsoft-prod.rpm"
+        name: "https://packages.microsoft.com/config/centos/{{ ansible_distribution_major_version }}/packages-microsoft-prod.rpm"
         state: present
       when:
-        - ansible_facts['distribution'] == "CentOS"
+        - ansible_distribution == "CentOS"
 
     - name: Update apt cache
       become: yes
@@ -167,7 +168,7 @@
         update_cache: yes
       changed_when: False
       when:
-        - ansible_facts['os_family'] == "Debian"
+        - ansible_os_family == "Debian"
 
     - name: Ensure all non-required packages are uninstalled
       become: yes
@@ -255,7 +256,7 @@
         - libproc-processtable-perl
         - acct
       when:
-        - ansible_facts['os_family'] == "Debian"
+        - ansible_os_family == "Debian"
 
     - name: Ensure all required RPM packages are installed
       become: yes
@@ -276,8 +277,8 @@
         - perl-Data-Dumper
         - psacct
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Ensure all required node.js packages are installed
       become: yes
@@ -346,8 +347,8 @@
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Ensure all required pip packages are installed
       pip:
@@ -443,7 +444,7 @@
         mode: 0751
 
     - name: Ensure Rust kernel is installed
-      shell: . '{{ JPHUB }}/bin/activate' && "{{ JUPPROC }}/evcxr_jupyter.{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}" --install
+      shell: . '{{ JPHUB }}/bin/activate' && "{{ JUPPROC }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
 
     - name: Ensure Rust kernel files are installed
       copy:
@@ -456,7 +457,7 @@
 
     - name: Ensure Rust kernel is deployed
       copy:
-        src: "{{ JUPPROC }}/evcxr_jupyter.{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_major_version'] }}"
+        src: "{{ JUPPROC }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
         dest: "/usr/local/bin/evcxr_jupyter"
         owner: jupyter
         group: jupyter
@@ -572,8 +573,8 @@
         mode: 0755
         force: yes
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Ensure powershell is installed through dotnet
       command: dotnet tool install --tool-path /usr/local/bin powershell
@@ -795,8 +796,8 @@
         line: 'StrictModes no'
         state: present
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == "7"
 
     - name: restart sshd service
       become: yes
@@ -807,8 +808,8 @@
         enabled: yes
         name: sshd
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] == "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == "7"
 
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the wod-notebooks git repo
