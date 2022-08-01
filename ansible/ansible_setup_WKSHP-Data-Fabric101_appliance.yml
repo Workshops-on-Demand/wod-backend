@@ -12,7 +12,7 @@
         - jq
         - openldap-clients
       when:
-        - ansible_facts['distribution'] == "CentOS"
+        - ansible_distribution == "CentOS"
 
     - name: Enable RPC service
       become: yes

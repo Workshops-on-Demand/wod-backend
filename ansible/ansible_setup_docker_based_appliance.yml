@@ -9,7 +9,7 @@
       enabled: yes
       state: present
     when:
-      - ansible_facts['distribution'] == "CentOS"
+      - ansible_distribution == "CentOS"
 
   - name: Setup Docker repo for APT
     become: yes
@@ -18,8 +18,8 @@
       repo: deb https://download.docker.com/linux/ubuntu/dists/ xenial main
       state: present
     when:
-     - ansible_facts['distribution'] == "Ubuntu"
-     - ansible_facts['distribution_major_version'] >= "20"
+     - ansible_distribution == "Ubuntu"
+     - ansible_distribution_major_version >= "20"
 
   - name: Ensure no existing docker pkg is installed
     become: yes
@@ -41,8 +41,8 @@
       - docker-engine
       - docker-compose
     when:
-     - ansible_facts['distribution'] == "Ubuntu"
-     - ansible_facts['distribution_major_version'] >= "20"
+     - ansible_distribution == "Ubuntu"
+     - ansible_distribution_major_version >= "20"
 
   - name: Add Docker GPG Key to RPM DB
     become: yes
@@ -53,7 +53,7 @@
     with_items:
       - https://download.docker.com/linux/centos/gpg
     when:
-      - ansible_facts['distribution'] == "CentOS"
+      - ansible_distribution == "CentOS"
 
   - name: Disable Docker service
     register: service_stop
@@ -96,7 +96,7 @@
       - docker-ce
       - docker-compose
     when:
-      - ansible_facts['distribution'] == "CentOS"
+      - ansible_distribution == "CentOS"
 
   - name: Enable Docker service
     become: yes

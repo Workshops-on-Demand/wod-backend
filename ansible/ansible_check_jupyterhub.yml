@@ -69,8 +69,8 @@
         - "123"
         - "{{POSTPORT}}"
       when:
-        - ansible_facts['distribution'] == "Ubuntu"
-        - ansible_facts['distribution_major_version'] >= "20"
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
 
     - name: Setup ufw firewall UDP rules
       become: yes
@@ -83,8 +83,8 @@
       with_items:
         - "123"
       when:
-        - ansible_facts['distribution'] == "Ubuntu"
-        - ansible_facts['distribution_major_version'] >= "20"
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
 
     - name: Setup firewalld TCP rules
       become: yes
@@ -101,8 +101,8 @@
         - "123"
         - "{{POSTPORT}}"
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Setup firewalld UDP rules
       become: yes
@@ -114,8 +114,8 @@
       with_items:
         - "123"
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Enable firewalld service
       become: yes
@@ -126,8 +126,8 @@
         enabled: yes
         name: firewalld
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Enable NTP service
       become: yes
@@ -138,8 +138,8 @@
         enabled: yes
         name: ntp
       when:
-        - ansible_facts['distribution'] == "Ubuntu"
-        - ansible_facts['distribution_major_version'] >= "20"
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
 
     - name: Enable NTP service
       become: yes
@@ -150,8 +150,8 @@
         enabled: yes
         name: ntpd
       when:
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Ensure limits are correct for jupyter account
       lineinfile:
@@ -180,7 +180,7 @@
         dest: "{{ ansible_env.HOME }}/.profile"
       when:
         - profile_path.rc != 0
-        - ansible_facts['os_family'] == "Debian"
+        - ansible_os_family == "Debian"
 
     - name: Ensure we have a .profile file for RPM systems
       copy:
@@ -188,8 +188,8 @@
         dest: "{{ ansible_env.HOME }}/.profile"
       when:
         - profile_path.rc != 0
-        - ansible_facts['distribution'] == "CentOS"
-        - ansible_facts['distribution_major_version'] >= "7"
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
     - name: Ensure vim is the default EDITOR
       lineinfile:

@@ -16,7 +16,7 @@
       pkg:
       - apt-transport-https
     when:
-     - ansible_facts['os_family'] == "Debian"
+     - ansible_os_family == "Debian"
 
   - name: Add universe repository into sources list
     become: yes
@@ -25,17 +25,17 @@
       repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
       state: present
     when:
-     - ansible_facts['distribution'] == "Ubuntu"
-     - ansible_facts['distribution_major_version'] >= "20"
+     - ansible_distribution == "Ubuntu"
+     - ansible_distribution_major_version >= "20"
 
   - name: Add EPEL repository into repo list
     become: yes
     become_user: root
     yum:
-      name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts['distribution_major_version'] }}.noarch.rpm"
+      name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
       state: present
     when:
-      - ansible_facts['distribution'] == "CentOS"
+      - ansible_distribution == "CentOS"
 
   - name: Update apt cache
     become: yes
@@ -44,7 +44,7 @@
       update_cache: yes
     changed_when: False
     when:
-      - ansible_facts['os_family'] == "Debian"
+      - ansible_os_family == "Debian"
 
   - name: Ensure all required packages are installed
     become: yes
@@ -183,7 +183,7 @@
       pkg:
       - nss-pam-ldapd
     when:
-      - ansible_facts['distribution'] == "CentOS"
+      - ansible_distribution == "CentOS"
       - LDAPSETUP == "1"
 
   - name: Setup authconfig for LDAP
@@ -213,7 +213,7 @@
       policy: targeted
       state: permissive
     when:
-      - ansible_facts['distribution'] == "CentOS"
+      - ansible_distribution == "CentOS"
 
     # Do it in all cases LDAP or not as mode needs to be confirmed for ssh login
     # However, that doesn't seem to work on CentOS as dirs remains with mode 770
