@@ -1,4 +1,4 @@
-PBKDIR: wod-ubuntu-20.04
+PBKDIR: production
 JPHOST: wod-ubuntu-20.04
 JPHOSTIP: 127.0.0.1
 JPHOSTEXT: localhost

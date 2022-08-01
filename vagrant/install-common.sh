@@ -9,16 +9,18 @@ set -e
 su - jupyter -c "rm -rf wod-backend.git .ssh"
 token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
-cat >> ~jupyter/wod-backend/ansible/inventory << EOF
-
-[wod]
-wod-$woddistrib 
-EOF
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
+
+# Setup this as a production env for WoD
+su - jupyter -c "cd wod-backend/ansible/group_vars ; ln -sf production wod-$woddistrib"
+cat >> ~jupyter/ansible/inventory << EOF
+wod-$woddistrib ansible_connection=local
+EOF
 
 #Setup ssh for jupyter
 su - jupyter -c "ssh-keygen -t rsa -b 4096 -N '' -f ~jupyter/.ssh/id_rsa"
 su - jupyter -c "install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/"
+su - jupyter -c "cat ~jupyter/.ssh/id_rsa.pub >> ~jupyter/.ssh/authorized_keys"
 
 # setup sudo for jupyter
 cat > /etc/sudoers.d/jupyter << EOF
