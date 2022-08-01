@@ -3,7 +3,8 @@
 cd /student/student$stdid/$w
 echo " This script resets the HPE CP API Workshop content for:" student$stdid
 # associated to studentXY.
-##
+#
+#
 echo "Setting  environment variables to help cleanup"
 ##
 student="student$stdid" # your Jupyter Notebook student Identifier (i.e.: student<xx>)
@@ -12,10 +13,11 @@ password="CleanUpDISCO2020" # your HPE CP tenant login credentials - password
 ##
 ## fixed environment variables setup by the HPE CP lab administrator
 ##
-controller_endpoint="gateway1.hpedevlab.net:8080"
-gateway_host="gateway1.hpedevlab.net"
+
+gateway_host="{{ HPEECPGWNAME }}"
+controller_endpoint="${gateway_host}:8080"
 tenantname="K8sHackTenant"
-k8sClusterId="3"  #this is the K8s Cluster Id provided by the HPE CP admisnistrator and assigned to your K8s tenant.
+k8sClusterId="1"  #this is the K8s Cluster Id provided by the HPE CP admisnistrator and assigned to your K8s tenant.
 helloWorldApp="hello-world-app.yaml" # the application manifest you will deploy in this lab
 tensorFlowApp="tensorflow-notebook-config-cluster.yaml" # the kubedirector application cluster configuration TensorFlow
 echo "your operation context is:" $username "on tenant" $tenantname 
