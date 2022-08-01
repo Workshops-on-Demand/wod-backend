@@ -5,8 +5,13 @@
 
 # Get content for WoD - now in private mode
 su - jupyter -c "rm -rf wod-backend.git .ssh"
-token=`cat token`
+token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
+cat >> ~jupyter/wod-backend/inventory << EOF
+
+[wod-$woddistrib]
+wod-$woddistrib 
+EOF
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
 
 #Setup ssh for jupyter
