@@ -283,9 +283,7 @@
     - name: Ensure all required node.js packages are installed
       become: yes
       become_user: root
-      community.general.npm:
-        name: "{{ item }}"
-        global: yes
+      command: npm install -g "{{ item }}"
       with_items:
         - json
         - configurable-http-proxy

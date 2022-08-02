@@ -13,7 +13,7 @@ if grep -qv 'ip_resolve=4' /etc/yum.conf; then
 fi
 
 # Base packages required
-yum -y install epel-release ansible git openssh-server jq
+yum -y install epel-release ansible git openssh-server jq npm
 
 # Additional repo for up to date git
 if rpm -q --quiet endpoint-repo; then
