@@ -15,12 +15,12 @@ fi
 useradd -U -m jupyter
 
 # Get content for WoD - now in private mode
-su - jupyter -c "rm -rf wod-backend.git .ssh"
+su - jupyter -c "rm -rf wod-backend.git wod-notebooks .ssh"
 token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
-# For now clone also notebooks
-su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
+# For now clone also notebooks
+su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
 
 # Setup this as a production env for WoD
 su - jupyter -c "cd wod-backend/ansible/group_vars ; ln -sf wod-$woddistrib production"
