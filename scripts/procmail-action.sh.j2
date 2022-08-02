@@ -52,7 +52,6 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
-export std0="$JUPNOBO"
 export stddir="{{ STUDDIR }}/student$stdid"
 export accessToken=`get_session_token`
 
@@ -92,7 +91,7 @@ if [ $action != "RESET" ]; then
 		exit -1
 	fi
 
-	cd $std0
+	cd $JUPNOBO
 
 	# Read workshop list on stdin
 	if [ -d "$stddir" ]; then
