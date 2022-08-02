@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"disabled":false,"guestpath":"/vagrant","hostpath":"/home/bruno/Maison/bruno/prj/jupyter-procmail/vagrant","type":"rsync","__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
