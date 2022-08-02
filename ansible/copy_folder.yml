@@ -5,7 +5,7 @@
   vars:
     VARDIR: "{{ ANSIBLEDIR }}/{{ PBKDIR }}"
 
-  tasks: 
+  tasks:
     - fail:
         msg: STDID variable is empty ! Fat fingers ?!?
       when: STDID is not defined
@@ -55,18 +55,18 @@
         path: "{{ VARDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       ignore_errors: true
       register: pass_file
- 
+
     - include_vars:
         file: "{{ VARDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       when: pass_file.stat.exists
-   
+
     # find all notebooks
     - name: find jupyter notebooks
       find:
         paths: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
         # Add other file types to process them as ansible templates
-        patterns: 
+        patterns:
           - "*.ipynb"
           - "*.yaml"
           - "*.py"
@@ -77,22 +77,42 @@
         excludes: '*-checkpoint.ipynb'
       register: notebooks
 
+    # find all private notebooks
+    - name: find jupyter private notebooks
+      find:
+        paths: "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
+        recurse: yes
+        # Add other file types to process them as ansible templates
+        patterns:
+          - "*.ipynb"
+          - "*.yaml"
+          - "*.py"
+          - "*.sh"
+          - "*.src"
+          - "Variables.ps1"
+        excludes: '*-checkpoint.ipynb'
+      register: notebookspriv
+
     - name: debug
-      debug: 
+      debug:
         msg: "{{ notebooks.files }}"
 
+    - name: debug
+      debug:
+        msg: "{{ notebookspriv.files }}"
+
         #- name: debug
-        #debug: 
+        #debug:
         #msg: "{{ ansible_facts }}"
 
 
         #- name: debug
-        #debug: 
+        #debug:
         #msg: "{{ OVIP }}"
 
         #- name: debug-OVIP
-        #debug: 
-        #msg: "{{ item.key }} => {{ item.value }}" 
+        #debug:
+        #msg: "{{ item.key }} => {{ item.value }}"
         #with_dict: "{{ OVIP }}"
         #when: "{{ STDID }} == {{ item.key }}"
 
@@ -103,14 +123,14 @@
         #| .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
         #with_items: "{{ notebooks.files }}"
         #when: item.path is not search("Variables.ps1")
-        
+
     - name: Purge potential remaining workshop (no CLEANUP done)
       become: yes
       become_user: root
       file:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         state: absent
- 
+
     - name: Create workspace directory for jupyter
       become: yes
       become_user: root
@@ -132,12 +152,35 @@
         group: student{{ STDID }}
         mode: 0644
 
+    - name: Verif whether we have a Workshop content
+      command: ls "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+      register: nobo_path
+      ignore_errors: true
+      changed_when: false
+
     - name: Synchronize target students with Notebooks Workshop content
       ansible.posix.synchronize:
         src: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
-        rsync_opts: 
+        rsync_opts:
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
+      when:
+        - nobo_path.rc == 0
+
+    - name: Verif whether we have a private Workshop content
+      command: ls "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+      register: nobopriv_path
+      ignore_errors: true
+      changed_when: false
+
+    - name: Synchronize target students with private Notebooks Workshop content
+      ansible.posix.synchronize:
+        src: "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        rsync_opts:
+          - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
+      when:
+        - nobopriv_path.rc == 0
 
       #- name: debug
       #debug:
@@ -146,8 +189,8 @@
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(JUPNOBO, STUDDIR + '/student' + STDID) }}"
-      with_items: "{{ notebooks.files }}"
+        dest: "{{ item.path | regex_replace(JUPNOBO, STUDDIR + '/student' + STDID) }} | regex_replace(JUPPRIVNOBO, STUDDIR + '/student' + STDID) }}  "
+      with_items: "[{{ notebooks.files }}, {{ notebookspriv.files }}] "
 
     - name: Create a checkpoint directory
       file:
@@ -184,7 +227,7 @@
         group: student{{ STDID }}
         recurse: yes
         mode: u+rwx
-      
+
     - name: setup ACL for the Workshop
       become: yes
       become_user: root
@@ -195,7 +238,7 @@
         etype: user
         permissions: rwx
         state: present
-      
+
     - name: setup default ACL for the Workshop
       become: yes
       become_user: root

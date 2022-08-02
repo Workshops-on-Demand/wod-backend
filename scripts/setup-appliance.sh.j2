@@ -40,6 +40,13 @@ export accessToken=`get_session_token`
 export wid=`get_workshop_id $w`
 #export WKSHP=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`
 export RTARGET=`grep IP-$w {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+if [ _"$RTARGET" = _"" ]; then
+	export RTARGET=`grep IP-$w {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	if [ _"$RTARGET" = _"" ]; then
+		echo "Unable to find the RTARGET for $w"
+		exit -1
+	fi
+fi
 export APPMIN=`get_range_min $wid`
 max=`get_range_max $wid`
 export APPMAX=$(($max+1))
@@ -48,11 +55,21 @@ if [ -x "{{ SCRIPTDIR }}/setup-pre-$w.sh" ]; then
 	echo "Setup Appliance for Workshop $w by executing {{ SCRIPTDIR }}/setup-pre-$w.sh at `date`"
 	{{ SCRIPTDIR }}/setup-pre-$w.sh
 	echo "End of Appliance pre setup for Workshop $w at `date`"
+if [ -x "{{ SCRIPTPRIVDIR }}/setup-pre-$w.sh" ]; then
+	echo "Setup Appliance for private Workshop $w by executing {{ SCRIPTPRIVDIR }}/setup-pre-$w.sh at `date`"
+	{{ SCRIPTPRIVDIR }}/setup-pre-$w.sh
+	echo "End of Appliance pre setup for Workshop $w at `date`"
 fi
 
 echo "Setup Global Appliance for Workshop $w at `date`"
 {{ SCRIPTDIR }}/setup-globalappliance.sh
 echo "End of Global Appliance setup for Workshop $w at `date`"
+
+if [ -x {{ SCRIPTPRIVDIR }}/setup-globalappliance.sh ]; then
+	echo "Setup Global Appliance for private Workshop $w at `date`"
+	{{ SCRIPTPRIVDIR }}/setup-globalappliance.sh
+	echo "End of Global Appliance setup for private Workshop $w at `date`"
+fi
 
 if [ -x "{{ SCRIPTDIR }}/setup-$w.sh" ]; then
 	echo "Setup Appliance for Workshop $w by executing remotely {{ SCRIPTDIR }}/setup-$w.sh at `date`"
@@ -62,4 +79,14 @@ if [ -x "{{ SCRIPTDIR }}/setup-$w.sh" ]; then
 	ssh $RTARGET "$TMPDIR/setup-$w.sh"
 	ssh $RTARGET rm -rf $TMPDIR
 	echo "End of Appliance setup for Workshop $w at `date`"
+fi
+
+if [ -x "{{ SCRIPTPRIVDIR }}/setup-$w.sh" ]; then
+	echo "Setup Appliance for private Workshop $w by executing remotely {{ SCRIPTPRIVDIR }}/setup-$w.sh at `date`"
+	TMPDIR=/tmp/sa.$$
+	ssh $RTARGET mkdir -p $TMPDIR
+	scp {{ SCRIPTPRIVDIR }}/setup-$w.sh $RTARGET:$TMPDIR/
+	ssh $RTARGET "$TMPDIR/setup-$w.sh"
+	ssh $RTARGET rm -rf $TMPDIR
+	echo "End of Appliance setup for private Workshop $w at `date`"
 fi

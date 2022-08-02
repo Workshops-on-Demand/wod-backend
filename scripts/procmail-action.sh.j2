@@ -116,16 +116,28 @@ if [ $action != "RESET" ]; then
                         fi
 			if [ _"$compile" != _"" ]; then
 				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
+				if [ -f {{ ANSIBLEPRIVDIR }}/compile_scripts.yml ]; then
+					# YAML file not duplicated, just overload SCRIPTDIR var
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODANSOPT --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\" SCRIPTDIR={{ SCRIPTPRIVDIR }}"
+				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
 				echo "Setup workshop $w Backend"
 				{{ SCRIPTDIR }}/create-$ws.sh
 			fi
+			if [ -x "{{ SCRIPTPRIVDIR }}/create-$ws.sh" ]; then
+				echo "Setup private workshop $w Backend"
+				{{ SCRIPTPRIVDIR }}/create-$ws.sh
+			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file {{ ANSIBLEDIR }}/vault_secret
+			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODANSOPT --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file {{ ANSIBLEDIR }}/vault_secret
 			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				{{ SCRIPTDIR }}/post-copy-$ws.sh
+			fi
+			if [ -x "{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh" ]; then
+				echo "Perform post actions for private workshop $w"
+				{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
 			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
@@ -161,6 +173,10 @@ if [ $action != "RESET" ]; then
 			if [ -x "{{ SCRIPTDIR }}/cleanup-$ws.sh" ]; then
 				echo "Cleaning up workshop $w"
 				{{ SCRIPTDIR }}/cleanup-$ws.sh
+			fi
+			if [ -x "{{ SCRIPTPRIVDIR }}/cleanup-$ws.sh" ]; then
+				echo "Cleaning up private workshop $w"
+				{{ SCRIPTPRIVDIR }}/cleanup-$ws.sh
 			fi
 			# Keep completion status
 			completion=`get_wod_completion_ratio`
@@ -249,12 +265,18 @@ elif [ "$action" = "RESET" ]; then
 		done
 
 		# Get Workshop backend reset status
-		if [ ! -x "{{ SCRIPTDIR }}/reset-$ws.sh" ]; then
+		if [ ! -x "{{ SCRIPTDIR }}/reset-$ws.sh" ] && [ ! -x "{{ SCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
-			echo "Reseting workshop $w Backend"
-			{{ SCRIPTDIR }}/reset-$ws.sh
+			if [ -x "{{ SCRIPTDIR }}/reset-$ws.sh" ]; then
+				echo "Reseting workshop $w Backend"
+				{{ SCRIPTDIR }}/reset-$ws.sh
+			fi
+			if [ -x "{{ SCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
+				echo "Reseting private workshop $w Backend"
+				{{ SCRIPTPRIVDIR }}/reset-$ws.sh
+			fi
 		fi
 
 		while [ $j -ge $min ]; do
