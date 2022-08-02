@@ -17,7 +17,6 @@ get_session_token() {
 			--header 'Content-Type: application/json' \
 			--data "{\"username\":\"$APIUSER\",\"password\":\"$APIPWD\"}" | jq -r '.accessToken'`
         echo "$ret"
-
 }
 
 

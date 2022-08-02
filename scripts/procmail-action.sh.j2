@@ -117,15 +117,15 @@ if [ $action != "RESET" ]; then
 			if [ _"$compile" != _"" ]; then
 				ansible-playbook $JUPPROC/ansible/ansible_compile_scripts.yml -i $JUPPROC/ansible/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
 			fi
-			if [ -x "$JUPPROC/scripts/create-$ws.sh" ]; then
+			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
 				echo "Setup workshop $w Backend"
-				$JUPPROC/scripts/create-$ws.sh
+				{{ SCRIPTDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
 			ansible-playbook $JUPPROC/ansible/ansible_copy_folder.yml -i $JUPPROC/ansible/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
-			if [ -x "$JUPPROC/scripts/post-copy-$ws.sh" ]; then
+			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
-				$JUPPROC/scripts/post-copy-$ws.sh
+				{{ SCRIPTDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
 			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml $JUPPROC/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
@@ -158,9 +158,9 @@ if [ $action != "RESET" ]; then
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Launch cleanup script if any
-			if [ -x "$JUPPROC/scripts/cleanup-$ws.sh" ]; then
+			if [ -x "{{ SCRIPTDIR }}/cleanup-$ws.sh" ]; then
 				echo "Cleaning up workshop $w"
-				$JUPPROC/scripts/cleanup-$ws.sh
+				{{ SCRIPTDIR }}/cleanup-$ws.sh
 			fi
 			# Keep completion status
 			completion=`get_wod_completion_ratio`
@@ -249,12 +249,12 @@ elif [ "$action" = "RESET" ]; then
 		done
 
 		# Get Workshop backend reset status
-		if [ ! -x "$JUPPROC/scripts/reset-$ws.sh" ]; then
+		if [ ! -x "{{ SCRIPTDIR }}/reset-$ws.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
 			echo "Reseting workshop $w Backend"
-			$JUPPROC/scripts/reset-$ws.sh
+			{{ SCRIPTDIR }}/reset-$ws.sh
 		fi
 
 		while [ $j -ge $min ]; do

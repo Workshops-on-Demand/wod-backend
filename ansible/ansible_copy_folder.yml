@@ -161,7 +161,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ JUPPROC }}/scripts/generate-pdf.sh"
+        src: "{{ SCRIPTDIR }}/generate-pdf.sh"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}

@@ -10,7 +10,7 @@ export TMPDIR=/tmp/$NAME.$stdid.ret
 dataspacesport3=$(({{ hostvars[inventory_hostname]['DATASPACESPORT3-WKSHP-Dataspaces'] }}))
 
 env
-$JUPPROC/scripts/cleanup-container-ratio.sh
+{{ SCRIPTDIR }}/cleanup-container-ratio.sh
 
 mkdir -p $TMPDIR
 # Delete user on dscp-project container
