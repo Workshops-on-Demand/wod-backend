@@ -131,10 +131,14 @@ EOF
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
-	if [ ! -d "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass" ]; then
-		mkdir -p "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass"
+	if [ ! -d "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass" ]; then
+		mkdir -p "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass"
 	fi
-	ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible/vault_secret" $randompw --name "'PASSSTU'" > "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+	if [ -f {{ ANSIBLEPRIVDIR }}//vault_secret ]; then
+		ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+	else
+		ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+	fi
 }
 
 # This function retuns the workshop name from the mail body
@@ -145,7 +149,7 @@ get_workshop_name() {
 		echo "Missing workshop name in the e-mail body"
 		exit -1
 	fi
-    ws=`echo $w |sed 's/CHLG/WKSHP/'`
+	ws=`echo $w |sed 's/CHLG/WKSHP/'`
 	if [ ! -d "$JUPNOBO/$ws" ]; then
 		echo "Non-existant workshop $ws"
 		exit -1
