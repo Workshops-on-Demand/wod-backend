@@ -3,10 +3,12 @@
 source {{ SCRIPTDIR }}/wod.sh
 
 # Git doesn't collect file rights and we need to have correct ones here so forcing
-cd {{ JUPPROC }}/skel
-find . -type f | xargs chmod 600
-chmod 700 .ssh
-chmod 644 .ssh/*.pub
+for d in {{ JUPPROC }}/skel  {{ JUPPRIV }}/skel; do
+	cd $d
+	find . -type f | xargs chmod 600
+	chmod 700 .ssh
+	chmod 644 .ssh/*.pub
+done
 #
 cd {{ ANSIBLEDIR }}
 
