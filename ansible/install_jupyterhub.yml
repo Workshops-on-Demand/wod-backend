@@ -9,7 +9,7 @@
       include_vars: "{{ ansible_env.JUPPROC }}/ansible/group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
     - name: Base setup for a JupyterHub environment server or appliance
-      include: ansible_setup_base_appliance.yml
+      include: setup_base_appliance.yml
 
     - name: Add CentOS SC repository into repo list
       become: yes
@@ -794,12 +794,12 @@
         - nobo_path.rc != 0
 
     - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/ansible_install_jupyterhub.yaml"
+      command: ls "{{ ANSIBLEPRIVDIR }}/install_jupyterhub.yml"
       register: acj_path
       ignore_errors: true
       changed_when: false
 
     - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/ansible_install_jupyterhub.yaml"
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/install_jupyterhub.yml"
       when:
         - acj_path.rc == 0

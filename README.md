@@ -17,7 +17,7 @@ pre reqs:
 - Necessary scripts:
     -setup-WKSHP-Workshop-name.sh.j2
     -In case of Docker Appliance:
-      - Yaml file in ansible-jupyter folder:  ansible_setup_WKSHP-Dataspaces_appliance.yml
+      - Yaml file in ansible-jupyter folder:  setup_WKSHP-Dataspaces_appliance.yml
 Steps:
 * launch setup script for appliance (This script will prepare the appliance : adding pre reqs and users)
 * ./setup-appliance.sh WKSHP-Workshop-name
