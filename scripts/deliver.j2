@@ -8,7 +8,7 @@ find . -type f | xargs chmod 600
 chmod 700 .ssh
 chmod 644 .ssh/*.pub
 #
-cd {{ JUPPROC }}/ansible
+cd {{ ANSIBLEDIR }}
 
 ansible-playbook -i inventory --limit {{ PBKDIR }} ansible_check_jupyterhub.yml
 if [ -f {{ ANSIBLEPRIVDIR }}/ansible_check_jupyterhub.yml ]; then
