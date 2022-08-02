@@ -115,20 +115,20 @@ if [ $action != "RESET" ]; then
                                 compile=""
                         fi
 			if [ _"$compile" != _"" ]; then
-				ansible-playbook $JUPPROC/ansible/ansible_compile_scripts.yml -i $JUPPROC/ansible/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
+				ansible-playbook {{ ANSIBLEDIR }}/ansible_compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
 				echo "Setup workshop $w Backend"
 				{{ SCRIPTDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $JUPPROC/ansible/ansible_copy_folder.yml -i $JUPPROC/ansible/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			ansible-playbook {{ ANSIBLEDIR }}/ansible_copy_folder.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file {{ ANSIBLEDIR }}/vault_secret
 			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				{{ SCRIPTDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
-			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml $JUPPROC/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table

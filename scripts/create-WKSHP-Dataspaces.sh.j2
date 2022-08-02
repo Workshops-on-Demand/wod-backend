@@ -147,14 +147,14 @@ ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launc
 ssh -q {{ NOCHECKSSH }} $RTARGET $TMPDIR/register_user
 
 # ansible-vault to store it in the pass file creating a MLTOK ansible variable
-if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
-	mkdir -p "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass"
+if [ ! -d "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass" ]; then
+	mkdir -p "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass"
 fi
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspaceshttpport2 --name "'DATASPACESHTTPPORT2'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspaceshttpport --name "'DATASPACESHTTPPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport --name "'DATASPACESPORT'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport2 --name "'DATASPACESPORT2'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible-jupyter/vault_secret" $dataspacesport4 --name "'DATASPACESPORT4'" >> "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}-jupyter/vault_secret" $dataspaceshttpport2 --name "'DATASPACESHTTPPORT2'" >> "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}-jupyter/vault_secret" $dataspaceshttpport --name "'DATASPACESHTTPPORT'" >> "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}-jupyter/vault_secret" $dataspacesport --name "'DATASPACESPORT'" >> "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}-jupyter/vault_secret" $dataspacesport2 --name "'DATASPACESPORT2'" >> "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}-jupyter/vault_secret" $dataspacesport4 --name "'DATASPACESPORT4'" >> "{{ ANSIBLEDIR }}-jupyter/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR

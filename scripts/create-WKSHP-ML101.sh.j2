@@ -92,12 +92,12 @@ ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:{{ STUDDIR }}/student$
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/mltoken $TMPDIR
 
 # ansible-vault to store it in the pass file creating a MLTOK ansible variable
-if [ ! -d "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass" ]; then
-	mkdir -p "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass"
+if [ ! -d "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass" ]; then
+	mkdir -p "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass"
 fi
 # We can overwrite the existing variables file as we don't need PASSSTU 
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible/vault_secret" `cat $TMPDIR/mltoken` --name "'MLTOK'" > "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "{{ JUPPROC }}/ansible/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ JUPPROC }}/ansible/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}/vault_secret" `cat $TMPDIR/mltoken` --name "'MLTOK'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 # ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
