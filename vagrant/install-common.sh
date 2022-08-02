@@ -43,4 +43,4 @@ chmod 440 /etc/sudoers.d/jupyter
 # Change default passwd for vagrant and root
 
 # Install WoD
-su - jupyter -c "cd wod-backend ; ./scripts/install_jupyter.sh"
+su - jupyter -c "./wod-backend/scripts/install_jupyter.sh"
