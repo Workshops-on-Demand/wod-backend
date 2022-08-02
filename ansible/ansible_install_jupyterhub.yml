@@ -296,8 +296,6 @@
         - jupyterhub>=2.0.1
         - jupyterlab>=3.2.5
         - jupyterhub-idle-culler
-        - pyhpecfm==0.1.6
-        - hpeOneView
         - ansible-kernel>=0.9.0
         - bash_kernel>=0.7.2
         - sshkernel>=0.11.1
@@ -356,8 +354,6 @@
         - jupyterhub
         - jupyterlab
         - jupyterhub-idle-culler
-        - pyhpecfm==0.1.6
-        - hpeOneView
         - ansible-kernel>=0.9.0
         - bash_kernel>=0.7.2
         - sshkernel>=0.11.1
@@ -519,32 +515,6 @@
         path: '{{ ansible_env.HOME }}/.local/share/jupyter/kernels'
         state: absent
       
-    - name: Test kubectl presence
-      command: ls /usr/local/bin/kubectl
-      register: kubectlpath
-      ignore_errors: true
-      changed_when: false
-
-    - name: Ensure kubectl is installed
-      copy:
-        src: "{{ JUPPROC }}/kubectl-{{ KUBECTLVER }}"
-        dest: /usr/local/bin/kubectl
-        mode: 0755
-      when: kubectlpath.rc != 0
-
-    - name: Test kubectl-hpecp presence
-      command: ls /usr/local/bin/kubectl-hpecp
-      register: kubectl_path
-      ignore_errors: true
-      changed_when: false
-
-    - name: Ensure kubectl-hpecp is installed
-      copy:
-        src: "{{ JUPPROC }}/kubectl-hpecp-5-1-Linux"
-        dest: /usr/local/bin/kubectl-hpecp
-        mode: 0755
-      when: kubectl_path.rc != 0
-
     - name: Remove MS tools to be sure a good one will be available
       file:
         path: /usr/local/bin/{{ item }}
@@ -596,7 +566,7 @@
         group: jupyter
         mode: 0751
 
-    - name: Disable HPEDev services
+    - name: Disable WoD services
       become: yes
       become_user: root
       systemd:
@@ -690,13 +660,13 @@
             ]
           #####################################################################################
    
-    - name: Copy HPEDev service file as ansible template for variable expansion
+    - name: Copy WoD service file as ansible template for variable expansion
       become: yes
       become_user: root
       template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
       with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
 
-    - name: Enable HPEDev service
+    - name: Enable WoD service
       become: yes
       become_user: root
       systemd:
@@ -816,3 +786,6 @@
       git:
         repo: https://github.com/Workshops-on-Demand/wod-notebooks.git
         dest: "{{ JUPNOBO  }}"
+
+    - name: Now call private tasks if available
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/ansible_install_jupyterhub.yaml"
