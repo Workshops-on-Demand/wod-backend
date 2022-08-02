@@ -3,8 +3,11 @@ STUDDIR: "{{ ansible_env.STUDDIR }}"
 JUPPROC: "{{ ansible_env.JUPPROC }}"
 JUPPRIV: "{{ ansible_env.JUPPRIV }}"
 JUPNOBO: "{{ ansible_env.JUPNOBO }}"
+JUPPRIVNOBO: "{{ JUPPRIV }}/notebooks"
 SCRIPTDIR: "{{ JUPPROC }}/scripts"
+ANSIBLEDIR: "{{ JUPPROC }}/ansible"
 SCRIPTPRIVDIR: "{{ JUPPRIV }}/scripts"
+ANSIBLEPRIVDIR: "{{ JUPPRIV }}/ansible"
 JPHUB: /opt/jupyterhub
 CLEAN: false
 USERMIN: 1
