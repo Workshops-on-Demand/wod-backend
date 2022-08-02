@@ -18,6 +18,8 @@ useradd -U -m jupyter
 su - jupyter -c "rm -rf wod-backend.git .ssh"
 token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
+# For now clone also notebooks
+su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
 
 # Setup this as a production env for WoD
