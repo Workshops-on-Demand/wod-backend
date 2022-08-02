@@ -4,6 +4,15 @@
 # Run as root
 
 set -e
+set -u
+set -o pipefail
+
+# Create the jupyter user
+
+if grep -qE '^jupyter:' /etc/passwd; then
+        userdel -f -r jupyter
+fi
+useradd -U -m jupyter
 
 # Get content for WoD - now in private mode
 su - jupyter -c "rm -rf wod-backend.git .ssh"
