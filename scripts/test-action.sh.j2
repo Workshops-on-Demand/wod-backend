@@ -48,7 +48,7 @@ fi
 send_mail() {
 
 	cat > /tmp/mail.$$ << EOF
-MAIL FROM: hpedev.hackshack@hpe.com
+MAIL FROM: {{ SENDER }}
 RCPT TO: jupyter@`hostname`
 DATA
 Subject: $ACTION $1 0
