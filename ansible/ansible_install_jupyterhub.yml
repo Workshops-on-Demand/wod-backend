@@ -779,11 +779,19 @@
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version == "7"
 
+    - name: Test whether notebooks are already available
+      command: ls "{{ JUPNONO }}/README.md"
+      register: nobo_path
+      ignore_errors: true
+      changed_when: false
+
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the wod-notebooks git repo
       git:
         repo: https://github.com/Workshops-on-Demand/wod-notebooks.git
         dest: "{{ JUPNOBO  }}"
+      when:
+        - nobo_path.rc != 0
 
     - name: Test private tasks YAML file
       command: ls "{{ ANSIBLEPRIVDIR }}/ansible_install_jupyterhub.yaml"
