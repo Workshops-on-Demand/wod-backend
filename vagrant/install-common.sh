@@ -21,8 +21,9 @@ su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshop
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
 
 # Setup this as a production env for WoD
-su - jupyter -c "cd wod-backend/ansible/group_vars ; ln -sf production wod-$woddistrib"
-cat >> ~jupyter/ansible/inventory << EOF
+su - jupyter -c "cd wod-backend/ansible/group_vars ; ln -sf wod-$woddistrib production"
+cat > ~jupyter/wod-backend/ansible/inventory << EOF
+[production]
 wod-$woddistrib ansible_connection=local
 EOF
 
