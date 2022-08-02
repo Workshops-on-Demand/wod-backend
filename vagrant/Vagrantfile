@@ -12,9 +12,16 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "generic/focal64"
   config.vm.synced_folder './', '/vagrant', type: 'rsync'
-  config.vm.hostname = "wod-ubuntu-20.04"
+  config.vm.define "centos-7" do |centos7|
+    centos7.vm.box = "generic/centos7"
+    centos7.vm.hostname = "wod-centos-7"
+  end
+  config.vm.define "ubuntu-20.04" do |ubuntu2004|
+    ubuntu2004.vm.box = "generic/ubuntu2004"
+    ubuntu2004.vm.hostname = "wod-ubuntu-20.04"
+  end
+  #ubuntu2004.vm.provider = "libvirt"
   #config.vm.synced_folder './', '/vagrant', type: 'nfs'
 
   # Disable automatic box update checking. If you disable this, then
