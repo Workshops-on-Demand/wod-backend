@@ -72,6 +72,7 @@
           - "*.py"
           - "*.sh"
           - "*.src"
+          - "*.tf"
           - "Variables.ps1"
         excludes: '*-checkpoint.ipynb'
       register: notebooks
