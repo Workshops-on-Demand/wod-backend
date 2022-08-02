@@ -2,6 +2,7 @@
 
 set -x
 
+source {{ SCRIPTDIR }}/wod.sh
 source {{ SCRIPTDIR }}/functions.sh
 
 # Change to its own appliance when in production
@@ -16,7 +17,7 @@ TMPDIR=/tmp/$NAME.$stdid
 mkdir -p $TMPDIR
 
 # Get apps
-cp -a $std0/$w/apps.tar.gz $TMPDIR
+cp -a $JUPNOBO/$w/apps.tar.gz $TMPDIR
 
 cat > $TMPDIR/entrypoint.sh << EOF
 #!/bin/bash
