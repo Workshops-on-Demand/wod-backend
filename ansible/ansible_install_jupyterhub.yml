@@ -780,7 +780,7 @@
         - ansible_distribution_major_version == "7"
 
     - name: Test whether notebooks are already available
-      command: ls "{{ JUPNONO }}/README.md"
+      command: ls "{{ JUPNOBO }}/README.md"
       register: nobo_path
       ignore_errors: true
       changed_when: false
