@@ -204,6 +204,12 @@
         line: UserTasksMax=100000
         state: present
 
+    - name: Test private hosts.j2 template
+      command: ls "{{ JUPPRIV }}/hosts.j2"
+      register: hosts_path
+      ignore_errors: true
+      changed_when: false
+
     - name: Expand template for /etc/hosts
       become: yes
       become_user: root
@@ -212,6 +218,8 @@
         dest: "/etc/hosts"
         mode: 0644
         owner: root
+      when:
+        - hosts_path.rc != 0
 
     - name: Create directory "{{ JPHUB }}" if needed
       become: yes
