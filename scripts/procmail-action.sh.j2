@@ -115,14 +115,14 @@ if [ $action != "RESET" ]; then
                                 compile=""
                         fi
 			if [ _"$compile" != _"" ]; then
-				ansible-playbook {{ ANSIBLEDIR }}/ansible_compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
+				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
 				echo "Setup workshop $w Backend"
 				{{ SCRIPTDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/ansible_copy_folder.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file {{ ANSIBLEDIR }}/vault_secret
+			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" --vault-password-file {{ ANSIBLEDIR }}/vault_secret
 			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				{{ SCRIPTDIR }}/post-copy-$ws.sh
