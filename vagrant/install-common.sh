@@ -21,6 +21,8 @@ su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshop
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
 # For now clone also notebooks
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
+# For now clone also public private
+su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git"
 
 # Setup this as a production env for WoD
 su - jupyter -c "cd wod-backend/ansible/group_vars ; ln -sf wod-$woddistrib production"
