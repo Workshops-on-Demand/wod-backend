@@ -491,7 +491,7 @@
     - name: Check whether to patch ansible kernel
       command: "grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py"
       register: patch_done
-      ignore_errors: true
+      failed_when: false
       changed_when: False
 
     - name: Patch ansible kernel with fixes coming from master
@@ -782,7 +782,7 @@
     - name: Test whether notebooks are already available
       command: ls "{{ JUPNOBO }}/README.md"
       register: nobo_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     # For this to work, you need to have a key used in deploy key of the projects
@@ -796,7 +796,7 @@
     - name: Test private tasks YAML file
       command: ls "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
       register: acj_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available

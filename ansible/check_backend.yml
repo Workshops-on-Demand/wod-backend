@@ -171,7 +171,7 @@
     - name: Test .profile file
       command: ls "{{ ansible_env.HOME }}/.profile"
       register: profile_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: Ensure we have a .profile file for DEB systems
@@ -207,7 +207,7 @@
     - name: Test private hosts.j2 template
       command: ls "{{ JUPPRIV }}/hosts.j2"
       register: hosts_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: Expand template for /etc/hosts
@@ -534,7 +534,7 @@
     - name: Test private tasks YAML file
       command: ls "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
       register: acj_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available

@@ -155,7 +155,7 @@
     - name: Verif whether we have a Workshop content
       command: ls "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
       register: nobo_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: Synchronize target students with Notebooks Workshop content
@@ -170,7 +170,7 @@
     - name: Verif whether we have a private Workshop content
       command: ls "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
       register: nobopriv_path
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: Synchronize target students with private Notebooks Workshop content
