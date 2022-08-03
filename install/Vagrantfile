@@ -13,29 +13,29 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.synced_folder './', '/vagrant', type: 'rsync'
-  config.vm.define "wod-be-centos-7" do |centos7|
-    wod-be-centos7.vm.box = "generic/centos7"
-    wod-be-centos7.vm.hostname = "wod-be-centos-7"
-    #wod-be-centos7.vm.network  "private_network", ip: "192.168.200.10"
-    wod-be-centos7.vm.network "forwarded_port", guest: 8000, host: 8010
+  config.vm.define "wod-be-centos-7" do |wodbecentos7|
+    wodbecentos7.vm.box = "generic/centos7"
+    wodbecentos7.vm.hostname = "wod-be-centos-7"
+    #wodbecentos7.vm.network  "private_network", ip: "192.168.200.10"
+    wodbecentos7.vm.network "forwarded_port", guest: 8000, host: 8010
   end
-  config.vm.define "wod-fe-centos-7" do |centos7|
-    wod-fe-centos7.vm.box = "generic/centos7"
-    wod-fe-centos7.vm.hostname = "wod-fe-centos-7"
-    #wod-fe-centos7.vm.network  "private_network", ip: "192.168.200.10"
-    wod-fe-centos7.vm.network "forwarded_port", guest: 8000, host: 8010
+  config.vm.define "wod-fe-centos-7" do |wodfecentos7|
+    wodfecentos7.vm.box = "generic/centos7"
+    wodfecentos7.vm.hostname = "wod-fe-centos-7"
+    #wodfecentos7.vm.network  "private_network", ip: "192.168.200.10"
+    wodfecentos7.vm.network "forwarded_port", guest: 8000, host: 8011
   end
-  config.vm.define "wod-be-ubuntu-20.04" do |ubuntu2004|
-    wod-be-ubuntu2004.vm.box = "generic/ubuntu2004"
-    wod-be-ubuntu2004.vm.hostname = "wod-be-ubuntu-20.04"
-    #wod-be-ubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
-    wod-be-ubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
+  config.vm.define "wod-be-ubuntu-20.04" do |wodbeubuntu2004|
+    wodbeubuntu2004.vm.box = "generic/ubuntu2004"
+    wodbeubuntu2004.vm.hostname = "wod-be-ubuntu-20.04"
+    #wodbeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
   end
-  config.vm.define "wod-srv-ubuntu-20.04" do |ubuntu2004|
-    wod-srv-ubuntu2004.vm.box = "generic/ubuntu2004"
-    wod-srv-ubuntu2004.vm.hostname = "wod-srv-ubuntu-20.04"
-    #wod-srv-ubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
-    wod-srv-ubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
+  config.vm.define "wod-srv-ubuntu-20.04" do |wodsrvubuntu2004|
+    wodsrvubuntu2004.vm.box = "generic/ubuntu2004"
+    wodsrvubuntu2004.vm.hostname = "wod-srv-ubuntu-20.04"
+    #wodsrvubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wodsrvubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
   end
   #ubuntu2004.vm.provider = "libvirt"
   #config.vm.synced_folder './', '/vagrant', type: 'nfs'

@@ -8,7 +8,7 @@ usage() {
 	echo "install.sh [-t type][-g groupname][-b backend][-f frontend][-e external]"
 	echo " "
 	echo "where:"
-	echo "type      is the installation types"
+	echo "type      is the installation type"
 	echo "          example: backend, frontend, server"
 	echo "          if empty using 'backend'                "
 	echo "groupname is the ansible group_vars name to be used"
@@ -23,14 +23,17 @@ usage() {
 	echo "external  is the external FQDN of the back-end JupyterHub server, reachable from the Internet"
 	echo "          example: jphub.example.org  "
 	echo "          if empty using the internal name of the back-end                "
-	exit -1
 }
 
-while getopts ":v:g:" option; do
+while getopts ":t:f:e:b:g:" option; do
     case "${option}" in
-        v)
+        t)
             t=${OPTARG}
-            ((t ==  "backend" || t == "frontend")) || usage
+            if [ ${t} !=  "backend" ] && [ ${t} != "frontend" ] && [ ${t} != "server" ]; then
+	    	echo "wrong type: ${t}"
+		  usage
+		  exit -1
+	    fi
             ;;
         f)
             f=${OPTARG}
@@ -46,6 +49,7 @@ while getopts ":v:g:" option; do
             ;;
         *)
             usage
+	    exit -1
             ;;
     esac
 done
@@ -54,7 +58,7 @@ shift $((OPTIND-1))
     #usage
 #fi
 if [ ! -z "${t}" ]; then
-	WODTYPE="${e}"
+	WODTYPE="${t}"
 else
 	WODTYPE="backend"
 fi
