@@ -6,10 +6,10 @@
       include_vars: "{{ ANSIBLEDIR }}group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
     - name: Base setup for a JupyterHub environment server or appliance
-      include: {{ ANSIBLEDIR }}/setup_base_appliance.yml
+      include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
 
     - name: Setup first the Docker context (packages, deps, ...)
-      include_tasks: {{ ANSIBLEDIR }}/install_docker.yml
+      include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
 
     - name: Ensure all required packages are installed
       become: yes
