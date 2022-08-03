@@ -86,8 +86,8 @@ if [ $WODTYPE = "backend" ]; then
 	else
 		ansible-galaxy collection install community.general
 	fi
-	ansible-galaxy collection install ansible.posix
 fi
+ansible-galaxy collection install ansible.posix
 
 
 SCRIPTREL=`echo $SCRIPT | perl -p -e "s|$JUPPROC||"`
@@ -97,14 +97,14 @@ then
 	$JUPPRIV/$SCRIPTREL
 fi
 
+if [ $WODTYPE = "backend" ]; then
+	ANSPLAYOPT="-e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
+fi
 # Automatic Installation script for the system 
-ansible-playbook -i inventory --limit $PBKDIR -e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0" install_backend.yml
-ansible-playbook -i inventory --limit $PBKDIR check_backend.yml
+ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
+ansible-playbook -i inventory --limit $PBKDIR check_$WODTYPE.yml
 
 ANSPLAYOPT=""
-if [ $WODTYPE = "backend" ]; then
-	ANSPLAYOPT="-e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
-fi
 if [ -f $JUPPRIV/ansible/install_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
 fi
