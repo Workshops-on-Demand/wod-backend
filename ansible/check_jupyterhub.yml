@@ -254,7 +254,7 @@
       lineinfile:
         path: /etc/postfix/main.cf
         regex: '^myhostname ='
-        line: "myhostname = {{ JPHOST }}"
+        line: "myhostname = {{ WODBEFQDN }}"
         state: present
 
     - name: Ensure listening addresses in postfix main.cf is configured correctly
@@ -263,7 +263,7 @@
       lineinfile:
         path: /etc/postfix/main.cf
         regex: '^inet_interfaces ='
-        line: "inet_interfaces =  {{ JPHOST }},localhost"
+        line: "inet_interfaces =  {{ WODBEFQDN }},localhost"
         state: present
 
     - name: Ensure the mailbox command is correct
@@ -281,7 +281,7 @@
       lineinfile:
         path: /etc/postfix/main.cf
         regex: '^mydestination ='
-        line: "mydestination = $myhostname, {{ JPHOST.split('.')[0] }}, {{ JPHOSTEXT }}, {{ JPHOSTEXT.split('.')[0] }}, localhost, localhost.localdomain"
+        line: "mydestination = $myhostname, {{ WODBEFQDN.split('.')[0] }}, {{ JPHOSTEXT }}, {{ JPHOSTEXT.split('.')[0] }}, localhost, localhost.localdomain"
         state: present
 
     - name: Deploy an instanciated procmailrc conf file
