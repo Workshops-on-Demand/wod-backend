@@ -149,26 +149,3 @@
       enabled: yes
       name: nslcd
     when: LDAPSETUP == "1"
-
-  - name: Disable SELinux for now as our students are non-standard
-    become: yes
-    become_user: root
-    selinux:
-      policy: targeted
-      state: permissive
-    when:
-      - ansible_distribution == "CentOS"
-
-    # Do it in all cases LDAP or not as mode needs to be confirmed for ssh login
-    # However, that doesn't seem to work on CentOS as dirs remains with mode 770
-    # However, for rsync to work, we need to keep 770 !!
-  - name: Ensure Linux students users home dir exist with correct mode
-    become: yes
-    become_user: root
-    file:
-      path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
-      owner: "{{ 'student%s' | format(item) }}"
-      group: "{{ 'student%s' | format(item) }}"
-      mode: '0750'
-      state: directory
-    loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
