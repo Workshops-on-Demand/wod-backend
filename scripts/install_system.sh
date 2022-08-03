@@ -99,6 +99,8 @@ fi
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
+elif [ $WODTYPE = "server" ]; then
+	ANSPLAYOPT="-e LDAPSETUP=0"
 fi
 # Automatic Installation script for the system 
 ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
