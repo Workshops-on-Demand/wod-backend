@@ -681,7 +681,7 @@
 
     #- name: Setup jupyter account in jupyterhub
     #  uri:
-    #    url: "{{ JPHUBAPISRV }}/hub/api/users"
+    #    url: "{{ WODBEAPIURL }}/hub/api/users"
     #    headers:
     #      Authorization: "token {{ JPHUBTOKEN }}"
     #    method: POST
@@ -691,7 +691,7 @@
 
     - name: Setup group admin in jupyterhub
       uri:
-        url: "{{ JPHUBAPISRV }}/hub/api/groups/admingroup"
+        url: "{{ WODBEAPIURL }}/hub/api/groups/admingroup"
         headers:
           Authorization: "token {{ JPHUBTOKEN }}"
         method: POST

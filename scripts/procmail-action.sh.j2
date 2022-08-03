@@ -60,7 +60,7 @@ if [ "$action" = "PURGE" ]; then
     curl --header "Authorization: token {{ JPHUBTOKEN }}" \
             --location \
             --request DELETE \
-            "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+            "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 	generate_randompwd
 	erase_student
     exit 0
@@ -166,7 +166,7 @@ if [ $action != "RESET" ]; then
 				 --location \
 				 --request POST \
 				 --data '{}' \
-                     "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+                     "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Launch cleanup script if any
@@ -192,7 +192,7 @@ if [ $action != "RESET" ]; then
 			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
 				--location \
 			--request DELETE \
-                         "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
+                         "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $wid`" = _"false" ]; then
