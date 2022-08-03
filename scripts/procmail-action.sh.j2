@@ -57,7 +57,7 @@ export accessToken=`get_session_token`
 
 # for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
-    curl --header "Authorization: token {{ JPHUBTOKEN }}" \
+    curl --header "Authorization: token {{ WODBETOKEN }}" \
             --location \
             --request DELETE \
             "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
@@ -162,7 +162,7 @@ if [ $action != "RESET" ]; then
 				 "$WODFEAPIURL/customer/$userid"
 			##Start Student jupyterhub dedicated server
 			curl --header "Content-Type: application/json" \
-				 --header "Authorization: token {{ JPHUBTOKEN }}" \
+				 --header "Authorization: token {{ WODBETOKEN }}" \
 				 --location \
 				 --request POST \
 				 --data '{}' \
@@ -189,7 +189,7 @@ if [ $action != "RESET" ]; then
 
 
 			#Delete Student jupyterhub dedicated server
-			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
+			curl --header "Authorization: token {{ WODBETOKEN }}" \
 				--location \
 			--request DELETE \
                          "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
