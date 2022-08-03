@@ -60,6 +60,7 @@ fi
 chmod 755 $SCRIPTDIR/wod.sh
 source $SCRIPTDIR/wod.sh
 
+cd $SCRIPTDIR/../ansible
 SHORTNAME="`hostname -s`"
 FULLNAME=`ansible-inventory -i inventory --list | jq -r '._meta.hostvars | to_entries[] | .key' | grep -E "^$SHORTNAME(\.|$)"`
 if [ _"$FULLNAME" = _"" ]; then
@@ -96,7 +97,6 @@ then
 	$JUPPRIV/$SCRIPTREL
 fi
 
-cd $SCRIPTDIR/../ansible
 # Automatic Installation script for the system 
 ansible-playbook -i inventory --limit $PBKDIR -e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0" install_backend.yml
 ansible-playbook -i inventory --limit $PBKDIR check_backend.yml
