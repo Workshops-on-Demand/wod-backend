@@ -81,13 +81,13 @@ then
 fi
 
 # Automatic Installation script for jupyterhub 
-ansible-playbook -i inventory --limit $PBKDIR -e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0" install_jupyterhub.yml
-ansible-playbook -i inventory --limit $PBKDIR check_jupyterhub.yml
+ansible-playbook -i inventory --limit $PBKDIR -e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0" install_backend.yml
+ansible-playbook -i inventory --limit $PBKDIR check_backend.yml
 
-if [ -f $JUPPRIV/ansible/install_jupyterhub.yml ]; then
-	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR -e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0" install_jupyterhub.yml
+if [ -f $JUPPRIV/ansible/install_backend.yml ]; then
+	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR -e "LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0" install_backend.yml
 fi
-if [ -f $JUPPRIV/ansible/check_jupyterhub.yml ]; then
-	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR check_jupyterhub.yml
+if [ -f $JUPPRIV/ansible/check_backend.yml ]; then
+	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR check_backend.yml
 fi
 date

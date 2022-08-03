@@ -794,12 +794,12 @@
         - nobo_path.rc != 0
 
     - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/install_jupyterhub.yml"
+      command: ls "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
       register: acj_path
       ignore_errors: true
       changed_when: false
 
     - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/install_jupyterhub.yml"
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
       when:
         - acj_path.rc == 0

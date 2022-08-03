@@ -12,7 +12,7 @@ done
 #
 cd {{ ANSIBLEDIR }}
 
-ansible-playbook -i inventory --limit {{ PBKDIR }} check_jupyterhub.yml
-if [ -f {{ ANSIBLEPRIVDIR }}/check_jupyterhub.yml ]; then
-        ansible-playbook -i inventory $WODANOPT --limit {{ PBKDIR }} {{ ANSIBLEPRIVDIR }}/check_jupyterhub.yml
+ansible-playbook -i inventory --limit {{ PBKDIR }} check_backend.yml
+if [ -f {{ ANSIBLEPRIVDIR }}/check_backend.yml ]; then
+        ansible-playbook -i inventory $WODANOPT --limit {{ PBKDIR }} {{ ANSIBLEPRIVDIR }}/check_backend.yml
 fi
