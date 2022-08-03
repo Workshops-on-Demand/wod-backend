@@ -8,7 +8,7 @@ SCRIPTDIR: "{{ JUPPROC }}/scripts"
 ANSIBLEDIR: "{{ JUPPROC }}/ansible"
 SCRIPTPRIVDIR: "{{ JUPPRIV }}/scripts"
 ANSIBLEPRIVDIR: "{{ JUPPRIV }}/ansible"
-SENDER: sender@example.com
+SENDER: sender@example.org
 JPHUB: /opt/jupyterhub
 CLEAN: false
 USERMIN: 1

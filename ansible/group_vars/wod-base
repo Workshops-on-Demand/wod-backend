@@ -12,6 +12,10 @@ BASESTDID: 0
 # Postfix Port
 POSTPORT: "10025"
 #
+# In case we have a LDAP server to use, flag as such the corresponding workshops
+#
+LDAPSRVNAME: ldap.example.org
+#
 # For various WoD
 #
 SSHPORT-WKSHP-Docker101: 14101
