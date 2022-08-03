@@ -105,4 +105,4 @@ fi
 # Change default passwd for vagrant and root
 
 # Install WoD
-su - jupyter -c "./wod-backend/scripts/install_backend.sh"
+su - jupyter -c "./wod-backend/scripts/install_$WODTYPE.sh"
