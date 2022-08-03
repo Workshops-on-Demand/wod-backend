@@ -12,16 +12,16 @@ set -o pipefail
 if grep -qE '^jupyter:' /etc/passwd; then
         userdel -f -r jupyter
 fi
-useradd -U -m jupyter
+useradd -U -m -s /bin/bash jupyter
 
 # Get content for WoD - now in private mode
 token=`cat /vagrant/token`
 su - jupyter -c "rm -rf wod-backend wod-private .ssh"
 if [ $WODTYPE = "server" ]; then
-	su - jupyter -c "rm -rf wod-server
+	su - jupyter -c "rm -rf wod-server"
 	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-server.git"
 elif [ $WODTYPE = "backend" ]; then
-	su - jupyter -c "rm -rf wod-notebooks
+	su - jupyter -c "rm -rf wod-notebooks"
 	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
 fi
 
@@ -43,10 +43,13 @@ WODBEEXTFQDN: $WODBEEXTFQDN
 WODFEFQDN: $WODFEFQDN
 WODDISTRIB: $WODDISTRIB
 EOF
+
 cat ~jupyter/wod-backend/ansible/group_vars/wod-system >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
 if [ $WODTYPE = "backend" ]; then
 	cat ~jupyter/wod-backend/ansible/group_vars/wod-backend >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
 fi
+
+# Inventory
 if [ $WODTYPE = "backend" ]; then
 	cat > ~jupyter/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
@@ -57,6 +60,7 @@ elif [ $WODTYPE = "server" ]; then
 [$WODGROUP]
 $WODFEFQDN ansible_connection=local
 EOF
+fi
 #Setup ssh for jupyter
 su - jupyter -c "ssh-keygen -t rsa -b 4096 -N '' -f ~jupyter/.ssh/id_rsa"
 su - jupyter -c "install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/"
@@ -105,4 +109,4 @@ fi
 # Change default passwd for vagrant and root
 
 # Install WoD
-su - jupyter -c "./wod-backend/scripts/install_system.sh"
+su - jupyter -c "./wod-backend/scripts/install_system.sh $WODTYPE"
