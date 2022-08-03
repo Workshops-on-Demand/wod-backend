@@ -441,18 +441,6 @@
         path: "{{ ANSIBLEDIR }}/vault_secret"
         mode: 0600
 
-    - name: Fix git config for future commit on student0
-      lineinfile:
-        path: "{{ ansible_env.HOME }}/student0/.git/config"
-        line: "sshCommand = ssh -i ~/.ssh/id_student0 -F /dev/null"
-        insertafter: '^\s+logallrefupdates'
-
-    - name: Fix git config for future commit on jupyter-procmail
-      lineinfile:
-        path: "{{ JUPPROC }}/.git/config"
-        line: "sshCommand = ssh -i ~/.ssh/id_jupproc -F /dev/null"
-        insertafter: '^\s+logallrefupdates'
-
     - name: Ensure that required nbconvert directories exists
       become: yes
       become_user: root
