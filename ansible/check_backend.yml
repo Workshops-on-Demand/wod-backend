@@ -532,12 +532,12 @@
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/check_jupyterhub.yml"
+      command: ls "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
       register: acj_path
       ignore_errors: true
       changed_when: false
 
     - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_jupyterhub.yml"
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
       when:
         - acj_path.rc == 0
