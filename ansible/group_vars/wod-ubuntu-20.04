@@ -1,7 +1,7 @@
 PBKDIR: production
 WODBEFQDN: wod-ubuntu-20.04
 JPHOSTEXT: localhost
-JPHUBAPISRV: http://{{ WODBEFQDN }}:8000
+WODBEAPIURL: http://{{ WODBEFQDN }}:8000
 JPHUBTOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 BASESTDID: 0
 WODFRONTEND: https://localhost/api
