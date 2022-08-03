@@ -37,4 +37,4 @@ check that this line is in .git/config: sshCommand = ssh -i ~/.ssh/id_jupproc -F
 git clone https://github.com/Workshops-on-Demand/wod-backend.git
 
 cd wod-backend
-./scripts/install_jupyter.sh
+./scripts/install_backend.sh

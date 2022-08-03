@@ -5,7 +5,8 @@ set -e
 # By default work with CentOS 7 - 
 #default=ubuntu-20.04
 default=centos-7
+host=`hostname -f`
 # Change the link to the Vagrantfile to point to an Ubuntu one
 vagrant halt $default
 vagrant up $default
-vagrant ssh  $default -c "sudo /vagrant/install.sh"
+vagrant ssh  $default -c "sudo /vagrant/install.sh -g production -b wod-$default -f $host -e $host"

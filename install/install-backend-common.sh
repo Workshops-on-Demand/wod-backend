@@ -27,10 +27,17 @@ su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand
 # Setup this using the group for WoD - created as jupyter
 su - jupyter -c "cd wod-backend/ansible/group_vars ; echo PBKDIR: $WODGROUP > $WODGROUP"
 cat > ~jupyter/wod-backend/ansible/group_vars/$WODGROUP << EOF
+# 
+# Installation specific values
+# Modify afterwards or re-run the installer to update
+#
 WODBEFQDN: $WODBEFQDN
 WODBEIP: $WODBEIP
 WODBEEXTFQDN: $WODBEEXTFQDN
+WODFEFQDN: $WODFEFQDN
+WODDISTRIB: $WODDISTRIB
 EOF
+cat ~jupyter/wod-backend/ansible/group_vars/wod-base >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
 cat > ~jupyter/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
 $WODBEFQDN ansible_connection=local
@@ -52,4 +59,4 @@ chmod 440 /etc/sudoers.d/jupyter
 # Change default passwd for vagrant and root
 
 # Install WoD
-su - jupyter -c "./wod-backend/scripts/install_jupyter.sh"
+su - jupyter -c "./wod-backend/scripts/install_backend.sh"

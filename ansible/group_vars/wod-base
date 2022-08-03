@@ -1,7 +1,18 @@
-PBKDIR: production
-WODBEFQDN: wod-ubuntu-20.04
-WODBEEXTFQDN: localhost
+#
+# API management
+#
+WODFEAPIURL: https://{{ WODFEFQDN }}/api
+WODBEAPIURL: http://{{ WODBEFQDN }}:8000
+WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
+#
+# User management
+#
 BASESTDID: 0
+#
+# Postfix Port
+POSTPORT: "10025"
+#
+# For various WoD
 #
 SSHPORT-WKSHP-Docker101: 14101
 SSHPORT-WKSHP-Ansible101: 16001
@@ -17,6 +28,3 @@ IP-WKSHP-Ansible101: x.y.z.t
 IP-WKSHP-Spark101: x.y.z.t
 SPARKPORT-WKSHP-Spark101: 17101
 SPARKPORT2-WKSHP-Spark101: 17131
-#
-# Postfix Port
-POSTPORT: "10025"
