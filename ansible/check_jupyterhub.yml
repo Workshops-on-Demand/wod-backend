@@ -321,29 +321,6 @@
         cron_file: upd
         state: present
 
-    - name: Install the cleanup-processes script
-      become: yes
-      become_user: root
-      copy:
-        src: "{{ SCRIPTDIR }}/cleanup-processes.sh"
-        dest: /usr/local/bin/cleanup-processes
-        owner: root
-        group: root
-        mode: 0700
-
-    - name: Setup weekly process cleanup
-      become: yes
-      become_user: root
-      cron:
-        name: cleanup-processes
-        minute: "{{ 59 | random(seed=inventory_hostname) }} "
-        hour: "04"
-        weekday: "0"
-        user: root
-        job: "/usr/local/bin/cleanup-processes"
-        cron_file: cleanup-processes
-        state: present
-
     - name: Install utility scripts
       become: yes
       become_user: root
@@ -389,6 +366,29 @@
     - name: Deliver variables files as ansible template for variable expansion
       template: src={{ item }} dest={{ ANSIBLEDIR }}/{{ PBKDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0644
       with_fileglob: [ '{{ ANSIBLEDIR }}/{{ PBKDIR }}/*.yml.j2' ]
+
+    - name: Install the cleanup-processes script
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ SCRIPTDIR }}/cleanup-processes.sh"
+        dest: /usr/local/bin/cleanup-processes
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Setup weekly process cleanup
+      become: yes
+      become_user: root
+      cron:
+        name: cleanup-processes
+        minute: "{{ 59 | random(seed=inventory_hostname) }} "
+        hour: "04"
+        weekday: "0"
+        user: root
+        job: "/usr/local/bin/cleanup-processes"
+        cron_file: cleanup-processes
+        state: present
 
     - name: Enable WoD services
       become: yes
