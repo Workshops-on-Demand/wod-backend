@@ -29,6 +29,7 @@ su - jupyter -c "cd wod-backend/ansible/group_vars ; echo PBKDIR: $WODGROUP > $W
 cat > ~jupyter/wod-backend/ansible/group_vars/$WODGROUP << EOF
 WODBEFQDN: $WODBEFQDN
 WODBEIP: $WODBEIP
+WODBEEXTFQDN: $WODBEEXTFQDN
 EOF
 cat > ~jupyter/wod-backend/ansible/inventory << EOF
 [$WODGROUP]

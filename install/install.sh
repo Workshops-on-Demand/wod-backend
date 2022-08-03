@@ -5,18 +5,21 @@ set -u
 set -o pipefail
 
 usage() {
-	echo "install.sh [-g groupname] [-e backend] [-f frontend]"
+	echo "install.sh [-g groupname] [-b backend] [-f frontend] [-e external]"
 	echo " "
 	echo "where:"
 	echo "groupname is the ansible group_vars name to be used"
 	echo "          example: production, staging, test, ...  "
 	echo "          if empty using 'production'                "
 	echo "backend  is the FQDN of the back-end JupyterHub server"
-	echo "          example: be.example.com  "
+	echo "          example: be.internal.example.org  "
 	echo "          if empty using the local name for the back-end                "
 	echo "frontend  is the FQDN of the front-end API/DB server"
-	echo "          example: fe.example.com  "
+	echo "          example: fe.example.org  "
 	echo "          if empty using the external name for the back-end                "
+	echo "external  is the external FQDN of the back-end JupyterHub server, reachable from the Internet"
+	echo "          example: jphub.example.org  "
+	echo "          if empty using the internal name of the back-end                "
 	exit -1
 }
 
@@ -32,6 +35,9 @@ while getopts ":v:g:" option; do
         e)
             e=${OPTARG}
             ;;
+        b)
+            b=${OPTARG}
+            ;;
         g)
             g=${OPTARG}
             ;;
@@ -44,10 +50,15 @@ shift $((OPTIND-1))
 #if [ -z "${v}" ] || [ -z "${g}" ]; then
     #usage
 #fi
-if [ ! -z "${e}" ]; then
-	WODBEFQDN="${e}"
+if [ ! -z "${b}" ]; then
+	WODBEFQDN="${b}"
 else
 	WODBEFQDN=`hostname -f`
+fi
+if [ ! -z "${e}" ]; then
+	WODBEEXTFQDN="${e}"
+else
+	WODBEEXTFQDN=$WODBEFQDN
 fi
 if [ ! -z "${f}" ]; then
 	WODFEFQDN="${f}"
