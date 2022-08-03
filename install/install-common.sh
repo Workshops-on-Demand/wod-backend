@@ -24,11 +24,15 @@ su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshop
 # For now clone also public private
 su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git"
 
-# Setup this as a production env for WoD
-su - jupyter -c "cd wod-backend/ansible/group_vars ; ln -sf wod-$woddistrib production"
+# Setup this using the group for WoD - created as jupyter
+su - jupyter -c "cd wod-backend/ansible/group_vars ; echo PBKDIR: $WODGROUP > $WODGROUP"
+cat > ~jupyter/wod-backend/ansible/group_vars/$WODGROUP << EOF
+WODBEFQDN: $WODBEFQDN
+WODBEIP: $WODBEIP
+EOF
 cat > ~jupyter/wod-backend/ansible/inventory << EOF
-[production]
-wod-$woddistrib ansible_connection=local
+[$WODGROUP]
+$WODBEFQDN ansible_connection=local
 EOF
 
 #Setup ssh for jupyter
