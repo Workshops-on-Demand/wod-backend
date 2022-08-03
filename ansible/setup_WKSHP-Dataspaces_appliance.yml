@@ -4,5 +4,5 @@
   hosts: '{{ RTARGET }}'
   tasks:
     - name: Setup docker based appliance
-      include: setup_docker_based_appliance.yml
+      include_tasks: setup_docker_based_appliance.yml
 
