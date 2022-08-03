@@ -1,4 +1,1 @@
 Warning: Permanently added '192.168.121.152' (ECDSA) to the list of known hosts.
-bind [::]:8021: Address already in use
-channel_setup_fwd_listener_tcpip: cannot listen to port: 8021
-Could not request local forwarding.

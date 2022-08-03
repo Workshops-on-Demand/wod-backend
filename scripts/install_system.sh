@@ -7,6 +7,13 @@ mkdir -p $HOME/.mail
 exec &> >(tee $HOME/.mail/install.log)
 
 date
+
+export WODTYPE=$1
+if [ -z "$WODTYPE" ]; then
+	echo "Syntax: install_system server|backend|frontend"
+	exit -1
+fi
+
 if [ ! -f $HOME/.gitconfig ]; then
 	cat > $HOME/.gitconfig << EOF
 # This is Git's per-user configuration file.
