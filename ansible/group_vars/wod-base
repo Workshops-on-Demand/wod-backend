@@ -32,3 +32,10 @@ IP-WKSHP-Ansible101: x.y.z.t
 IP-WKSHP-Spark101: x.y.z.t
 SPARKPORT-WKSHP-Spark101: 17101
 SPARKPORT2-WKSHP-Spark101: 17131
+#
+# You may wan to use these variables if you have an OPNSense server as a security FW
+#
+#OPNSENSEKEY:
+#OPNSENSESEC:
+#OPNSENSEIP:
+#OPNSENSEPORT:
