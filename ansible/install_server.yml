@@ -1,0 +1,161 @@
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Include variables for the underlying distribution
+      include_vars: "{{ ANSIBLEDIR }}group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+
+    - name: Base setup for a JupyterHub environment server or appliance
+      include: {{ ANSIBLEDIR }}/setup_base_appliance.yml
+
+    - name: Setup first the Docker context (packages, deps, ...)
+      include_tasks: {{ ANSIBLEDIR }}/install_docker.yml
+
+    - name: Ensure all required packages are installed
+      become: yes
+      become_user: root
+      package:
+        pkg:
+        - ansible
+        - git
+        - rsync
+        - wget
+        - bzip2
+        - jq
+        - moreutils
+        - net-tools
+        - nodejs
+        - npm
+        - telnet
+        - man
+        - unzip
+        - netcat
+        update_cache: yes
+
+    - name: Ensure all required DEB packages are installed
+      become: yes
+      become_user: root
+      apt:
+        pkg:
+        - apt-file
+        - ldap-utils
+        - fail2ban
+        - libproc-processtable-perl
+        - acct
+      when:
+        - ansible_os_family == "Debian"
+
+    - name: Ensure all required RPM packages are installed
+      become: yes
+      become_user: root
+      yum:
+        pkg:
+        - openldap-clients
+        - perl-Crypt-PasswdMD5
+        - fail2ban-all
+        - perl-Proc-ProcessTable
+        - perl-Data-Dumper
+        - psacct
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
+
+    - name: Ensure required directories under /usr/local are owned by jupyter
+      become: yes
+      become_user: root
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0755
+      with_items:
+        - /usr/local/bin
+        - /usr/local/share
+
+    - name: Disable WoD services
+      become: yes
+      become_user: root
+      systemd:
+        state: stopped
+        daemon_reload: yes
+        enabled: no
+        name: "{{ item }}"
+      ignore_errors: yes
+      with_items:
+        - kill-processes
+
+    - name: Copy WoD service file as ansible template for variable expansion
+      become: yes
+      become_user: root
+      template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+      with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
+
+    - name: Enable WoD service
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: "{{ item }}"
+      with_items:
+        - kill-processes
+
+    - name: Setup ansible configuration
+      copy:
+        src: "{{ JUPPROC }}/.ansible.cfg"
+        dest: "{{ ansible_env.HOME }}/.ansible.cfg"
+        owner: jupyter
+        group: jupyter
+        mode: 0644
+
+    - name: Configure fail2ban filter
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ SRVDIR }}/conf/fail2ban.conf"
+        dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Configure fail2ban jail
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ SRVDIR }}/conf/fail2ban.jail"
+        dest: "/etc/fail2ban/jail.local"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Configure fail2ban action
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ SRVDIR }}/conf/fail2ban.action"
+        dest: "/etc/fail2ban/action.d/jupyterhub.conf"
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Enable fail2ban
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: fail2ban
+
+    - name: Test private tasks YAML file
+      command: ls "{{ ANSIBLEPRIVDIR }}/install_server.yml"
+      register: acj_path
+      failed_when: false
+      changed_when: false
+
+    - name: Now call private tasks if available
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/install_server.yml"
+      when:
+        - acj_path.rc == 0
