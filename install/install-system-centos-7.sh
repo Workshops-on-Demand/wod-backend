@@ -14,6 +14,7 @@ fi
 
 # Base packages required
 yum -y install epel-release ansible git openssh-server jq npm
+# yarn is needed for server TBChecked requires an additional repo
 
 # Additional repo for up to date git
 if rpm -q --quiet endpoint-repo; then

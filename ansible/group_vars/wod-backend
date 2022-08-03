@@ -1,14 +1,4 @@
 #
-# Backend API management
-#
-WODBEAPIURL: http://{{ WODBEFQDN }}:8000
-WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
-#
-# Front-end API management
-WODFEAPIURL: https://{{ WODFEFQDN }}/api
-WODFEAPIUSER: moderator
-WODFEAPIPWD: MotDePasseCompliquéAussi123!!!##
-#
 # User management
 #
 BASESTDID: 0
@@ -44,10 +34,3 @@ SPARKPORT-WKSHP-Spark101: 17101
 SPARKPORT2-WKSHP-Spark101: 17131
 MLPORT-WKSHP-ML101: 18101
 MLPORT2-WKSHP-ML101: 18031
-#
-# You may wan to use these variables if you have an OPNSense server as a security FW
-#
-#OPNSENSEKEY:
-#OPNSENSESEC:
-#OPNSENSEIP:
-#OPNSENSEPORT:
