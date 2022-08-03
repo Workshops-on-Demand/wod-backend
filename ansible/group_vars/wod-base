@@ -19,6 +19,7 @@ POSTPORT: "10025"
 # In case we have a LDAP server to use, flag as such the corresponding workshops
 #
 LDAPSRVNAME: ldap.example.org
+LDAPDMN: example.org
 #
 # For various WoD
 #
