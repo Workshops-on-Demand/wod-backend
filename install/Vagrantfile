@@ -13,17 +13,29 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.synced_folder './', '/vagrant', type: 'rsync'
-  config.vm.define "centos-7" do |centos7|
-    centos7.vm.box = "generic/centos7"
-    centos7.vm.hostname = "wod-centos-7"
-    #centos7.vm.network  "private_network", ip: "192.168.200.10"
-    centos7.vm.network "forwarded_port", guest: 8000, host: 8010
+  config.vm.define "wod-be-centos-7" do |centos7|
+    wod-be-centos7.vm.box = "generic/centos7"
+    wod-be-centos7.vm.hostname = "wod-be-centos-7"
+    #wod-be-centos7.vm.network  "private_network", ip: "192.168.200.10"
+    wod-be-centos7.vm.network "forwarded_port", guest: 8000, host: 8010
   end
-  config.vm.define "ubuntu-20.04" do |ubuntu2004|
-    ubuntu2004.vm.box = "generic/ubuntu2004"
-    ubuntu2004.vm.hostname = "wod-ubuntu-20.04"
-    #ubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
-    ubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
+  config.vm.define "wod-fe-centos-7" do |centos7|
+    wod-fe-centos7.vm.box = "generic/centos7"
+    wod-fe-centos7.vm.hostname = "wod-fe-centos-7"
+    #wod-fe-centos7.vm.network  "private_network", ip: "192.168.200.10"
+    wod-fe-centos7.vm.network "forwarded_port", guest: 8000, host: 8010
+  end
+  config.vm.define "wod-be-ubuntu-20.04" do |ubuntu2004|
+    wod-be-ubuntu2004.vm.box = "generic/ubuntu2004"
+    wod-be-ubuntu2004.vm.hostname = "wod-be-ubuntu-20.04"
+    #wod-be-ubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wod-be-ubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
+  end
+  config.vm.define "wod-srv-ubuntu-20.04" do |ubuntu2004|
+    wod-srv-ubuntu2004.vm.box = "generic/ubuntu2004"
+    wod-srv-ubuntu2004.vm.hostname = "wod-srv-ubuntu-20.04"
+    #wod-srv-ubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wod-srv-ubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
   end
   #ubuntu2004.vm.provider = "libvirt"
   #config.vm.synced_folder './', '/vagrant', type: 'nfs'
