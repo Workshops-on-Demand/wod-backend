@@ -21,6 +21,7 @@ POSTPORT: "10025"
 LDAPSRVNAME: ldap.example.org
 LDAPDMN: example.org
 LDAPPWD: MotDePasseLDAPCompliquéAussi123!!!##
+LDAPPORT: "389"
 #
 # For various WoD
 #
@@ -41,6 +42,7 @@ IP-WKSHP-StackStorm101: x.y.z.t
 SPARKPORT-WKSHP-Spark101: 17101
 SPARKPORT2-WKSHP-Spark101: 17131
 MLPORT-WKSHP-ML101: 18101
+MLPORT2-WKSHP-ML101: 18031
 #
 # You may wan to use these variables if you have an OPNSense server as a security FW
 #
