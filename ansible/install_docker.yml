@@ -15,7 +15,7 @@
     become: yes
     become_user: root
     apt_repository:
-      repo: deb https://download.docker.com/linux/ubuntu/dists/ xenial main
+      repo: deb https://download.docker.com/linux/ubuntu/dists/ focal main
       state: present
     when:
      - ansible_distribution == "Ubuntu"
