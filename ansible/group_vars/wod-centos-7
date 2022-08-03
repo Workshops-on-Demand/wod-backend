@@ -1,7 +1,6 @@
 PBKDIR: production
 WODBEFQDN: wod-centos-7
-JPHOSTEXT: localhost
-WODBEAPIURL: http://{{ WODBEFQDN }}:8000
+WODBEEXTFQDN: localhost
 JPHUBTOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 BASESTDID: 0
 WODFRONTEND: https://localhost/api

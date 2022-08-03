@@ -37,7 +37,7 @@ ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/Redfish
 
 # Modify SDF mockup: switch from https to http and generate internal server error when creating user
 # to avoid mockup server to hang.
-ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }}  sed -i -e "s?http://localhost:8000?https://{{ JPHOSTEXT }}:${FWDPORTRFSDF}?g"  $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist/index.js
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }}  sed -i -e "s?http://localhost:8000?https://{{ WODBEEXTFQDN }}:${FWDPORTRFSDF}?g"  $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist/index.js
 
 ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "sed -i -e 's?post\((./redfish/v1/AccountService/Accounts.\)?get\1?'"  $KITPATH/VMs/RedfishMockups/student$stdid-rmc/mockup/dist/index.js
 
