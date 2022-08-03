@@ -8,4 +8,4 @@ set -o pipefail
 # This first part is distribution specific and should be adapted based on its nature
 
 # Base packages required
-apt install -y git openssh-server jq npm yarn
+apt install -y git ansible openssh-server jq npm yarn
