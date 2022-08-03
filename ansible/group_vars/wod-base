@@ -1,9 +1,13 @@
 #
-# API management
+# Backend API management
 #
-WODFEAPIURL: https://{{ WODFEFQDN }}/api
 WODBEAPIURL: http://{{ WODBEFQDN }}:8000
 WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
+#
+# Front-end API management
+WODFEAPIURL: https://{{ WODFEFQDN }}/api
+WODFEAPIUSER: moderator
+WODFEAPIPWD: MotDePasseCompliquéAussi123!!!##
 #
 # User management
 #
@@ -30,6 +34,8 @@ IP-WKSHP-Concourse101: x.y.z.t
 IP-WKSHP-Docker101: x.y.z.t
 IP-WKSHP-Ansible101: x.y.z.t
 IP-WKSHP-Spark101: x.y.z.t
+IP-WKSHP-ML101: x.y.z.t
+IP-WKSHP-StackStorm101: x.y.z.t
 SPARKPORT-WKSHP-Spark101: 17101
 SPARKPORT2-WKSHP-Spark101: 17131
 #
