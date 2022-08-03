@@ -12,7 +12,7 @@ SENDER: sender@example.org
 JPHUB: /opt/jupyterhub
 CLEAN: false
 USERMIN: 1
-USERMAX: 2000
+USERMAX: 20
 GIDBASE: 2000
 UIDBASE: 2000
 VAULTPWD: VeryComplexPasswd1234!
