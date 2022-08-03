@@ -19,7 +19,7 @@ su - jupyter -c "rm -rf wod-server wod-private .ssh"
 token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-server.git"
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-server.git"
-su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git"
+su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git"
 
 #Setup ssh for jupyter
 su - jupyter -c "ssh-keygen -t rsa -b 4096 -N '' -f ~jupyter/.ssh/id_rsa"
@@ -33,9 +33,8 @@ jupyter ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 440 /etc/sudoers.d/jupyter
 
-cd wod-server/server
-npm install
-cat > .env << EOF
+su - jupyter -c "touch wod-server/.env"
+cat > ~jupyter/wod-server/.env << EOF
 FROM_EMAIL_ADDRESS='sender@example.org'
 SENDGRID_API_KEY="None"
 API_PORT=8021
@@ -62,6 +61,7 @@ SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 EOF
+su - jupyter -c "cd wod-server ; npm install"
 
 # Change default passwd for vagrant and root
 
