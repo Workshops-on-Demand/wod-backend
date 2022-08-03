@@ -88,10 +88,10 @@ export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using frontend $WODFEFQDN"
+echo "Using external backend $WODBEEXTFQDN"
 if [ $WODTYPE = "backend" ]; then
 	echo "Using groupname $WODGROUP"
 	echo "Using backend $WODBEFQDN ($WODBEIP)"
-	echo "Using external backend $WODBEEXTFQDN"
 fi
 
 # redirect stdout/stderr to a file

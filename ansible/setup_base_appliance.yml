@@ -129,7 +129,7 @@
     become_user: root
     lineinfile:
       path: /etc/openldap/ldap.conf
-      line: 'URI ldap://{{ LDAPSRVIP }}'
+      line: 'URI ldap://{{ LDAPSRVNAME }}'
       state: present
     when: LDAPSETUP == "1"
 
@@ -190,7 +190,7 @@
     become: yes
     become_user: root
     command:
-      cmd: authconfig-tui --enableldap --enableldapauth --ldapserver="{{ LDAPSRVIP }}" --ldapbasedn="{{ LDAPDMN }}" --disableldaptls --kickstart --update
+      cmd: authconfig-tui --enableldap --enableldapauth --ldapserver="{{ LDAPSRVNAME }}" --ldapbasedn="{{ LDAPDMN }}" --disableldaptls --kickstart --update
     register: cmd_res
     # Do not fail when returning 7
     failed_when: cmd_res.rc < 7

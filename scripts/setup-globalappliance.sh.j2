@@ -16,7 +16,7 @@ echo "Use ansible to setup generic remote appliance at $RTARGET"
 ansible-playbook {{ ANSIBLEDIR }}/setup_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
 if [ -f "{{ ANSIBLEDIR }}/setup_${w}_appliance.yml" ]; then
 	echo "Use ansible to setup specificities for $w on remote appliance $RTARGET"
-	ansible-playbook {{ ANSIBLEDIR }}/setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVIP={{ LDAPSRVIP }}"
+	ansible-playbook {{ ANSIBLEDIR }}/setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP -e PBKDIR={{ PBKDIR }} -e JUPPROC={{ JUPPROC }} -e LDAPDMN={{ LDAPDMN }} -e LDAPSRVNAME={{ LDAPSRVNAME }}"
 fi
 
 echo "Final script setup phase for $w on remote appliance $RTARGET"

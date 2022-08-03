@@ -124,7 +124,7 @@ changetype: modify
 replace: userPassword
 userPassword: $randompw
 EOF
-	ldapmodify -D "cn=Directory Manager" -w {{ LDAPPWD }} -p {{ LDAPPORT }} -h {{ LDAPSRV.split(' ')[1] }} -x -f /tmp/ldif.$$
+	ldapmodify -D "cn=Directory Manager" -w {{ LDAPPWD }} -p {{ LDAPPORT }} -h {{ LDAPSRVNAME }} -x -f /tmp/ldif.$$
 	rm -f /tmp/ldif.$$
 }
 
