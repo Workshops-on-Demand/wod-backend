@@ -22,7 +22,7 @@ source {{ SCRIPTDIR }}/functions.sh
 #
 
 # endpoint variable - Has to be global
-export WODFRONTEND={{ WODFRONTEND }}
+export WODFEAPIURL={{ WODFEAPIURL }}
 APIUSER={{ APIUSER }}
 APIPWD={{ APIPWD }}
 export USER=$LOGNAME
@@ -152,14 +152,14 @@ if [ $action != "RESET" ]; then
 		curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 			 --request PUT \
 			 --data '{"password":"'$randompw'"}' \
-			 "$WODFRONTEND/student/$dbstdid"
+			 "$WODFEAPIURL/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
 			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				 --request PUT \
 				 --data '{"active": "true"}' \
-				 "$WODFRONTEND/customer/$userid"
+				 "$WODFEAPIURL/customer/$userid"
 			##Start Student jupyterhub dedicated server
 			curl --header "Content-Type: application/json" \
 				 --header "Authorization: token {{ JPHUBTOKEN }}" \
@@ -185,7 +185,7 @@ if [ $action != "RESET" ]; then
 			 curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
               			 --request PUT \
               			 --data '{"completionPercentage": "'$completion'"}' \
-               			"$WODFRONTEND/customer/$userid"
+               			"$WODFEAPIURL/customer/$userid"
 
 
 			#Delete Student jupyterhub dedicated server
@@ -200,7 +200,7 @@ if [ $action != "RESET" ]; then
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"false"}' \
-					 "$WODFRONTEND/student/$dbstdid"
+					 "$WODFEAPIURL/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
 	 			erase_student
 				cleanup_processes_student
@@ -208,12 +208,12 @@ if [ $action != "RESET" ]; then
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
-					 "$WODFRONTEND/student/$dbstdid"
+					 "$WODFEAPIURL/student/$dbstdid"
 	 			# set customer  to inactive by default for all workshops
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					     --request PUT \
 					     --data '{"active": "false"}' \
-					     "$WODFRONTEND/customer/$userid"
+					     "$WODFEAPIURL/customer/$userid"
 			fi
 		else
 			echo "Unknown action $action"
@@ -242,7 +242,7 @@ elif [ "$action" = "RESET" ]; then
 	        	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"capacity":"'$cap'"}' \
-				"$WODFRONTEND/workshop/$wid"
+				"$WODFEAPIURL/workshop/$wid"
 		else
 			teststdid $stdid
 			# We have a single value to manage
@@ -285,7 +285,7 @@ elif [ "$action" = "RESET" ]; then
 			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"assigned":"false"}' \
-				"$WODFRONTEND/student/$j"
+				"$WODFEAPIURL/student/$j"
 			stdid=$((j-{{ BASESTDID }}))
 			stddir="{{ STUDDIR }}/student$stdid"
 			erase_student
