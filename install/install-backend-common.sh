@@ -15,7 +15,7 @@ fi
 useradd -U -m jupyter
 
 # Get content for WoD - now in private mode
-su - jupyter -c "rm -rf wod-backend.git wod-notebooks .ssh"
+su - jupyter -c "rm -rf wod-backend wod-notebooks wod-private .ssh"
 token=`cat /vagrant/token`
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
