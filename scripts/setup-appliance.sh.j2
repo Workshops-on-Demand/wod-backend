@@ -32,7 +32,7 @@ source {{ SCRIPTDIR }}/functions.sh
 
 # endpoint variable - Has to be global
 echo "Prepare environment variables for Workshop $w at `date`"
-export WODFRONTEND={{ WODFRONTEND }}
+export WODFEAPIURL={{ WODFEAPIURL }}
 export APIUSER={{ APIUSER }}
 export APIPWD={{ APIPWD }}
 export accessToken=`get_session_token`
