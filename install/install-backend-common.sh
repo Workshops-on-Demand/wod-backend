@@ -25,8 +25,9 @@ su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshop
 su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git"
 
 # Setup this using the group for WoD - created as jupyter
-su - jupyter -c "cd wod-backend/ansible/group_vars ; echo PBKDIR: $WODGROUP > $WODGROUP"
+su - jupyter -c "cd wod-backend/ansible/group_vars ; touch $WODGROUP"
 cat > ~jupyter/wod-backend/ansible/group_vars/$WODGROUP << EOF
+PBKDIR: $WODGROUP
 # 
 # Installation specific values
 # Modify afterwards or re-run the installer to update
