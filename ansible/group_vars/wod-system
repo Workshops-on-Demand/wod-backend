@@ -1,0 +1,17 @@
+#
+# Backend API management
+#
+WODBEAPIURL: http://{{ WODBEFQDN }}:8000
+WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
+#
+# Front-end API management
+WODFEAPIURL: https://{{ WODFEFQDN }}/api
+WODFEAPIUSER: moderator
+WODFEAPIPWD: MotDePasseCompliquéAussi123!!!##
+#
+# You may wan to use these variables if you have an OPNSense server as a security FW
+#
+#OPNSENSEKEY:
+#OPNSENSESEC:
+#OPNSENSEIP:
+#OPNSENSEPORT:

@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-	echo "install.sh [-t type][-g groupname][-b backend][-f frontend][-e external]"
+	echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-e external]"
 	echo " "
 	echo "where:"
 	echo "type      is the installation type"
@@ -25,7 +25,14 @@ usage() {
 	echo "          if empty using the internal name of the back-end                "
 }
 
-while getopts ":t:f:e:b:g:" option; do
+t=""
+g=""
+b=""
+b=""
+f=""
+e=""
+
+while getopts "t:f:e:b:g:h" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -46,6 +53,9 @@ while getopts ":t:f:e:b:g:" option; do
             ;;
         g)
             g=${OPTARG}
+            ;;
+        h)
+            usage
             ;;
         *)
             usage
@@ -104,8 +114,8 @@ EXEPATH=`( cd "$EXEPATH" && pwd )`
 
 # Call the distribution specific install script
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
-$EXEPATH/install-$WODTYPE-$WODDISTRIB.sh
+$EXEPATH/install-system-$WODDISTRIB.sh
 
 # Call the common install script to finish install
 echo "Installing common remaining stuff"
-$EXEPATH/install-$WODTYPE-common.sh
+$EXEPATH/install-system-common.sh
