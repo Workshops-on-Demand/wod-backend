@@ -594,7 +594,7 @@
 
     - name: Existing token
       debug:
-        msg: "Existing token: {{ JPHUBTOKEN }}"
+        msg: "Existing token: {{ WODBETOKEN }}"
 
     - name: Adapt jupyterhub configuration file
       blockinfile:
@@ -611,7 +611,7 @@
          c.JupyterHub.services = [
                 {
                 "name": "admintk",
-                "api_token": "{{ JPHUBTOKEN }}",
+                "api_token": "{{ WODBETOKEN }}",
                 }
                 ]
          c.JupyterHub.load_roles = [
@@ -683,7 +683,7 @@
     #  uri:
     #    url: "{{ WODBEAPIURL }}/hub/api/users"
     #    headers:
-    #      Authorization: "token {{ JPHUBTOKEN }}"
+    #      Authorization: "token {{ WODBETOKEN }}"
     #    method: POST
     #    body_format: json
     #    body: '{ "usernames": [ "jupyter" ], "admin": true }'
@@ -693,7 +693,7 @@
       uri:
         url: "{{ WODBEAPIURL }}/hub/api/groups/admingroup"
         headers:
-          Authorization: "token {{ JPHUBTOKEN }}"
+          Authorization: "token {{ WODBETOKEN }}"
         method: POST
         body_format: json
         body: '{ "users": [ "jupyter"], "roles": [ "jupyteradm" ], "name": "admingroup"}'

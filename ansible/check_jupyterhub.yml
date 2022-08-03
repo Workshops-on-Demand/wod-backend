@@ -471,7 +471,7 @@
 
     - name: Remove existing jupyter users
       command:
-        cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
       when: CLEAN|bool
@@ -512,7 +512,7 @@
 
     - name: Ensure jupyter students users exist
       command:
-        cmd: "curl -X POST --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        cmd: "curl -X POST --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
