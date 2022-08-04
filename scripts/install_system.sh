@@ -110,6 +110,17 @@ ANSPLAYOPT=""
 if [ -f $JUPPRIV/ansible/install_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
 fi
+if [ $WODTYPE = "server" ]; then
+	cd $SRVDIR
+	# Start the PostgreSQL DB
+	docker-compose up -d
+	# Start the backend server
+	npm start
+	# Seed the DB
+	npm run seed-data
+	# Reset the DB
+	npm run reset-data
+fi
 if [ -f $JUPPRIV/ansible/check_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR check_$WODTYPE.yml
 fi
