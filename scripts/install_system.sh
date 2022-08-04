@@ -34,26 +34,26 @@ fi
 
 cat > $SCRIPTDIR/wod.sh << EOF
 # This main dir is computed
-export JUPPROC=`dirname $SCRIPTDIR`
+export WODBEDIR=`dirname $SCRIPTDIR`
 EOF
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # These 3 dirs have fixed names by default that you can change in this file
-# they are placed as sister dirs wrt JUPPROC
-PJUPPROC=`dirname $JUPPROC`
-export JUPPRIV=$PJUPPROC/wod-private
-export WODSRVDIR=$PJUPPROC/wod-server
-export WODFEDIR=$PJUPPROC/wod-frontend
+# they are placed as sister dirs wrt WODBEDIR
+PWODBEDIR=`dirname $WODBEDIR`
+export WODPRIVDIR=$PWODBEDIR/wod-private
+export WODSRVDIR=$PWODBEDIR/wod-server
+export WODFEDIR=$PWODBEDIR/wod-frontend
 WODANSOPT=""
 # Manages private inventory if any
-if [ -f $JUPPRIV/ansible/inventory ]; then
-	WODANSOPT="-i $JUPPRIV/ansible/inventory"
+if [ -f $WODPRIVDIR/ansible/inventory ]; then
+	WODANSOPT="-i $WODPRIVDIR/ansible/inventory"
 	export WODANSOPT
 fi
 EOF
 if [ $WODTYPE = "backend" ]; then
 	cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # This dir is also fixed by default and can be changed as needed
-export JUPNOBO=$PJUPPROC/wod-notebooks
+export WODNOBO=$PWODBEDIR/wod-notebooks
 export STUDDIR=/student
 EOF
 fi
@@ -91,11 +91,11 @@ fi
 ansible-galaxy collection install ansible.posix
 
 
-SCRIPTREL=`echo $SCRIPT | perl -p -e "s|$JUPPROC||"`
-if [ -x $JUPPRIV/$SCRIPTREL ];
+SCRIPTREL=`echo $SCRIPT | perl -p -e "s|$WODBEDIR||"`
+if [ -x $WODPRIVDIR/$SCRIPTREL ];
 then
-	echo "Executing additional private script $JUPPRIV/$SCRIPTREL"
-	$JUPPRIV/$SCRIPTREL
+	echo "Executing additional private script $WODPRIVDIR/$SCRIPTREL"
+	$WODPRIVDIR/$SCRIPTREL
 fi
 
 if [ $WODTYPE = "backend" ]; then
@@ -125,10 +125,10 @@ fi
 
 # Manages private part if any
 ANSPLAYOPT=""
-if [ -f $JUPPRIV/ansible/install_$WODTYPE.yml ]; then
+if [ -f $WODPRIVDIR/ansible/install_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
 fi
-if [ -f $JUPPRIV/ansible/check_$WODTYPE.yml ]; then
+if [ -f $WODPRIVDIR/ansible/check_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR check_$WODTYPE.yml
 fi
 date

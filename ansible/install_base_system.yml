@@ -61,7 +61,7 @@
     become: yes
     become_user: root
     template:
-      src: "{{ JUPPROC }}/ldap.conf.j2"
+      src: "{{ WODBEDIR }}/ldap.conf.j2"
       dest: /etc/ldap.conf
       owner: root
       group: root

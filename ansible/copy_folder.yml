@@ -63,7 +63,7 @@
     # find all notebooks
     - name: find jupyter notebooks
       find:
-        paths: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
+        paths: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
         # Add other file types to process them as ansible templates
         patterns:
@@ -80,7 +80,7 @@
     # find all private notebooks
     - name: find jupyter private notebooks
       find:
-        paths: "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
+        paths: "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
         # Add other file types to process them as ansible templates
         patterns:
@@ -146,21 +146,21 @@
       become: yes
       become_user: root
       template:
-        src: "{{ JUPPROC }}/lab-a511.jupyterlab-workspace.j2"
+        src: "{{ WODBEDIR }}/lab-a511.jupyterlab-workspace.j2"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: 0644
 
     - name: Verif whether we have a Workshop content
-      command: ls "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+      command: ls "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
       register: nobo_path
       failed_when: false
       changed_when: false
 
     - name: Synchronize target students with Notebooks Workshop content
       ansible.posix.synchronize:
-        src: "{{ JUPNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+        src: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts:
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
@@ -168,14 +168,14 @@
         - nobo_path.rc == 0
 
     - name: Verif whether we have a private Workshop content
-      command: ls "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+      command: ls "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
       register: nobopriv_path
       failed_when: false
       changed_when: false
 
     - name: Synchronize target students with private Notebooks Workshop content
       ansible.posix.synchronize:
-        src: "{{ JUPPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
+        src: "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts:
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
@@ -189,7 +189,7 @@
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(JUPNOBO, STUDDIR + '/student' + STDID) }} | regex_replace(JUPPRIVNOBO, STUDDIR + '/student' + STDID) }}  "
+        dest: "{{ item.path | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }} | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}  "
       with_items: "[{{ notebooks.files }}, {{ notebookspriv.files }}] "
 
     - name: Create a checkpoint directory

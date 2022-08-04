@@ -1,15 +1,15 @@
 ---
 STUDDIR: "{{ ansible_env.STUDDIR }}"
-JUPPROC: "{{ ansible_env.JUPPROC }}"
-JUPPRIV: "{{ ansible_env.JUPPRIV }}"
-JUPNOBO: "{{ ansible_env.JUPNOBO }}"
+WODBEDIR: "{{ ansible_env.WODBEDIR }}"
+WODPRIVDIR: "{{ ansible_env.WODPRIVDIR }}"
+WODNOBO: "{{ ansible_env.WODNOBO }}"
 WODSRVDIR: "{{ ansible_env.WODSRVDIR }}"
 WODFEDIR: "{{ ansible_env.WODFEDIR }}"
-JUPPRIVNOBO: "{{ JUPPRIV }}/notebooks"
-SCRIPTDIR: "{{ JUPPROC }}/scripts"
-ANSIBLEDIR: "{{ JUPPROC }}/ansible"
-SCRIPTPRIVDIR: "{{ JUPPRIV }}/scripts"
-ANSIBLEPRIVDIR: "{{ JUPPRIV }}/ansible"
+WODPRIVNOBO: "{{ WODPRIVDIR }}/notebooks"
+SCRIPTDIR: "{{ WODBEDIR }}/scripts"
+ANSIBLEDIR: "{{ WODBEDIR }}/ansible"
+SCRIPTPRIVDIR: "{{ WODPRIVDIR }}/scripts"
+ANSIBLEPRIVDIR: "{{ WODPRIVDIR }}/ansible"
 SENDER: sender@example.org
 JPHUB: /opt/jupyterhub
 CLEAN: false

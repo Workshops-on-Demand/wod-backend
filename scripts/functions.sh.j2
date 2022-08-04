@@ -150,7 +150,7 @@ get_workshop_name() {
 		exit -1
 	fi
 	ws=`echo $w |sed 's/CHLG/WKSHP/'`
-	if [ ! -d "$JUPNOBO/$ws" ]; then
+	if [ ! -d "$WODNOBO/$ws" ]; then
 		echo "Non-existant workshop $ws"
 		exit -1
 	fi
@@ -162,7 +162,7 @@ erase_student() {
 	if [ _"$stddir" != _"" ]; then
 		echo "Erasing target student dir $stddir content"
 		sudo rm -rf $stddir/* $stddir/.??*
-		sudo cp -a {{ JUPPROC }}/skel/.??* {{ JUPPRIV }}/skel/.??* $stddir
+		sudo cp -a {{ WODBEDIR }}/skel/.??* {{ WODPRIVDIR }}/skel/.??* $stddir
 		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
 		echo "Create ssh keys to allow remote connections to appliance if needed"
 		sudo su - student${stdid} -c "ssh-keygen -b 2048 -t rsa -f .ssh/id_rsa -N ''"
