@@ -108,7 +108,6 @@ ansible-playbook -i inventory --limit $PBKDIR check_$WODTYPE.yml
 if [ $WODTYPE = "server" ]; then
 	cd $WODSRVDIR
 	# Start the PostgreSQL DB
-	sleep 5
 	docker-compose up -d
 	# Start the backend server
 	npm start &
