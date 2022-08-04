@@ -1,4 +1,15 @@
 ---
+  - name: Add Docker GPG Key to RPM DB
+    become: yes
+    become_user: root
+    rpm_key:
+      key: "{{ item }}"
+      state: present
+    with_items:
+      - https://download.docker.com/linux/centos/gpg
+    when:
+      - ansible_distribution == "CentOS"
+
   - name: Setup Docker repo for RPM
     become: yes
     become_user: root
@@ -40,30 +51,7 @@
       - docker-common
       - docker
       - docker-engine
-      - docker-compose
       state: absent
-
-  - name: Ensure all APT required packages are installed
-    become: yes
-    become_user: root
-    package:
-      pkg:
-      - docker-ce
-      - docker-compose
-    when:
-     - ansible_distribution == "Ubuntu"
-     - ansible_distribution_major_version >= "20"
-
-  - name: Add Docker GPG Key to RPM DB
-    become: yes
-    become_user: root
-    rpm_key:
-      key: "{{ item }}"
-      state: present
-    with_items:
-      - https://download.docker.com/linux/centos/gpg
-    when:
-      - ansible_distribution == "CentOS"
 
   - name: Disable Docker service
     register: service_stop
@@ -98,15 +86,13 @@
       path: /var/run/docker.sock
       state: absent
 
-  - name: Ensure all RPM required packages are installed
+  - name: Ensure all required packages are installed
     become: yes
     become_user: root
     package:
       pkg:
       - docker-ce
       - docker-compose
-    when:
-      - ansible_distribution == "CentOS"
 
   - name: Enable Docker service
     become: yes
