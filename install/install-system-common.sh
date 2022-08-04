@@ -115,6 +115,8 @@ SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 EOF
 	su - jupyter -c "cd wod-server ; npm install"
+elif [ $WODTYPE = "frontend" ]; then
+	su - jupyter -c "cd wod-frontend ; npm install"
 fi
 
 # Change default passwd for vagrant and root
