@@ -1,6 +1,23 @@
 #!/usr/bin/perl -w
 #
 use strict;
+use Getopt::Long;
+
+sub usage {
+	print "Syntax: build-vagrant.pl [-t (backend|frontend|server)]\n";
+	print "\n";
+	print "where you can give the type of wod server to build with the -t option\n";
+	print "not specifying the option launch the build for all the 3 systems sequentially\n";
+	exit(-1);
+}
+
+my $wodtype = undef;
+my $help;
+GetOptions("type|t=s" => \$wodtype,
+	   "help|h" => \$help,
+);
+
+usage() if ($help || defined $ARGV[0]); 
 
 # Automate Wod server creation
 my %machines = (
@@ -9,10 +26,10 @@ my %machines = (
 	'backend' => "wod-be-centos-7",
 );
 my @mtypes = ();
-if (not defined $ARGV[0]) {
+if (not defined $wodtype) {
 	@mtypes = sort keys %machines;
 } else {
-	@mtypes = @ARGV;
+	@mtypes = ($wodtype);
 }
 
 my $h = \%machines;

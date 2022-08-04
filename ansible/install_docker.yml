@@ -48,7 +48,7 @@
     become_user: root
     package:
       pkg:
-      - docker-engine
+      - docker-ce
       - docker-compose
     when:
      - ansible_distribution == "Ubuntu"
