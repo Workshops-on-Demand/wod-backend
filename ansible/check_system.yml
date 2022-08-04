@@ -1,0 +1,289 @@
+- name: Ensure correct nproc soft limits
+  become: yes
+  become_user: root
+  community.general.pam_limits:
+    domain: jupyter
+    limit_type: soft
+    limit_item: nproc
+    value: "800000"
+
+- name: Ensure correct nproc hard limits
+  become: yes
+  become_user: root
+  community.general.pam_limits:
+    domain: jupyter
+    limit_type: hard
+    limit_item: nproc
+    value: "800000"
+
+- name: Ensure correct nofile soft limits
+  become: yes
+  become_user: root
+  community.general.pam_limits:
+    domain: jupyter
+    limit_type: soft
+    limit_item: nofile
+    value: "65535"
+
+- name: Ensure correct nofile hard limits
+  become: yes
+  become_user: root
+  community.general.pam_limits:
+    domain: jupyter
+    limit_type: hard
+    limit_item: nofile
+    value: "65535"
+
+- name: Setup sysctl params
+  become: yes
+  become_user: root
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+    sysctl_set: yes
+  with_items:
+    - { key: "net.ipv4.tcp_keepalive_time", value: "1800" }
+    - { key: "kernel.threads-max", value: "4096000" }
+    - { key: "kernel.pid_max", value: "200000" }
+    - { key: "vm.max_map_count", value: "600000" }
+
+- name: Setup Wod System ufw firewall TCP rules
+  become: yes
+  become_user: root
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+    state: enabled
+  with_items:
+    - "22"
+    - "123"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "20"
+
+- name: Setup ufw firewall UDP rules
+  become: yes
+  become_user: root
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+    state: enabled
+  with_items:
+    - "123"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "20"
+
+- name: Setup firewalld TCP rules
+  become: yes
+  become_user: root
+  ansible.posix.firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items:
+    - "22"
+    - "123"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version >= "7"
+
+- name: Setup firewalld UDP rules
+  become: yes
+  become_user: root
+  ansible.posix.firewalld:
+    port: "{{ item }}/udp"
+    permanent: yes
+    state: enabled
+  with_items:
+    - "123"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version >= "7"
+
+- name: Enable firewalld service
+  become: yes
+  become_user: root
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: firewalld
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version >= "7"
+
+- name: Enable NTP service
+  become: yes
+  become_user: root
+  systemd:
+    state: started
+    daemon_reload: yes
+    enabled: yes
+    name: ntp
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "20"
+
+- name: Enable NTP service
+  become: yes
+  become_user: root
+  systemd:
+    state: started
+    daemon_reload: yes
+    enabled: yes
+    name: ntpd
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version >= "7"
+
+- name: Ensure limits are correct for jupyter account
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "{{ item }}"
+  with_items:
+    - "ulimit -u 641465"
+    - "ulimit -n 65535"
+
+- name: Copy the skeleton content under /etc/skel
+  become: yes
+  become_user: root
+  ansible.posix.synchronize:
+    dest: /etc/skel/
+    src: '{{ WODBEDIR }}/skel/'
+
+- name: Test .profile file
+  command: ls "{{ ansible_env.HOME }}/.profile"
+  register: profile_path
+  failed_when: false
+  changed_when: false
+
+- name: Ensure we have a .profile file for DEB systems
+  copy:
+    src: /etc/skel/.profile
+    dest: "{{ ansible_env.HOME }}/.profile"
+  when:
+    - profile_path.rc != 0
+    - ansible_os_family == "Debian"
+
+- name: Ensure we have a .profile file for RPM systems
+  copy:
+    src: /etc/skel/.bash_profile
+    dest: "{{ ansible_env.HOME }}/.profile"
+  when:
+    - profile_path.rc != 0
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version >= "7"
+
+- name: Ensure vim is the default EDITOR
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    line: export EDITOR=vim
+
+- name: Setup logind.conf
+  become: yes
+  become_user: root
+  lineinfile:
+    path: /etc/systemd/logind.conf
+    line: UserTasksMax=100000
+    state: present
+
+- name: Test private hosts.j2 template
+  command: ls "{{ WODPRIVDIR }}/hosts.j2"
+  register: hosts_path
+  failed_when: false
+  changed_when: false
+
+- name: Expand template for /etc/hosts
+  become: yes
+  become_user: root
+  template:
+    src: "{{ WODBEDIR }}/hosts.j2"
+    dest: "/etc/hosts"
+    mode: 0644
+    owner: root
+  when:
+    - hosts_path.rc != 0
+
+- name: Install the pkg update script
+  become: yes
+  become_user: root
+  copy:
+    src: "{{ SCRIPTDIR }}/upd.{{ ansible_pkg_mgr }}"
+    dest: /usr/local/bin/upd
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Setup crontab for daily pkg security update
+  become: yes
+  become_user: root
+  cron:
+    name: upd
+    minute: "{{ 59 | random(seed=inventory_hostname) }} "
+    hour: "03"
+    user: root
+    job: "/usr/local/bin/upd"
+    cron_file: upd
+    state: present
+
+- name: Install utility scripts
+  become: yes
+  become_user: root
+  template:
+    src: "{{ SCRIPTDIR }}/{{ item }}.j2"
+    dest: /usr/local/bin/{{ item }}
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - fail2ban-IP
+
+- name: Install the cleanup-processes script
+  become: yes
+  become_user: root
+  copy:
+    src: "{{ SCRIPTDIR }}/cleanup-processes.sh"
+    dest: /usr/local/bin/cleanup-processes
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Setup weekly process cleanup
+  become: yes
+  become_user: root
+  cron:
+    name: cleanup-processes
+    minute: "{{ 59 | random(seed=inventory_hostname) }} "
+    hour: "04"
+    weekday: "0"
+    user: root
+    job: "/usr/local/bin/cleanup-processes"
+    cron_file: cleanup-processes
+    state: present
+
+- name: Enable WoD services
+  become: yes
+  become_user: root
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: "{{ item }}"
+  with_items:
+    - kill-processes
+
+- name: Test private tasks YAML file
+  command: ls "{{ ANSIBLEPRIVDIR }}/check_system.yml"
+  register: acj_path
+  failed_when: false
+  changed_when: false
+
+- name: Now call private tasks if available
+  include_tasks: "{{ ANSIBLEPRIVDIR }}/check_system.yml"
+  when:
+    - acj_path.rc == 0

@@ -1,0 +1,71 @@
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Ensure that this a compliant WoD system
+      include_tasks: {{ ANSIBLEDIR }}/check_system.yml
+
+
+    - name: Setup server ufw firewall TCP rules
+      become: yes
+      become_user: root
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+        state: enabled
+      with_items:
+        - "8000"
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
+
+    - name: Setup firewalld TCP rules
+      become: yes
+      become_user: root
+      ansible.posix.firewalld:
+        port: "{{ item }}/tcp"
+        permanent: yes
+        state: enabled
+      with_items:
+        - "8000"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
+
+
+
+    - name: Install server utility scripts
+      become: yes
+      become_user: root
+      template:
+        src: "{{ SCRIPTDIR }}/{{ item }}.j2"
+        dest: /usr/local/bin/{{ item }}
+        owner: root
+        group: root
+        mode: 0755
+      with_items:
+        - fail2ban-IP
+
+
+    - name: Enable server WoD services
+      become: yes
+      become_user: root
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+        name: "{{ item }}"
+      with_items:
+        - docker
+
+    - name: Test private tasks YAML file
+      command: ls "{{ ANSIBLEPRIVDIR }}/check_server.yml"
+      register: acj_path
+      failed_when: false
+      changed_when: false
+
+    - name: Now call private tasks if available
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_server.yml"
+      when:
+        - acj_path.rc == 0
