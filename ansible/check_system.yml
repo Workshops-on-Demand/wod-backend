@@ -243,6 +243,11 @@
   with_items:
     - fail2ban-IP
 
+- name: Deliver the system scripts
+  template: src={{ item }} dest={{ SCRIPTDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0755
+  with_items:
+    - {{ SCRIPTDIR }}/cleanup-processes.sh.j2
+
 - name: Install the cleanup-processes script
   become: yes
   become_user: root
