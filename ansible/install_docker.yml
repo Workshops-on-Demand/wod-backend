@@ -25,7 +25,7 @@
     become: yes
     become_user: root
     apt_repository:
-      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu/dists/ focal stable
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
       state: present
     when:
      - ansible_distribution == "Ubuntu"
