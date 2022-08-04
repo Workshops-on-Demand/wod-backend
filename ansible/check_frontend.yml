@@ -3,7 +3,7 @@
 
   tasks:
     - name: Ensure that this a compliant WoD system
-      include_tasks: {{ ANSIBLEDIR }}/check_system.yml
+      include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
     - name: Setup frontend ufw firewall TCP rules
       become: yes
