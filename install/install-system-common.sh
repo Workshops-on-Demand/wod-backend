@@ -20,12 +20,17 @@ su - jupyter -c "rm -rf wod-backend wod-private .ssh"
 if [ $WODTYPE = "server" ]; then
 	su - jupyter -c "rm -rf wod-server"
 	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-server.git"
+elif [ $WODTYPE = "frontend" ]; then
+	su - jupyter -c "rm -rf wod-frontend"
+	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-frontend.git"
 elif [ $WODTYPE = "backend" ]; then
 	su - jupyter -c "rm -rf wod-notebooks"
 	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
 fi
 
+# We'll store in backend dir the data we need whatever the type we're building
 su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git"
+# When Open Sourced used that one
 #su - jupyter -c "git clone https://github.com/Workshops-on-Demand/wod-backend.git"
 su - jupyter -c "git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git"
 
@@ -41,6 +46,7 @@ WODBEFQDN: $WODBEFQDN
 WODBEIP: $WODBEIP
 WODBEEXTFQDN: $WODBEEXTFQDN
 WODFEFQDN: $WODFEFQDN
+WODSRVFQDN: $WODSRVFQDN
 WODDISTRIB: $WODDISTRIB
 EOF
 
@@ -49,13 +55,18 @@ if [ $WODTYPE = "backend" ]; then
 	cat ~jupyter/wod-backend/ansible/group_vars/wod-backend >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
 fi
 
-# Inventory
+# Inventory based on the installed system
 if [ $WODTYPE = "backend" ]; then
 	cat > ~jupyter/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
 $WODBEFQDN ansible_connection=local
 EOF
 elif [ $WODTYPE = "server" ]; then
+	cat > ~jupyter/wod-backend/ansible/inventory << EOF
+[$WODGROUP]
+$WODSRVFQDN ansible_connection=local
+EOF
+elif [ $WODTYPE = "frontend" ]; then
 	cat > ~jupyter/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
 $WODFEFQDN ansible_connection=local
@@ -108,5 +119,5 @@ fi
 
 # Change default passwd for vagrant and root
 
-# Install WoD
+# Install WoD - install scripts managed in backend whatever system we install
 su - jupyter -c "./wod-backend/scripts/install_system.sh $WODTYPE"

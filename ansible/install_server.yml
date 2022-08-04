@@ -114,7 +114,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ SRVDIR }}/conf/fail2ban.conf"
+        src: "{{ WODSRVDIR }}/conf/fail2ban.conf"
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
@@ -124,7 +124,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ SRVDIR }}/conf/fail2ban.jail"
+        src: "{{ WODSRVDIR }}/conf/fail2ban.jail"
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
@@ -134,7 +134,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ SRVDIR }}/conf/fail2ban.action"
+        src: "{{ WODSRVDIR }}/conf/fail2ban.action"
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root

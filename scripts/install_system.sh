@@ -41,7 +41,8 @@ cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # they are placed as sister dirs wrt JUPPROC
 PJUPPROC=`dirname $JUPPROC`
 export JUPPRIV=$PJUPPROC/wod-private
-export SRVDIR=$PJUPPROC/wod-server
+export WODSRVDIR=$PJUPPROC/wod-server
+export WODFEDIR=$PJUPPROC/wod-frontend
 WODANSOPT=""
 # Manages private inventory if any
 if [ -f $JUPPRIV/ansible/inventory ]; then
@@ -99,19 +100,15 @@ fi
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
-elif [ $WODTYPE = "server" ]; then
+elif [ $WODTYPE = "server" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0"
 fi
 # Automatic Installation script for the system 
 ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
 ansible-playbook -i inventory --limit $PBKDIR check_$WODTYPE.yml
 
-ANSPLAYOPT=""
-if [ -f $JUPPRIV/ansible/install_$WODTYPE.yml ]; then
-	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
-fi
 if [ $WODTYPE = "server" ]; then
-	cd $SRVDIR
+	cd $WODSRVDIR
 	# Start the PostgreSQL DB
 	docker-compose up -d
 	# Start the backend server
@@ -120,6 +117,16 @@ if [ $WODTYPE = "server" ]; then
 	npm run seed-data
 	# Reset the DB
 	npm run reset-data
+elif [ $WODTYPE = "frontend" ]; then
+	cd $WODFEDIR
+	yarn install
+	yarn start
+fi
+
+# Manages private part if any
+ANSPLAYOPT=""
+if [ -f $JUPPRIV/ansible/install_$WODTYPE.yml ]; then
+	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
 fi
 if [ -f $JUPPRIV/ansible/check_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR check_$WODTYPE.yml
