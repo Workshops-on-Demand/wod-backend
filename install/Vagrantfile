@@ -18,30 +18,50 @@ Vagrant.configure("2") do |config|
     wodbecentos7.vm.hostname = "wod-be-centos-7"
     #wodbecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodbecentos7.vm.network "forwarded_port", guest: 8000, host: 8010
+    wodbecentos7.vm.provision :hosts do |prov|
+      prov..autoconfigure = true
+      prov.sync_hosts = true
+    end
   end
   config.vm.define "wod-fe-centos-7" do |wodfecentos7|
     wodfecentos7.vm.box = "generic/centos7"
     wodfecentos7.vm.hostname = "wod-fe-centos-7"
     #wodfecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodfecentos7.vm.network "forwarded_port", guest: 8000, host: 8011
+    wodfecentos7.vm.provision :hosts do |prov|
+      prov..autoconfigure = true
+      prov.sync_hosts = true
+    end
   end
   config.vm.define "wod-fe-ubuntu-20.04" do |wodfeubuntu2004|
     wodfeubuntu2004.vm.box = "generic/ubuntu2004"
     wodfeubuntu2004.vm.hostname = "wod-fe-ubuntu-20.04"
     #wodfeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodfeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8012
+    wodfeubuntu2004.vm.provision :hosts do |prov|
+      prov..autoconfigure = true
+      prov.sync_hosts = true
+    end
   end
   config.vm.define "wod-be-ubuntu-20.04" do |wodbeubuntu2004|
     wodbeubuntu2004.vm.box = "generic/ubuntu2004"
     wodbeubuntu2004.vm.hostname = "wod-be-ubuntu-20.04"
     #wodbeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
+    wodbeubuntu2004.vm.provision :hosts do |prov|
+      prov..autoconfigure = true
+      prov.sync_hosts = true
+    end
   end
   config.vm.define "wod-srv-ubuntu-20.04" do |wodsrvubuntu2004|
     wodsrvubuntu2004.vm.box = "generic/ubuntu2004"
     wodsrvubuntu2004.vm.hostname = "wod-srv-ubuntu-20.04"
     #wodsrvubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodsrvubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
+    wodsrvubuntu2004.vm.provision :hosts do |prov|
+      prov..autoconfigure = true
+      prov.sync_hosts = true
+    end
   end
   #ubuntu2004.vm.provider = "libvirt"
   #config.vm.synced_folder './', '/vagrant', type: 'nfs'
