@@ -46,16 +46,16 @@
       with_items:
         - fail2ban-IP
 
-    - name: Enable frontend WoD services
-      become: yes
-      become_user: root
-      systemd:
-        state: restarted
-        daemon_reload: yes
-        enabled: yes
-        name: "{{ item }}"
-      with_items:
-        - httpd
+          #- name: Enable frontend WoD services
+          #become: yes
+          #become_user: root
+          #systemd:
+          #state: restarted
+          #daemon_reload: yes
+          #enabled: yes
+          #name: "{{ item }}"
+          #with_items:
+          #- httpd
 
     - name: Test private tasks YAML file
       command: ls "{{ ANSIBLEPRIVDIR }}/check_frontend.yml"
