@@ -50,7 +50,7 @@ ENV NB_USER student$stdid
 ENV NB_UID $stdid
 ENV HTTPPORT $httpport
 RUN git clone https://github.com/hpe-container-platform-community/Apache-Spark-Tutorials /student/student$stdid/
-RUN /opt/jupyterhub/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
+RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
 EOF
 
 
@@ -90,8 +90,8 @@ container_id=$(ssh -q {{ NOCHECKSSH }} $RTARGET docker ps -aqf "name=$NAME$stdid
 sleep 5
 ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp $container_id:/student/student$stdid/sparktoken $TMPDIR"
 scp -q {{ NOCHECKSSH }} $RTARGET:$TMPDIR/sparktoken $TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp /tmp/$NAME $container_id:/student/student$stdid"
-ssh -q {{ NOCHECKSSH }} $RTARGET "docker exec -u root $container_id chown -R student$stdid:users /student/student$stdid/$NAME"
+#ssh -q {{ NOCHECKSSH }} $RTARGET "docker cp /tmp/$NAME.$stdid $container_id:/student/student$stdid"
+#ssh -q {{ NOCHECKSSH }} $RTARGET "docker exec -u root $container_id chown -R student$stdid:users /student/student$stdid/$NAME"
 
 # ansible-vault to store it in the pass file creating a SPARKTOK ansible variable
 if [ ! -d "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}/pass" ]; then
