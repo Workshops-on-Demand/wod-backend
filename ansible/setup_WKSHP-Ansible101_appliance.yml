@@ -52,7 +52,7 @@
       become: yes
       become_user: root
       template:
-        src: "{{ JUPPROC }}/conf/WKSHP-Ansible101-httpd.conf.j2"
+        src: "{{ WODBEDIR }}/conf/WKSHP-Ansible101-httpd.conf.j2"
         dest: /etc/httpd/conf.d/ansible.conf
         owner: apache
         group: apache
@@ -83,7 +83,7 @@
       become: yes
       become_user: root
       template:
-        src: "{{ JUPPROC }}/conf/WKSHP-Ansible101-index.html.j2"
+        src: "{{ WODBEDIR }}/conf/WKSHP-Ansible101-index.html.j2"
         dest: "/var/www/student/{{ 'student%s' | format(item) }}/index.html"
         owner: apache
         group: apache

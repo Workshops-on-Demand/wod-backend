@@ -11,7 +11,7 @@
 set -e
 set -x
 
-# Defines JUPPROC
+# Defines WODBEDIR
 source {{ SCRIPTDIR }}/wod.sh
 source {{ SCRIPTDIR }}/random.sh
 source {{ SCRIPTDIR }}/functions.sh
@@ -91,7 +91,7 @@ if [ $action != "RESET" ]; then
 		exit -1
 	fi
 
-	cd $JUPNOBO
+	cd $WODNOBO
 
 	# Read workshop list on stdin
 	if [ -d "$stddir" ]; then

@@ -89,7 +89,7 @@
       become: yes
       become_user: root
       template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-      with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
+      with_fileglob: [ '{{ WODBEDIR }}//*.service.j2' ]
 
     - name: Enable WoD service
       become: yes
@@ -104,7 +104,7 @@
 
     - name: Setup ansible configuration
       copy:
-        src: "{{ JUPPROC }}/.ansible.cfg"
+        src: "{{ WODBEDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
         owner: jupyter
         group: jupyter

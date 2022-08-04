@@ -6,7 +6,7 @@
 
   tasks:
     - name: Include variables for the underlying distribution
-      include_vars: "{{ ansible_env.JUPPROC }}/ansible/group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      include_vars: "{{ ANSIBLEDIR }}/group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
     - name: Base setup for a JupyterHub environment server or appliance
       include_tasks: setup_base_appliance.yml
@@ -438,7 +438,7 @@
         mode: 0751
 
     - name: Ensure Rust kernel is installed
-      shell: . '{{ JPHUB }}/bin/activate' && "{{ JUPPROC }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
+      shell: . '{{ JPHUB }}/bin/activate' && "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
 
     - name: Ensure Rust kernel files are installed
       copy:
@@ -451,7 +451,7 @@
 
     - name: Ensure Rust kernel is deployed
       copy:
-        src: "{{ JUPPROC }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
+        src: "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
         dest: "/usr/local/bin/evcxr_jupyter"
         owner: jupyter
         group: jupyter
@@ -496,7 +496,7 @@
 
     - name: Patch ansible kernel with fixes coming from master
       ansible.posix.patch:
-        src: "{{ JUPPROC }}/master-vs-0.9.0.patch"
+        src: "{{ WODBEDIR }}/master-vs-0.9.0.patch"
         basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
         strip: 2
         backup: yes
@@ -662,7 +662,7 @@
       become: yes
       become_user: root
       template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-      with_fileglob: [ '{{ JUPPROC }}//*.service.j2' ]
+      with_fileglob: [ '{{ WODBEDIR }}//*.service.j2' ]
 
     - name: Enable WoD service
       become: yes
@@ -701,7 +701,7 @@
 
     - name: Setup ansible configuration
       copy:
-        src: "{{ JUPPROC }}/.ansible.cfg"
+        src: "{{ WODBEDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
         owner: jupyter
         group: jupyter
@@ -720,7 +720,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ JUPPROC }}/fail2ban.conf"
+        src: "{{ WODBEDIR }}/fail2ban.conf"
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
@@ -730,7 +730,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ JUPPROC }}/fail2ban.jail"
+        src: "{{ WODBEDIR }}/fail2ban.jail"
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
@@ -740,7 +740,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ JUPPROC }}/fail2ban.action"
+        src: "{{ WODBEDIR }}/fail2ban.action"
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root
@@ -780,7 +780,7 @@
         - ansible_distribution_major_version == "7"
 
     - name: Test whether notebooks are already available
-      command: ls "{{ JUPNOBO }}/README.md"
+      command: ls "{{ WODNOBO }}/README.md"
       register: nobo_path
       failed_when: false
       changed_when: false
@@ -789,7 +789,7 @@
     - name: Checkout notebooks from the wod-notebooks git repo
       git:
         repo: https://github.com/Workshops-on-Demand/wod-notebooks.git
-        dest: "{{ JUPNOBO  }}"
+        dest: "{{ WODNOBO }}"
       when:
         - nobo_path.rc != 0
 
