@@ -118,6 +118,8 @@ elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
 	npm start &
 fi
+
+cd $SCRIPTDIR/../ansible
 ANSPLAYOPT=""
 if [ -f $WODPRIVDIR/ansible/install_$WODTYPE.yml ]; then
 	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
