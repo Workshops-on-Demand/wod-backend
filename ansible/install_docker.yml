@@ -31,7 +31,7 @@
      - ansible_distribution == "Ubuntu"
      - ansible_distribution_major_version >= "20"
 
-  - name: Ensure no existing docker pkg is installed
+  - name: Ensure no existing incorrect docker pkg is installed
     become: yes
     become_user: root
     package:
