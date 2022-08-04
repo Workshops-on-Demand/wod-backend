@@ -25,6 +25,12 @@ Vagrant.configure("2") do |config|
     #wodfecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodfecentos7.vm.network "forwarded_port", guest: 8000, host: 8011
   end
+  config.vm.define "wod-fe-ubuntu-20.04" do |wodfeubuntu2004|
+    wodfeubuntu2004.vm.box = "generic/ubuntu2004"
+    wodfeubuntu2004.vm.hostname = "wod-fe-ubuntu-20.04"
+    #wodfeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wodfeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8012
+  end
   config.vm.define "wod-be-ubuntu-20.04" do |wodbeubuntu2004|
     wodbeubuntu2004.vm.box = "generic/ubuntu2004"
     wodbeubuntu2004.vm.hostname = "wod-be-ubuntu-20.04"
