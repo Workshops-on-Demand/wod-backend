@@ -36,7 +36,7 @@ f=""
 e=""
 s=""
 
-while getopts "t:f:e:b:g:h" option; do
+while getopts "t:f:e:b:s:g:h" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -105,7 +105,7 @@ else
 	WODGROUP="production"
 fi
 export WODGROUP WODFEFQDN WODBEFQDN WODSRVFQDN WODBEEXTFQDN WODTYPE
-export WODBEIP=`host $WODBEFQDN | cut -d' ' -f4 | head -1`
+export WODBEIP=`host $WODBEFQDN | grep -v 'not found' | cut -d' ' -f4 | head -1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
