@@ -136,7 +136,7 @@ EOF
 	# Start the PostgreSQL DB stack
 	# We need to relog as jupyter so it's really in the docker group
 	# and be able to communicate with docker
-	sudo su - jupyter -c "docker-compose up -d"
+	sudo su - jupyter -c "cd $WODAPIDBDIR ; docker-compose up -d"
 	# Reset the DB
 	npm run reset-data
 	# Start the backend server
