@@ -53,12 +53,12 @@ Vagrant.configure("2") do |config|
       prov.sync_hosts = true
     end
   end
-  config.vm.define "wod-srv-ubuntu-20.04" do |wodsrvubuntu2004|
-    wodsrvubuntu2004.vm.box = "generic/ubuntu2004"
-    wodsrvubuntu2004.vm.hostname = "wod-srv-ubuntu-20.04"
-    #wodsrvubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
-    wodsrvubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
-    wodsrvubuntu2004.vm.provision :hosts do |prov|
+  config.vm.define "wod-api-ubuntu-20.04" do |wodapiubuntu2004|
+    wodapiubuntu2004.vm.box = "generic/ubuntu2004"
+    wodapiubuntu2004.vm.hostname = "wod-api-ubuntu-20.04"
+    #wodapiubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wodapiubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
+    wodapiubuntu2004.vm.provision :hosts do |prov|
       prov.autoconfigure = true
       prov.sync_hosts = true
     end

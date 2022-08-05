@@ -17,9 +17,9 @@ useradd -U -m -s /bin/bash jupyter
 # Get content for WoD - now in private mode
 token=`cat /vagrant/token`
 su - jupyter -c "rm -rf wod-backend wod-private .ssh"
-if [ $WODTYPE = "server" ]; then
-	su - jupyter -c "rm -rf wod-server"
-	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-server.git"
+if [ $WODTYPE = "api-db" ]; then
+	su - jupyter -c "rm -rf wod-api-db"
+	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-api-db.git"
 elif [ $WODTYPE = "frontend" ]; then
 	su - jupyter -c "rm -rf wod-frontend"
 	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-frontend.git"
@@ -46,7 +46,7 @@ WODBEFQDN: $WODBEFQDN
 WODBEIP: $WODBEIP
 WODBEEXTFQDN: $WODBEEXTFQDN
 WODFEFQDN: $WODFEFQDN
-WODSRVFQDN: $WODSRVFQDN
+WODAPIDBFQDN: $WODAPIDBFQDN
 WODDISTRIB: $WODDISTRIB
 EOF
 
@@ -61,10 +61,10 @@ if [ $WODTYPE = "backend" ]; then
 [$WODGROUP]
 $WODBEFQDN ansible_connection=local
 EOF
-elif [ $WODTYPE = "server" ]; then
+elif [ $WODTYPE = "api-db" ]; then
 	cat > ~jupyter/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
-$WODSRVFQDN ansible_connection=local
+$WODAPIDBFQDN ansible_connection=local
 EOF
 elif [ $WODTYPE = "frontend" ]; then
 	cat > ~jupyter/wod-backend/ansible/inventory << EOF
@@ -85,9 +85,9 @@ jupyter ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 440 /etc/sudoers.d/jupyter
 
-if [ $WODTYPE = "server" ]; then
-	su - jupyter -c "touch wod-server/.env"
-	cat > ~jupyter/wod-server/.env << EOF
+if [ $WODTYPE = "api-db" ]; then
+	su - jupyter -c "touch wod-api-db/.env"
+	cat > ~jupyter/wod-api-db/.env << EOF
 FROM_EMAIL_ADDRESS='sender@example.org'
 SENDGRID_API_KEY="None"
 API_PORT=8021
@@ -114,7 +114,7 @@ SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 EOF
-	su - jupyter -c "cd wod-server ; npm install"
+	su - jupyter -c "cd wod-api-db ; npm install"
 elif [ $WODTYPE = "frontend" ]; then
 	su - jupyter -c "cd wod-frontend ; npm install"
 fi

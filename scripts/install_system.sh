@@ -10,7 +10,7 @@ date
 
 export WODTYPE=$1
 if [ -z "$WODTYPE" ]; then
-	echo "Syntax: install_system server|backend|frontend"
+	echo "Syntax: install_system api-db|backend|frontend"
 	exit -1
 fi
 
@@ -41,7 +41,7 @@ cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # they are placed as sister dirs wrt WODBEDIR
 PWODBEDIR=`dirname $WODBEDIR`
 export WODPRIVDIR=$PWODBEDIR/wod-private
-export WODSRVDIR=$PWODBEDIR/wod-server
+export WODAPIDBDIR=$PWODBEDIR/wod-api-db
 export WODFEDIR=$PWODBEDIR/wod-frontend
 WODANSOPT=""
 # Manages private inventory if any
@@ -98,14 +98,14 @@ fi
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
-elif [ $WODTYPE = "server" ] || [ $WODTYPE = "frontend" ]; then
+elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0"
 fi
 # Automatic Installation script for the system 
 ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
 
-if [ $WODTYPE = "server" ]; then
-	cd $WODSRVDIR
+if [ $WODTYPE = "api-db" ]; then
+	cd $WODAPIDBDIR
 	# Start the PostgreSQL DB
 	docker-compose up -d
 	# Start the backend server

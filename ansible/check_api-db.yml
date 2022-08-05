@@ -6,7 +6,7 @@
       include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
 
-    - name: Setup server ufw firewall TCP rules
+    - name: Setup ufw firewall TCP rules
       become: yes
       become_user: root
       community.general.ufw:
@@ -35,7 +35,7 @@
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
-    - name: Install server utility scripts
+    - name: Install utility scripts
       become: yes
       become_user: root
       template:
@@ -47,7 +47,7 @@
       with_items:
         - fail2ban-IP
 
-    - name: Enable server WoD services
+    - name: Enable WoD services
       become: yes
       become_user: root
       systemd:
@@ -59,12 +59,12 @@
         - docker
 
     - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/check_server.yml"
+      command: ls "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
       register: acj_path
       failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_server.yml"
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
       when:
         - acj_path.rc == 0
