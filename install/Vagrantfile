@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
     #wodbecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodbecentos7.vm.network "forwarded_port", guest: 8000, host: 8010
     wodbecentos7.vm.provision :hosts do |prov|
-      prov..autoconfigure = true
+      prov.autoconfigure = true
       prov.sync_hosts = true
     end
   end
@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
     #wodfecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodfecentos7.vm.network "forwarded_port", guest: 8000, host: 8011
     wodfecentos7.vm.provision :hosts do |prov|
-      prov..autoconfigure = true
+      prov.autoconfigure = true
       prov.sync_hosts = true
     end
   end
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
     #wodfeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodfeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8012
     wodfeubuntu2004.vm.provision :hosts do |prov|
-      prov..autoconfigure = true
+      prov.autoconfigure = true
       prov.sync_hosts = true
     end
   end
@@ -49,7 +49,7 @@ Vagrant.configure("2") do |config|
     #wodbeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
     wodbeubuntu2004.vm.provision :hosts do |prov|
-      prov..autoconfigure = true
+      prov.autoconfigure = true
       prov.sync_hosts = true
     end
   end
@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
     #wodsrvubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodsrvubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
     wodsrvubuntu2004.vm.provision :hosts do |prov|
-      prov..autoconfigure = true
+      prov.autoconfigure = true
       prov.sync_hosts = true
     end
   end
