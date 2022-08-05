@@ -3,4 +3,4 @@
   tasks:
 
     - name: Base setup for a JupyterHub environment server or appliance
-      include_tasks: setup_base_appliance.yml
+      include_tasks: "{{ ANSIBLEDIR }}/setup_base_appliance.yml"
