@@ -114,7 +114,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODSRVDIR }}/config/fail2ban.conf"
+        src: "{{ WODAPIDBDIR }}/config/fail2ban.conf"
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
@@ -124,7 +124,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODSRVDIR }}/config/fail2ban.jail"
+        src: "{{ WODAPIDBDIR }}/config/fail2ban.jail"
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
@@ -134,7 +134,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODSRVDIR }}/config/fail2ban.action"
+        src: "{{ WODAPIDBDIR }}/config/fail2ban.action"
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root
@@ -150,12 +150,12 @@
         name: fail2ban
 
     - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/install_server.yml"
+      command: ls "{{ ANSIBLEPRIVDIR }}/install_api-db.yml"
       register: acj_path
       failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/install_server.yml"
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/install_api-db.yml"
       when:
         - acj_path.rc == 0
