@@ -133,9 +133,10 @@ SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 EOF
-	# Start the PostgreSQL DB
-	bash
-	docker-compose up -d
+	# Start the PostgreSQL DB stack
+	# We need to relog as jupyter so it's really in the docker group
+	# and be able to communicate with docker
+	sudo su - jupyter -c "docker-compose up -d"
 	# Reset the DB
 	npm run reset-data
 	# Start the backend server
