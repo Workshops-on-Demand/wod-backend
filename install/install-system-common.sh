@@ -19,6 +19,7 @@ token=`cat /vagrant/token`
 su - jupyter -c "rm -rf wod-backend wod-private .ssh"
 if [ $WODTYPE = "api-db" ]; then
 	su - jupyter -c "rm -rf wod-api-db"
+	# using branch rename/migrationfiles for now - rebased on it
 	su - jupyter -c "git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-api-db.git"
 elif [ $WODTYPE = "frontend" ]; then
 	su - jupyter -c "rm -rf wod-frontend"
@@ -85,38 +86,8 @@ jupyter ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 440 /etc/sudoers.d/jupyter
 
-if [ $WODTYPE = "api-db" ]; then
-	su - jupyter -c "touch wod-api-db/.env"
-	cat > ~jupyter/wod-api-db/.env << EOF
-FROM_EMAIL_ADDRESS='sender@example.org'
-SENDGRID_API_KEY="None"
-API_PORT=8021
-DB_PW=TrèsCompliqué!!##123
-DURATION=4
-JUPYTER_MOUGINS_LOCATION=
-JUPYTER_GRENOBLE_LOCATION=GNB
-JUPYTER_GREENLAKE_LOCATION=
-POSTFIX_EMAIL_GRENOBLE=jupyter@$WODBEEXTFQDN
-POSTFIX_EMAIL_MOUGINS=
-POSTFIX_EMAIL_GREENLAKE=
-POSTFIX_HOST_GRENOBLE=$WODBEEXTFQDN
-POSTFIX_PORT_GRENOBLE=10025
-POSTFIX_HOST_MOUGINS=
-POSTFIX_PORT_MOUGINS=
-POSTFIX_HOST_GREENLAKE=
-POSTFIX_PORT_GREENLAKE=
-FEEDBACK_WORKSHOP_URL="None"
-FEEDBACK_CHALLENGE_URL="None"
-PRODUCTION_API_SERVER=$WODFEFQDN
-NO_OF_STUDENT_ACCOUNTS=1000
-SLACK_CHANNEL_WORKSHOPS_ON_DEMAND="None"
-SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
-SESSION_TYPE_CODING_CHALLENGE="None"
-SLACK_CHANNEL_CHALLENGES="None"
-EOF
-	su - jupyter -c "cd wod-api-db ; npm install"
-elif [ $WODTYPE = "frontend" ]; then
-	su - jupyter -c "cd wod-frontend ; npm install"
+if [ $WODTYPE = "api-db" ] ||  [ $WODTYPE = "frontend" ]; then
+	su - jupyter -c "cd wod-$WODTYPE ; npm install"
 fi
 
 # Change default passwd for vagrant and root
