@@ -51,8 +51,8 @@ WODDISTRIB: $WODDISTRIB
 EOF
 
 cat ~jupyter/wod-backend/ansible/group_vars/wod-system >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
-if [ $WODTYPE = "backend" ]; then
-	cat ~jupyter/wod-backend/ansible/group_vars/wod-backend >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
+if [ -f ~jupyter/wod-backend/ansible/group_vars/wod-$WODTYPE ]; then
+	cat ~jupyter/wod-backend/ansible/group_vars/wod-$WODTYPE >> ~jupyter/wod-backend/ansible/group_vars/$WODGROUP
 fi
 
 # Inventory based on the installed system

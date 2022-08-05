@@ -551,15 +551,23 @@
         - ansible_distribution_major_version >= "7"
 
     - name: Ensure powershell is installed through dotnet
+      become: yes
+      become_user: root
       command: dotnet tool install --tool-path /usr/local/bin powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
+      become: yes
+      become_user: root
       command: dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
+      become: yes
+      become_user: root
       command: dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
 
     - name: Ensure powershell scripts are installed
+      become: yes
+      become_user: root
       command: "{{ SCRIPTDIR }}/install_PwshModules.sh"
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
