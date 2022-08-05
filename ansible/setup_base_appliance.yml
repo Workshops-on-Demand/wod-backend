@@ -1,5 +1,5 @@
 - name: Install a base system
-  include_tasks: "[[ ANSIBLEDIR }}'/install_base_system.yml"
+  include_tasks: "{{ ANSIBLEDIR }}'/install_base_system.yml"
 
 - name: Ensure that student directory exists
   become: yes
