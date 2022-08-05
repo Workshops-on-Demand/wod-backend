@@ -134,6 +134,7 @@ SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 EOF
 	# Start the PostgreSQL DB
+	bash
 	docker-compose up -d
 	# Reset the DB
 	npm run reset-data
