@@ -400,6 +400,8 @@
         - /usr/local/share/powershell/Modules
 
 #    - name: Make gophernotes available under /usr/local/bin
+#      become: yes
+#      become_user: root
 #      copy:
 #        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
 #        dest: /usr/local/bin/gophernotes
@@ -415,6 +417,8 @@
 #        state: absent
 
     - name: Make kernel_python available under /usr/local/bin
+      become: yes
+      become_user: root
       copy:
         src: "{{ SCRIPTDIR }}/kernel_python"
         dest: /usr/local/bin/kernel_python
@@ -430,6 +434,8 @@
         state: present
 
     - name: Ensure Rust kernel directory is installed
+      become: yes
+      become_user: root
       file:
         path: "{{ JPHUB }}//share/jupyter/kernels/rust"
         state: directory
@@ -444,12 +450,12 @@
       copy:
         src: "{{ item }}"
         dest: "{{ JPHUB }}//share/jupyter/kernels/rust/{{ item | basename }}"
-        owner: jupyter
-        group: jupyter
         mode: 0644
       with_fileglob: [ '{{ ansible_env.HOME }}/.local/share/jupyter/kernels/rust/*' ]
 
     - name: Ensure Rust kernel is deployed
+      become: yes
+      become_user: root
       copy:
         src: "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
         dest: "/usr/local/bin/evcxr_jupyter"
@@ -703,8 +709,6 @@
       copy:
         src: "{{ WODBEDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
-        owner: jupyter
-        group: jupyter
         mode: 0644
 
     - name: Enable postfix service
