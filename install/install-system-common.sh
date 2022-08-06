@@ -13,6 +13,19 @@ if grep -qE '^jupyter:' /etc/passwd; then
         userdel -f -r jupyter
 fi
 useradd -U -m -s /bin/bash jupyter
+#Setup ssh for jupyter
+su - jupyter -c "ssh-keygen -t rsa -b 4096 -N '' -f ~jupyter/.ssh/id_rsa"
+su - jupyter -c "install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/"
+su - jupyter -c "cat ~jupyter/.ssh/id_rsa.pub >> ~jupyter/.ssh/authorized_keys"
+
+# setup sudo for jupyter
+cat > /etc/sudoers.d/jupyter << EOF
+Defaults:jupyter !fqdn
+Defaults:jupyter !requiretty
+jupyter ALL=(ALL) NOPASSWD: ALL
+EOF
+chmod 440 /etc/sudoers.d/jupyter
+
 
 # Get content for WoD - now in private mode
 token=`cat /vagrant/token`
@@ -73,19 +86,6 @@ elif [ $WODTYPE = "frontend" ]; then
 $WODFEFQDN ansible_connection=local
 EOF
 fi
-#Setup ssh for jupyter
-su - jupyter -c "ssh-keygen -t rsa -b 4096 -N '' -f ~jupyter/.ssh/id_rsa"
-su - jupyter -c "install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/"
-su - jupyter -c "cat ~jupyter/.ssh/id_rsa.pub >> ~jupyter/.ssh/authorized_keys"
-
-# setup sudo for jupyter
-cat > /etc/sudoers.d/jupyter << EOF
-Defaults:jupyter !fqdn
-Defaults:jupyter !requiretty
-jupyter ALL=(ALL) NOPASSWD: ALL
-EOF
-chmod 440 /etc/sudoers.d/jupyter
-
 if [ $WODTYPE = "api-db" ] ||  [ $WODTYPE = "frontend" ]; then
 	su - jupyter -c "cd wod-$WODTYPE ; npm install"
 fi

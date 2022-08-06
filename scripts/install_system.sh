@@ -132,17 +132,20 @@ SLACK_CHANNEL_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
+SOURCE_ORIGIN="http://localhost:3000,http://localhost:8000"
 EOF
 	# Start the PostgreSQL DB stack
 	# We need to relog as jupyter so it's really in the docker group
 	# and be able to communicate with docker
+	echo "Launching docker PostgreSQL stack"
 	sudo su - jupyter -c "cd $WODAPIDBDIR ; docker-compose up -d"
-	# Reset the DB
+	echo "Reset DB data"
 	npm run reset-data
-	# Start the backend server
+	echo "Start the API server"
 	npm start &
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
+	echo "Start the Frontend server"
 	npm start &
 fi
 
