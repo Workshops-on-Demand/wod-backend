@@ -63,7 +63,7 @@ while getopts "t:f:e:b:s:g:h" option; do
             ;;
         h)
             usage
-	    exit 01
+	    exit 0
             ;;
         *)
             usage
