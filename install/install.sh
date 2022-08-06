@@ -28,26 +28,23 @@ usage() {
 	echo "          if empty using the internal name of the back-end                "
 }
 
+echo "install.sh called with $*"
 t=""
-g=""
-b=""
-b=""
 f=""
 e=""
-s=""
+b=""
+a=""
+g=""
 
-while getopts "t:f:e:b:s:g:h" option; do
+while getopts "t:f:e:b:a:g:h" option; do
     case "${option}" in
         t)
             t=${OPTARG}
             if [ ${t} !=  "backend" ] && [ ${t} != "frontend" ] && [ ${t} != "api-db" ]; then
-	    	echo "wrong type: ${t}"
-		  usage
-		  exit -1
+		echo "wrong type: ${t}"
+		usage
+		exit -1
 	    fi
-            ;;
-        s)
-            s=${OPTARG}
             ;;
         f)
             f=${OPTARG}
@@ -60,6 +57,9 @@ while getopts "t:f:e:b:s:g:h" option; do
             ;;
         g)
             g=${OPTARG}
+            ;;
+        a)
+            a=${OPTARG}
             ;;
         h)
             usage
@@ -95,8 +95,8 @@ if [ ! -z "${f}" ]; then
 else
 	WODFEFQDN=$WODBEFQDN
 fi
-if [ ! -z "${s}" ]; then
-	WODAPIDBFQDN="${s}"
+if [ ! -z "${a}" ]; then
+	WODAPIDBFQDN="${a}"
 else
 	WODAPIDBFQDN=$WODFEFQDN
 fi
@@ -124,10 +124,25 @@ exec &> >(tee $HOME/.jupyter/install.log)
 EXEPATH=`dirname "$0"`
 EXEPATH=`( cd "$EXEPATH" && pwd )`
 
+# Needs to be root
 # Call the distribution specific install script
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
 $EXEPATH/install-system-$WODDISTRIB.sh
 
+# Create the jupyter user
+if grep -qE '^jupyter:' /etc/passwd; then
+        userdel -f -r jupyter
+fi
+useradd -U -m -s /bin/bash jupyter
+# setup sudo for jupyter
+cat > /etc/sudoers.d/jupyter << EOF
+Defaults:jupyter !fqdn
+Defaults:jupyter !requiretty
+jupyter ALL=(ALL) NOPASSWD: ALL
+EOF
+chmod 440 /etc/sudoers.d/jupyter
+
+# Now drop priviledges
 # Call the common install script to finish install
-echo "Installing common remaining stuff"
-$EXEPATH/install-system-common.sh
+echo "Installing common remaining stuff as jupyter"
+su - jupyert -c "$EXEPATH/install-system-common.sh"
