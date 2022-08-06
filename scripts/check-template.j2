@@ -6,7 +6,7 @@ TEMPLATE=WKSHP-Template
 
 source {{ SCRIPTDIR }}/wod.sh
 
-for u in `grep /home /etc/passwd | grep -vE 'syslog|jupyter' | cut -d: -f1`; do
+for u in `grep /home /etc/passwd | grep -vE 'syslog|{{ WODUSER }}' | cut -d: -f1`; do
 	rsync -av "{{ ansible_env.WODNOBO }}/$TEMPLATE" /home/$u
 	chown $u:$u /home/$u/$TEMPLATE
 done

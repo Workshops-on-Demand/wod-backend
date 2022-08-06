@@ -19,8 +19,8 @@ if [ ! -f $HOME/.gitconfig ]; then
 # This is Git's per-user configuration file.
 [user]
 # Please adapt and uncomment the following lines:
-name = jupyter
-email = jupyter@nowhere.org
+name = $WODUSER
+email = $WODUSER@nowhere.org
 EOF
 fi
 
@@ -35,6 +35,7 @@ fi
 cat > $SCRIPTDIR/wod.sh << EOF
 # This main dir is computed
 export WODBEDIR=`dirname $SCRIPTDIR`
+export WODUSER=$WODUSER
 EOF
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # These 3 dirs have fixed names by default that you can change in this file
@@ -115,7 +116,7 @@ DURATION=4
 JUPYTER_MOUGINS_LOCATION=
 JUPYTER_GRENOBLE_LOCATION=GNB
 JUPYTER_GREENLAKE_LOCATION=
-POSTFIX_EMAIL_GRENOBLE=jupyter@$WODBEEXTFQDN
+POSTFIX_EMAIL_GRENOBLE=$WODUSER@$WODBEEXTFQDN
 POSTFIX_EMAIL_MOUGINS=
 POSTFIX_EMAIL_GREENLAKE=
 POSTFIX_HOST_GRENOBLE=$WODBEEXTFQDN
@@ -135,10 +136,10 @@ SLACK_CHANNEL_CHALLENGES="None"
 SOURCE_ORIGIN="http://localhost:3000,http://localhost:8000"
 EOF
 	# Start the PostgreSQL DB stack
-	# We need to relog as jupyter so it's really in the docker group
+	# We need to relog as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
 	echo "Launching docker PostgreSQL stack"
-	sudo su - jupyter -c "cd $WODAPIDBDIR ; docker-compose up -d"
+	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Start the API server"

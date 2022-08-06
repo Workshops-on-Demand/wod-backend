@@ -2,7 +2,7 @@
   become: yes
   become_user: root
   community.general.pam_limits:
-    domain: jupyter
+    domain: "{{ WODUSER }}"
     limit_type: soft
     limit_item: nproc
     value: "800000"
@@ -11,7 +11,7 @@
   become: yes
   become_user: root
   community.general.pam_limits:
-    domain: jupyter
+    domain: "{{ WODUSER }}"
     limit_type: hard
     limit_item: nproc
     value: "800000"
@@ -20,7 +20,7 @@
   become: yes
   become_user: root
   community.general.pam_limits:
-    domain: jupyter
+    domain: "{{ WODUSER }}"
     limit_type: soft
     limit_item: nofile
     value: "65535"
@@ -29,7 +29,7 @@
   become: yes
   become_user: root
   community.general.pam_limits:
-    domain: jupyter
+    domain: "{{ WODUSER }}"
     limit_type: hard
     limit_item: nofile
     value: "65535"
@@ -141,7 +141,7 @@
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version >= "7"
 
-- name: Ensure limits are correct for jupyter account
+- name: Ensure limits are correct for "{{ WODUSER }}" account
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: "{{ item }}"

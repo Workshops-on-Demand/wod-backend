@@ -36,7 +36,7 @@
       ansible.posix.acl:
         path: "{{ item | regex_replace(SCRIPTDIR, STUDDIR + '/student' + STDID) }}"
         recursive: no
-        entity: jupyter
+        entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         state: present

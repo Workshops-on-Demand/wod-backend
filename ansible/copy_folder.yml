@@ -26,8 +26,8 @@
       file:
         path: "{{ VARDIR }}/pass"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: check variables file exists
@@ -196,8 +196,8 @@
       file:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: Copy the generate-pdf script in the workshop dir
@@ -214,8 +214,8 @@
       copy:
         src: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0644
 
     - name: Adapt owner/group/modes for target workshop
@@ -234,7 +234,7 @@
       ansible.posix.acl:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: yes
-        entity: jupyter
+        entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         state: present
@@ -245,7 +245,7 @@
       ansible.posix.acl:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: yes
-        entity: jupyter
+        entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         default: yes

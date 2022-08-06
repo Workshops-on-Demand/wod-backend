@@ -103,11 +103,11 @@
       enabled: yes
       name: docker
 
-  - name: Ensure jupyter user belong to the docker group
+  - name: Ensure "{{ WODUSER }}" user belong to the docker group
     become: yes
     become_user: root
     user:
-      name: "jupyter"
+      name: ""{{ WODUSER }}""
       state: present
       append: yes
       groups: "docker"
