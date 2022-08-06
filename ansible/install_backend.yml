@@ -325,8 +325,8 @@
       file:
         path: "{{ JPHUB }}"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: Ensure all additional pip packages are installed
@@ -363,14 +363,14 @@
 #    - name: Ensure Go kernel is installed
 #      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
 
-    - name: Ensure required directories under /usr/local are owned by jupyter
+    - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: yes
       become_user: root
       file:
         path: "{{ item }}"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0755
       with_items:
         - /usr/local/bin
@@ -384,8 +384,8 @@
 #      copy:
 #        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
 #        dest: /usr/local/bin/gophernotes
-#        owner: jupyter
-#        group: jupyter
+#        owner: "{{ WODUSER }}"
+#        group: "{{ WODUSER }}"
 #        mode: 0755
 
 #    - name: Cleanup intermediate go directory
@@ -401,8 +401,8 @@
       copy:
         src: "{{ SCRIPTDIR }}/kernel_python"
         dest: /usr/local/bin/kernel_python
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0755
 
     - name: Fix python kernel path to include virtualenv setup
@@ -418,8 +418,8 @@
       file:
         path: "{{ JPHUB }}//share/jupyter/kernels/rust"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: Ensure Rust kernel is installed
@@ -438,8 +438,8 @@
       copy:
         src: "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
         dest: "/usr/local/bin/evcxr_jupyter"
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0755
 
     - name: Extract iJava kernel
@@ -448,16 +448,16 @@
         dest: "{{ ansible_env.HOME }}"
         remote_src: yes
 
-    - name: Ensure jupyter IJava kernel is installed
+    - name: Ensure jupyterhub IJava kernel is installed
       shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
 
-    - name: Ensure jupyter docx bundle is installed
+    - name: Ensure jupyterhub docx bundle is installed
       shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && jupyter bundlerextension enable --py jupyter_docx_bundler --prefix={{ JPHUB }}
 
-    - name: Ensure jupyter ssh kernel is installed
+    - name: Ensure jupyterhub ssh kernel is installed
       shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
 
-    - name: Ensure jupyter kernels are installed
+    - name: Ensure jupyterhub kernels are installed
       shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
         - bash_kernel
@@ -515,8 +515,8 @@
         src: /usr/share/dotnet/dotnet
         dest: /usr/local/bin/dotnet
         state: link
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0755
         force: yes
       when:
@@ -547,8 +547,8 @@
       file:
         path: "{{ JPHUB }}/etc/jupyterhub"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: Disable WoD services
@@ -620,7 +620,7 @@
                 'proxy',
                 'shutdown',
             ],
-            'users': ['jupyter'],
+            'users': ['"{{ WODUSER }}"'],
                  },
                 {
             'name': "jupyteradmin",
@@ -673,7 +673,7 @@
     #      Authorization: "token {{ WODBETOKEN }}"
     #    method: POST
     #    body_format: json
-    #    body: '{ "usernames": [ "jupyter" ], "admin": true }'
+    #    body: '{ "usernames": [ ""{{ WODUSER }}"" ], "admin": true }'
     #    status_code: 201
 
     - name: Setup group admin in jupyterhub
@@ -683,7 +683,7 @@
           Authorization: "token {{ WODBETOKEN }}"
         method: POST
         body_format: json
-        body: '{ "users": [ "jupyter"], "roles": [ "jupyteradm" ], "name": "admingroup"}'
+        body: '{ "users": [ ""{{ WODUSER }}"" ], "roles": [ "jupyteradm" ], "name": "admingroup"}'
         status_code: 201
 
     - name: Setup ansible configuration

@@ -3,7 +3,7 @@ Description=Killing mining and other processes service
 After=syslog.target network.target
 
 [Service]
-User=jupyter
+User={{ WODUSER }}
 ExecStart={{ SCRIPTDIR }}/kill-processes.pl
 
 [Install]

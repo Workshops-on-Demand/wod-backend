@@ -8,4 +8,4 @@ maxretry = 3
 banaction = jupyterhub
 #ignoreip = 127.0.0.1/8
 #bantime = 10d
-#destemail = jupyter@localhost
+#destemail = root@localhost

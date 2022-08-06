@@ -7,7 +7,7 @@ set -e
 set -u
 set -o pipefail
 
-# This is run as jupyter user
+# This is run as WODUSER user
 
 # Get content for WoD - now in private mode
 token=`cat /vagrant/token`
@@ -30,10 +30,10 @@ git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-b
 #git clone https://github.com/Workshops-on-Demand/wod-backend.git
 git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git
 
-#Setup ssh for jupyter
-ssh-keygen -t rsa -b 4096 -N '' -f ~jupyter/.ssh/id_rsa
+#Setup ssh for WODUSER
+ssh-keygen -t rsa -b 4096 -N '' -f ~$WODUSER/.ssh/id_rsa
 install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
-cat ~jupyter/.ssh/id_rsa.pub >> ~jupyter/.ssh/authorized_keys
+cat ~$WODUSER/.ssh/id_rsa.pub >> ~$WODUSER/.ssh/authorized_keys
 
 # Setup this using the group for WoD
 cat > $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF

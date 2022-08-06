@@ -44,16 +44,16 @@
       file:
         path: "{{ JPHUB }}"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
         path: "{{ JPHUB }}/etc/jupyterhub"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0751
 
     - name: Ensure listening port in postfix master.cf is configured correctly
@@ -136,7 +136,7 @@
         name: deliver
         minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "04"
-        user: jupyter
+        user: "{{ WODUSER }}"
         job: "/usr/local/bin/deliver"
         cron_file: deliver
         state: present
@@ -178,8 +178,8 @@
       file:
         path: "{{ STUDDIR }}"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0711
 
     - name: Lockdown /home
@@ -196,8 +196,8 @@
       file:
         path: "{{ ansible_env.HOME }}/.mail"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0750
 
     - name: Ensure that file vault_secret in {{ ANSIBLEDIR }}/ exists
@@ -217,8 +217,8 @@
       file:
         path: "{{ item }}"
         state: directory
-        owner: jupyter
-        group: jupyter
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
         mode: 0755
       with_items:
         - /usr/local/share/jupyter/nbconvert/
@@ -227,7 +227,7 @@
         - /usr/local/share/jupyter/nbconvert/templates/latex/
         - "{{ JPHUB }}/share/jupyter/nbconvert/templates/html/"
 
-    - name: Remove existing jupyter users
+    - name: Remove existing jupyterhub users
       command:
         cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
@@ -268,32 +268,32 @@
         group: "{{ 'student%s' | format(item) }}"
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
-    - name: Ensure jupyter students users exist
+    - name: Ensure jupyterhub students users exist
       command:
         cmd: "curl -X POST --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
-    - name: Setup ACL for students with jupyter account
+    - name: Setup ACL for students with jupyterhub account
       become: yes
       become_user: root
       ansible.posix.acl:
         path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
         recursive: yes
-        entity: jupyter
+        entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         state: present
         recalculate_mask: no_mask
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
-    - name: Setup default ACL for students with jupyter account
+    - name: Setup default ACL for students with jupyterhub account
       become: yes
       become_user: root
       ansible.posix.acl:
         path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
         recursive: yes
-        entity: jupyter
+        entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         default: yes

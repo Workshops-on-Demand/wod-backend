@@ -7,8 +7,8 @@
   file:
     path: "{{ STUDDIR }}"
     state: directory
-    owner: jupyter
-    group: jupyter
+    owner: "{{ WODUSER }}"
+    group: "{{ WODUSER }}"
     mode: 0711
 
 - name: Use USERMIN for APPMIN if installing

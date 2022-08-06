@@ -109,7 +109,8 @@ fi
 export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`host $WODBEFQDN | grep -v 'not found' | cut -d' ' -f4 | head -1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
-export WODUSER="wod"
+export WODUSER="wodadmin"
+echo "WODUSER: $WODUSER" > /etc/wod.conf
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using frontend $WODFEFQDN"
@@ -132,20 +133,20 @@ EXEPATH=`( cd "$EXEPATH" && pwd )`
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
 $EXEPATH/install-system-$WODDISTRIB.sh
 
-# Create the jupyter user
-if grep -qE '^jupyter:' /etc/passwd; then
-        userdel -f -r jupyter
+# Create the WODUSER user
+if grep -qE '^$WODUSER:' /etc/passwd; then
+        userdel -f -r $WODUSER
 fi
-useradd -U -m -s /bin/bash jupyter
-# setup sudo for jupyter
-cat > /etc/sudoers.d/jupyter << EOF
-Defaults:jupyter !fqdn
-Defaults:jupyter !requiretty
-jupyter ALL=(ALL) NOPASSWD: ALL
+useradd -U -m -s /bin/bash $WODUSER
+# setup sudo for $WODUSER
+cat > /etc/sudoers.d/$WODUSER << EOF
+Defaults:$WODUSER !fqdn
+Defaults:$WODUSER !requiretty
+$WODUSER ALL=(ALL) NOPASSWD: ALL
 EOF
-chmod 440 /etc/sudoers.d/jupyter
+chmod 440 /etc/sudoers.d/$WODUSER
 
 # Now drop priviledges
 # Call the common install script to finish install
-echo "Installing common remaining stuff as jupyter"
-su - jupyter -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB -c "$EXEPATH/install-system-common.sh"
+echo "Installing common remaining stuff as $WODUSER"
+su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER -c "$EXEPATH/install-system-common.sh"
