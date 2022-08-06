@@ -29,6 +29,7 @@ usage() {
 }
 
 echo "install.sh called with $*"
+# Run as root
 t=""
 f=""
 e=""
@@ -108,6 +109,7 @@ fi
 export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`host $WODBEFQDN | grep -v 'not found' | cut -d' ' -f4 | head -1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
+export WODUSER="wod"
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using frontend $WODFEFQDN"
@@ -115,6 +117,7 @@ echo "Using api-db $WODAPIDBFQDN"
 echo "Using backend $WODBEFQDN ($WODBEIP)"
 echo "Using external backend $WODBEEXTFQDN"
 echo "Using groupname $WODGROUP"
+echo "Using WoD user $WODUSER"
 
 # redirect stdout/stderr to a file
 mkdir -p $HOME/.jupyter
@@ -145,4 +148,4 @@ chmod 440 /etc/sudoers.d/jupyter
 # Now drop priviledges
 # Call the common install script to finish install
 echo "Installing common remaining stuff as jupyter"
-su - jupyert -c "$EXEPATH/install-system-common.sh"
+su - jupyter -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB -c "$EXEPATH/install-system-common.sh"
