@@ -128,6 +128,8 @@ exec &> >(tee $HOME/.jupyter/install.log)
 EXEPATH=`dirname "$0"`
 EXEPATH=`( cd "$EXEPATH" && pwd )`
 
+source $EXEPATH/install.repo
+export WODFEREPO WODBEREPO WODAPIREPO WODNOBOREPO WODPRIVREPO
 # Needs to be root
 # Call the distribution specific install script
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
@@ -149,4 +151,4 @@ chmod 440 /etc/sudoers.d/$WODUSER
 # Now drop priviledges
 # Call the common install script to finish install
 echo "Installing common remaining stuff as $WODUSER"
-su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER -c "$EXEPATH/install-system-common.sh"
+su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO -c "$EXEPATH/install-system-common.sh"
