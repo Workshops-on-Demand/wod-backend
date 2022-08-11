@@ -683,7 +683,7 @@
           Authorization: "token {{ WODBETOKEN }}"
         method: POST
         body_format: json
-        body: '{ "users": [ ""{{ WODUSER }}"" ], "roles": [ "jupyteradm" ], "name": "admingroup"}'
+        body: '{ "users": [ "{{ WODUSER }}" ], "roles": [ "jupyteradm" ], "name": "admingroup"}'
         status_code: 201
 
     - name: Setup ansible configuration
