@@ -15,20 +15,18 @@ rm -rf wod-backend wod-private .ssh
 if [ $WODTYPE = "api-db" ]; then
 	rm -rf wod-api-db
 	# using branch rename/migrationfiles for now - rebased on it
-	git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-api-db.git
+	$WODAPIREPO
 elif [ $WODTYPE = "frontend" ]; then
 	rm -rf wod-frontend
-	git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-frontend.git
+	$WODFEREPO
 elif [ $WODTYPE = "backend" ]; then
 	rm -rf wod-notebooks
-	git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git
+	$WODNOBO
 fi
 
 # We'll store in backend dir the data we need whatever the type we're building
-git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-backend.git
-# When Open Sourced used that one
-#git clone https://github.com/Workshops-on-Demand/wod-backend.git
-git clone https://bcornec:$token@github.com/Workshops-on-Demand/wod-private.git
+$WODBEREPO
+$WODPRIVREPO
 
 #Setup ssh for WODUSER
 ssh-keygen -t rsa -b 4096 -N '' -f ~$WODUSER/.ssh/id_rsa
