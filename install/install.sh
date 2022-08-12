@@ -110,7 +110,7 @@ export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`host $WODBEFQDN | grep -v 'not found' | cut -d' ' -f4 | head -1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 export WODUSER="wodadmin"
-echo "WODUSER: $WODUSER" > /etc/wod.conf
+echo "WODUSER: $WODUSER" > /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using frontend $WODFEFQDN"

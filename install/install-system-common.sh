@@ -29,9 +29,9 @@ $WODBEREPO
 $WODPRIVREPO
 
 #Setup ssh for WODUSER
-ssh-keygen -t rsa -b 4096 -N '' -f ~$WODUSER/.ssh/id_rsa
+ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa
 install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
-cat ~$WODUSER/.ssh/id_rsa.pub >> ~$WODUSER/.ssh/authorized_keys
+cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 
 # Setup this using the group for WoD
 cat > $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
