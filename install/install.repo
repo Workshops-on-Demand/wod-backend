@@ -1,6 +1,8 @@
 #
 # Commands to clone the repositories needed at install time
 #
+#
+token=`cat $EXEPATH/token`
 WODAPIREPO="git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-api-db.git"
 WODFEREPO="git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-frontend.git"
 WODNOBOREPO="git clone -b private https://bcornec:$token@github.com/Workshops-on-Demand/wod-notebooks.git"
