@@ -47,7 +47,7 @@ foreach my $m (@mtypes) {
 	system("vagrant up $h->{$m}");
 	if ($wodtype =~ /appliance/) {
 		# We need to find who is the WODUSER to use it
-		my $WODUSER=`vagrant ssh  $h->{'backend'} -c grep -Ev 'WODUSER' /etc/wod.conf | cut -d: -f2`;
+		my $WODUSER=`vagrant ssh  $h->{'backend'} -c grep -Ev 'WODUSER' /etc/wod.yml | cut -d: -f2`;
 		my $cmd = "sudo su - $WODUSER -c \"./wod-backend/scripts/setup-appliance $wkshp\"";
 		system("vagrant ssh $h->{'backend'} -c \"sudo su - $WODUSER -c $cmd\"");
 	} else {

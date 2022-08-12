@@ -1,4 +1,7 @@
 ---
+  - name: Load variables generated at install time
+    include_vars: /etc/wod.yml
+
   - name: Ensure that common packages are installed for repo setup
     become: yes
     become_user: root
