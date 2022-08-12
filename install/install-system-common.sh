@@ -21,7 +21,7 @@ elif [ $WODTYPE = "frontend" ]; then
 	$WODFEREPO
 elif [ $WODTYPE = "backend" ]; then
 	rm -rf wod-notebooks
-	$WODNOBO
+	$WODNOBOREPO
 fi
 
 # We'll store in backend dir the data we need whatever the type we're building

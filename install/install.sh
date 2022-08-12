@@ -126,7 +126,7 @@ exec &> >(tee $HOME/.jupyter/install.log)
 
 # Get path of execution
 EXEPATH=`dirname "$0"`
-EXEPATH=`( cd "$EXEPATH" && pwd )`
+export EXEPATH=`( cd "$EXEPATH" && pwd )`
 
 source $EXEPATH/install.repo
 export WODFEREPO WODBEREPO WODAPIREPO WODNOBOREPO WODPRIVREPO
@@ -136,7 +136,7 @@ echo "Installing $WODDISTRIB specificities for $WODTYPE"
 $EXEPATH/install-system-$WODDISTRIB.sh
 
 # Create the WODUSER user
-if grep -qE '^$WODUSER:' /etc/passwd; then
+if grep -qE "^$WODUSER:" /etc/passwd; then
         userdel -f -r $WODUSER
 fi
 useradd -U -m -s /bin/bash $WODUSER
@@ -151,4 +151,27 @@ chmod 440 /etc/sudoers.d/$WODUSER
 # Now drop priviledges
 # Call the common install script to finish install
 echo "Installing common remaining stuff as $WODUSER"
-su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO -c "$EXEPATH/install-system-common.sh"
+if [ $WODDISTRIB = "centos-7" ]; then
+	# that su version doesn't support option -w turning around
+	cat > /tmp/wodexports << EOF
+export WODGROUP="$WODGROUP"
+export WODFEFQDN="$WODFEFQDN"
+export WODBEFQDN="$WODBEFQDN"
+export WODAPIDBFQDN="$WODAPIDBFQDN"
+export WODBEEXTFQDN="$WODBEEXTFQDN"
+export WODTYPE="$WODTYPE"
+export WODBEIP="$WODBEIP"
+export WODDISTRIB="$WODDISTRIB"
+export WODUSER="$WODUSER"
+export WODFEREPO="$WODFEREPO"
+export WODBEREPO="$WODBEREPO"
+export WODAPIREPO="$WODAPIREPO"
+export WODNOBOREPO="$WODNOBOREPO"
+export WODPRIVREPO="$WODPRIVREPO"
+EOF
+	chmod 644 /tmp/wodexports
+	su - $WODUSER -c "source /tmp/wodexports ; $EXEPATH/install-system-common.sh"
+	rm -f /tmp/wodexports
+else
+	su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO -c "$EXEPATH/install-system-common.sh"
+fi
