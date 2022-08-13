@@ -621,7 +621,7 @@
                 'proxy',
                 'shutdown',
             ],
-            'users': ['"{{ WODUSER }}"'],
+            'users': ['{{ WODUSER }}'],
                  },
                 {
             'name': "jupyteradmin",
