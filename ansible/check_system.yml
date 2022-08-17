@@ -1,3 +1,6 @@
+- name: Load variables generated at install time
+  include_vars: /etc/wod.yml
+
 - name: Ensure correct nproc soft limits
   become: yes
   become_user: root
