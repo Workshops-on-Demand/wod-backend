@@ -19,7 +19,7 @@ GetOptions("type|t=s" => \$wodtype,
 	   "help|h" => \$help,
 );
 
-usage() if ($help || defined $ARGV[0]); 
+usage() if ($help || defined $ARGV[0] || (not defined $wodtype)); 
 
 # Automate Wod systems creation
 my %machines = (
