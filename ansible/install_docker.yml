@@ -107,7 +107,7 @@
     become: yes
     become_user: root
     user:
-      name: ""{{ WODUSER }}""
+      name: "{{ WODUSER }}"
       state: present
       append: yes
       groups: "docker"
