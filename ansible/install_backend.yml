@@ -669,7 +669,7 @@
           Authorization: "token {{ WODBETOKEN }}"
         method: POST
         body_format: json
-        body: '{ "usernames": [ ""{{ WODUSER }}"" ], "admin": true }'
+        body: '{ "usernames": [ "{{ WODUSER }}" ], "admin": true }'
         status_code: 201
 
     - name: Setup group admin in jupyterhub
