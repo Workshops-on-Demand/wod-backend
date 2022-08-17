@@ -599,48 +599,48 @@
          c.JupyterHub.services = [
                 {
                 "name": "admintk",
-                "api_token": "{{ WODBETOKEN }}",
+                "api_token": "{{ WODBETOKEN }}"
                 }
                 ]
          c.JupyterHub.load_roles = [
                   {
-            'name': 'jupyteradm',
-            'description': 'Elevated privileges (can do anything)',
-            'scopes': [
+            "name": "jupyteradm",
+            "description": "Elevated privileges (can do anything)",
+            "scopes": [
                 "admin:users",
                 "admin:groups",
                 "admin:servers",
-                'read:roles',
-                'tokens',
-                'list:users',
-                'list:services',
-                'read:services',
-                'read:hub',
-                'access:services',
-                'access:servers',
-                'proxy',
-                'shutdown',
+                "read:roles",
+                "tokens",
+                "list:users",
+                "list:services",
+                "read:services",
+                "read:hub",
+                "access:services",
+                "access:servers",
+                "proxy",
+                "shutdown"
             ],
-            'users': ['{{ WODUSER }}'],
+            "users": ["{{ WODUSER }}"]
                  },
                 {
-            'name': "jupyteradmin",
-            'scopes': [
+            "name": "jupyteradmin",
+            "scopes": [
                 "admin:users",
                 "admin:groups",
                 "admin:servers",
-                'read:roles',
-                'tokens',
-                'list:services',
-                'read:services',
-                'read:hub',
-                'access:services',
-                'access:servers',
-                'proxy',
-                'shutdown',
+                "read:roles",
+                "tokens",
+                "list:services",
+                "read:services",
+                "read:hub",
+                "access:services",
+                "access:servers",
+                "proxy",
+                "shutdown"
                 ],
-            'services': [
-                "admintk",
+            "services": [
+                "admintk"
                 ]
                 }
             ]
