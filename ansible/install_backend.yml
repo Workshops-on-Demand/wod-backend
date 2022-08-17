@@ -539,11 +539,6 @@
       become_user: root
       command: /usr/local/bin/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
 
-    - name: Ensure powershell scripts are installed
-      become: yes
-      become_user: root
-      command: "{{ SCRIPTDIR }}/install_PwshModules.sh"
-
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
         path: "{{ JPHUB }}/etc/jupyterhub"
