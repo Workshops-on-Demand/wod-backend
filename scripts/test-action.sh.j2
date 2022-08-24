@@ -49,7 +49,7 @@ send_mail() {
 
 	cat > /tmp/mail.$$ << EOF
 MAIL FROM: {{ SENDER }}
-RCPT TO: {{ WODUSER }}@`hostname`
+RCPT TO: {{ WODUSER }}@`hostname -f`
 DATA
 Subject: $ACTION $1 0
 

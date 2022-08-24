@@ -101,6 +101,15 @@
         line: "mydestination = $myhostname, {{ WODBEFQDN.split('.')[0] }}, {{ WODBEEXTFQDN }}, {{ WODBEEXTFQDN.split('.')[0] }}, localhost, localhost.localdomain"
         state: present
 
+    - name: Ensure hostname is not modified (useful for vagrant setup e.g.)
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regex: '^append_dot_mydomain ='
+        line: "append_dot_mydomain = no"
+        state: present
+
     - name: Deploy an instanciated procmailrc conf file
       template:
         src: "{{ WODBEDIR }}/procmailrc.j2"
