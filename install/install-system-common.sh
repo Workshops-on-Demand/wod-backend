@@ -10,7 +10,6 @@ set -o pipefail
 # This is run as WODUSER user
 
 # Get content for WoD - now in private mode
-token=`cat /vagrant/token`
 rm -rf wod-backend wod-private .ssh
 if [ $WODTYPE = "api-db" ]; then
 	rm -rf wod-api-db
