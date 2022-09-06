@@ -1,0 +1,28 @@
+<network ipv6='no'>
+  <name>wodnet</name>
+- <bridge name='virbrwod' stp='on' delay='0'/>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <domain name='wodnet.local' localOnly='yes'/>
+  <dns>
+    <host ip='10.1.0.3'>
+      <hostname>wod-be-centos-7.wodnet.local</hostname>
+    </host>
+    <host ip='10.1.0.4'>
+      <hostname>wod-fe-ubuntu-20.04.wodnet.local</hostname>
+    </host>
+    <host ip='10.1.0.5'>
+      <hostname>wod-api-ubuntu-20.04.wodnet.local</hostname>
+    </host>
+  </dns>
+  <ip address='10.1.0.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.1.0.3' end='10.1.0.5'/>
+    </dhcp>
+  </ip>
+</network>
+
+

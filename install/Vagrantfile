@@ -13,58 +13,44 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.synced_folder './', '/vagrant', type: 'rsync'
+  #config.vm.synced_folder './', '/vagrant', type: 'nfs'
+  # Private management network for DHCP naming and adressing
+  config.vm.provider :libvirt do |domain|
+    domain.management_network_name = "wodnet"
+    domain.management_network_address = "10.1.0.0/24"
+    domain.management_network_mode = "route"
+  end
+
   config.vm.define "wod-be-centos-7" do |wodbecentos7|
     wodbecentos7.vm.box = "generic/centos7"
-    wodbecentos7.vm.hostname = "wod-be-centos-7"
+    wodbecentos7.vm.hostname = "wod-be-centos-7.wodnet.local"
     #wodbecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodbecentos7.vm.network "forwarded_port", guest: 8000, host: 8010
-    wodbecentos7.vm.provision :hosts do |prov|
-      prov.autoconfigure = true
-      prov.sync_hosts = true
-    end
   end
   config.vm.define "wod-fe-centos-7" do |wodfecentos7|
     wodfecentos7.vm.box = "generic/centos7"
-    wodfecentos7.vm.hostname = "wod-fe-centos-7"
+    wodfecentos7.vm.hostname = "wod-fe-centos-7.wodnet.local"
     #wodfecentos7.vm.network  "private_network", ip: "192.168.200.10"
     wodfecentos7.vm.network "forwarded_port", guest: 8000, host: 8011
-    wodfecentos7.vm.provision :hosts do |prov|
-      prov.autoconfigure = true
-      prov.sync_hosts = true
-    end
   end
   config.vm.define "wod-fe-ubuntu-20.04" do |wodfeubuntu2004|
     wodfeubuntu2004.vm.box = "generic/ubuntu2004"
-    wodfeubuntu2004.vm.hostname = "wod-fe-ubuntu-20.04"
+    wodfeubuntu2004.vm.hostname = "wod-fe-ubuntu-2004.wodnet.local"
     #wodfeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodfeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8012
-    wodfeubuntu2004.vm.provision :hosts do |prov|
-      prov.autoconfigure = true
-      prov.sync_hosts = true
-    end
   end
   config.vm.define "wod-be-ubuntu-20.04" do |wodbeubuntu2004|
     wodbeubuntu2004.vm.box = "generic/ubuntu2004"
-    wodbeubuntu2004.vm.hostname = "wod-be-ubuntu-20.04"
+    wodbeubuntu2004.vm.hostname = "wod-be-ubuntu-2004.wodnet.local"
     #wodbeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
     wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
-    wodbeubuntu2004.vm.provision :hosts do |prov|
-      prov.autoconfigure = true
-      prov.sync_hosts = true
-    end
   end
   config.vm.define "wod-api-ubuntu-20.04" do |wodapiubuntu2004|
     wodapiubuntu2004.vm.box = "generic/ubuntu2004"
-    wodapiubuntu2004.vm.hostname = "wod-api-ubuntu-20.04"
-    #wodapiubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
+    wodapiubuntu2004.vm.hostname = "wod-api-ubuntu-2004.wodnet.local"
     wodapiubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
-    wodapiubuntu2004.vm.provision :hosts do |prov|
-      prov.autoconfigure = true
-      prov.sync_hosts = true
-    end
   end
   #ubuntu2004.vm.provider = "libvirt"
-  #config.vm.synced_folder './', '/vagrant', type: 'nfs'
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
