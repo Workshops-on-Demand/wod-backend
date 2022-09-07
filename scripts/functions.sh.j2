@@ -162,7 +162,7 @@ erase_student() {
 	if [ _"$stddir" != _"" ]; then
 		echo "Erasing target student dir $stddir content"
 		sudo rm -rf $stddir/* $stddir/.??*
-		sudo cp -a {{ WODBEDIR }}/skel/.??* {{ WODPRIVDIR }}/skel/.??* $stddir
+		sudo cp -a {{ WODBEDIR }}/skel/.??* `find {{ WODPRIVDIR }}/skel -name '.??*'` $stddir
 		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
 		echo "Create ssh keys to allow remote connections to appliance if needed"
 		sudo su - student${stdid} -c "ssh-keygen -b 2048 -t rsa -f .ssh/id_rsa -N ''"
