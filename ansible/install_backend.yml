@@ -494,6 +494,8 @@
         state: absent
       
     - name: Remove MS tools to be sure a good one will be available
+      become: yes
+      become_user: root
       file:
         path: /usr/local/bin/{{ item }}
         state: absent
@@ -504,6 +506,8 @@
         - dotnet-interactive
 
     - name: Remove pwsh components to be sure a good one will be available
+      become: yes
+      become_user: root
       file:
         path: /usr/local/bin/.store
         state: absent
@@ -561,11 +565,15 @@
         - kill-processes
 
     - name: Remove jupyterhub configuration file
+      become: yes
+      become_user: root
       file:
         path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
         state: absent
 
     - name: Remove jupyterhub db
+      become: yes
+      become_user: root
       file:
         path: "{{ JPHUB }}/lib/jupyterhub.sqlite"
         state: absent
