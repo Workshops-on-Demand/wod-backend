@@ -33,6 +33,12 @@ if (($wodtype =~ /appliance/) && ((not defined $wkshp) || ($wkshp !~ /^WKSHP-/))
 	print "missing or incorrect workshop name - should be WKSHP-Name\n";
 	usage();
 }
+# Manages the private network for machines and DHCP/DNS setup
+my $wodnet = `sudo virsh net-list --name`;
+if ($wodnet =~ /^wodnet$/) {
+	system("sudo virsh net-define wodnet.xml");
+	system("sudo virsh net-start --network wodnet");
+}
 
 my @mtypes = ();
 if (not defined $wodtype) {
