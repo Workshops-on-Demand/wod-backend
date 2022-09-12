@@ -3,12 +3,16 @@
 source {{ SCRIPTDIR }}/wod.sh
 
 # Git doesn't collect file rights and we need to have correct ones here so forcing
-for d in {{ JUPPROC }}/skel  {{ JUPPRIV }}/skel; do
+for d in {{ WODBEDIR }}/skel  {{ WODPRIVDIR }}/skel; do
 	if [ -d $d ]; then
 		cd $d
-		find . -type f | xargs chmod 600
+		find .ssh -type f | xargs chmod 600
 		chmod 700 .ssh
+		# Avoids error msgs
+		touch .ssh/toto.pub
 		find .ssh -type f -name '*.pub' | xargs chmod 644
+		rm -f .ssh/toto.pub
+		cd ..
 	fi
 done
 #
