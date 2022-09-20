@@ -22,6 +22,9 @@
         msg: PBKDIR variable is empty ! Fat fingers ?!?
       when: PBKDIR is not defined
 
+    - name: Load variables generated at install time
+      include_vars: /etc/wod.yml
+
     - name: check VARDIR exists
       file:
         path: "{{ VARDIR }}/pass"
@@ -181,6 +184,7 @@
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
       when:
         - nobopriv_path.rc == 0
+        - nobo_path.rc != 0
 
       #- name: debug
       #debug:
@@ -189,8 +193,19 @@
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }} | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}  "
-      with_items: "[{{ notebooks.files }}, {{ notebookspriv.files }}] "
+        dest: "{{ item.path | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }}"
+      with_items: "[{{ notebooks.files }}]"
+      when:
+        - nobo_path.rc == 0
+
+    - name: Deliver private notebooks as ansible template for variable expansion
+      template:
+        src: "{{ item.path }}"
+        dest: "{{ item.path | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}  "
+      with_items: "[{{ notebookspriv.files }}] "
+      when:
+        - nobopriv_path.rc == 0
+        - nobo_path.rc != 0
 
     - name: Create a checkpoint directory
       file:
