@@ -1,6 +1,6 @@
 ---
   - name: Setup first the Docker context (packages, deps, ...)
-    include_tasks: {{ ANSIBLEDIR }}/install_docker.yml
+    include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
 
   - name: Ensure Linux students users belong to the docker group
     become: yes
