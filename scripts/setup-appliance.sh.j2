@@ -55,6 +55,7 @@ if [ -x "{{ SCRIPTDIR }}/setup-pre-$w.sh" ]; then
 	echo "Setup Appliance for Workshop $w by executing {{ SCRIPTDIR }}/setup-pre-$w.sh at `date`"
 	{{ SCRIPTDIR }}/setup-pre-$w.sh
 	echo "End of Appliance pre setup for Workshop $w at `date`"
+fi
 if [ -x "{{ SCRIPTPRIVDIR }}/setup-pre-$w.sh" ]; then
 	echo "Setup Appliance for private Workshop $w by executing {{ SCRIPTPRIVDIR }}/setup-pre-$w.sh at `date`"
 	{{ SCRIPTPRIVDIR }}/setup-pre-$w.sh
