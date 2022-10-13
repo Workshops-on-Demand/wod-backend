@@ -147,6 +147,7 @@ Defaults:$WODUSER !requiretty
 $WODUSER ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 440 /etc/sudoers.d/$WODUSER
+chown $WODUSER /etc/wod.yml
 
 # Now drop priviledges
 # Call the common install script to finish install
