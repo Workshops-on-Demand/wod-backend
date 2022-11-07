@@ -22,3 +22,4 @@ ansible/*/pass/variables_*.yml
 ansible/*/variables_*.yml
 */pass/variables_*.yml
 *.sw?
+install/.vagrant/machines/*/libvirt/*
