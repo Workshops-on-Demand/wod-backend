@@ -1,17 +1,28 @@
 #
 # Backend API management
 #
+# Do not change as the port is fixed in JupyterHub install
+#
 WODBEAPIURL: http://{{ WODBEFQDN }}:8000
+#
+# Replace with a random one - TODO Do that automatically at install time
+#
 WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 #
-# Front-end API management
-WODFEAPIURL: https://{{ WODAPIDBFQDN }}/api
-WODFEAPIUSER: moderator
-WODFEAPIPWD: MotDePasseCompliquéAussi123!!!##
-#
-# You may wan to use these variables if you have an OPNSense server as a security FW
+# You may want to use these variables if you have an OPNSense server as a security FW and allowing http comm internally
 #
 #OPNSENSEKEY:
 #OPNSENSESEC:
 #OPNSENSEIP:
 #OPNSENSEPORT:
+#
+# Front-end API management
+#
+# Do not change as the port is fixed in JupyterHub install
+#
+WODFEAPIURL: https://{{ WODAPIDBFQDN }}/api
+#
+# Adapt to your setup - Used by installer to setup the frontend
+#
+WODFEAPIUSER: moderator
+WODFEAPIPWD: MotDePasseCompliquéAussi123!!!##
