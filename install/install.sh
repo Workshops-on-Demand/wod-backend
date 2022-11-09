@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-	echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external]"
+	echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user]"
 	echo " "
 	echo "where:"
 	echo "type      is the installation type"
@@ -26,6 +26,9 @@ usage() {
 	echo "external  is the external FQDN of the back-end JupyterHub server, reachable from the Internet"
 	echo "          example: jphub.example.org  "
 	echo "          if empty using the internal name of the back-end                "
+	echo "user      is the name of the admin user for the WoD project"
+	echo "          example: mywodamin "
+	echo "          if empty using wodadmin               "
 }
 
 echo "install.sh called with $*"
@@ -37,7 +40,7 @@ b=""
 a=""
 g=""
 
-while getopts "t:f:e:b:a:g:h" option; do
+while getopts "t:f:e:b:a:g:u:h" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -61,6 +64,9 @@ while getopts "t:f:e:b:a:g:h" option; do
             ;;
         a)
             a=${OPTARG}
+            ;;
+        u)
+            u=${OPTARG}
             ;;
         h)
             usage
@@ -101,6 +107,11 @@ if [ ! -z "${a}" ]; then
 else
 	WODAPIDBFQDN=$WODFEFQDN
 fi
+if [ ! -z "${u}" ]; then
+	export WODUSER="${u}"
+else
+	export WODUSER="wodadmin"
+fi
 if [ ! -z "${g}" ]; then
 	WODGROUP="${g}"
 else
@@ -109,7 +120,6 @@ fi
 export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
-export WODUSER="wodadmin"
 echo "WODUSER: $WODUSER" > /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
