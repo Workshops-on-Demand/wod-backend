@@ -1,29 +1,71 @@
 ---
+#
+# SENDER is the e-mail address used in the front-end to send API procmail mails to the backed
+#
+SENDER: sender@example.org
+#
+# JPHUB  is the directory used to install the JupyterHub stack (a python venv)
+#
+JPHUB: /opt/jupyterhub
+#
+# We create fixed user accounts to provide an isolated execution environemnt to run the jupyter notebooks
+# They are called studentXXX where XXX is comprised between USERMIN and USERMAX defined below poentially with the addition of an offset (UIDBASE) for their uid/gid
+# Their home directory is located under /student and is thus named /student/studentXXX
+# Corresponding JupyterHub accounts are also created
+#
+# USERMIN indicates the starting ID of the Linux and Jupyter user account range
+#
+USERMIN: 1
+#
+# USERMAX indicates the ending ID of the Linux and Jupyter user account range
+#
+USERMAX: 20
+#
+# UIDBASE is the offset used to create the Linux user account IDs
+# Example when creating user 35 with UIDBASE of 2000, the uid created is 2035
+#
+UIDBASE: 2000
+#
+# GIDBASE is the offset used to create the Linux group IDs
+# Example when creating user 35 with GIDBASE of 2000, the gid created is 2035
+#
+GIDBASE: 2000
+#
+# Setup CLEAN to true if you want all Liunx & Jupyter user accounts to be removed before ansible check
+#
+CLEAN: false
+#
+# VAULTPWD is the passwd used to manage the ansible vault
+#
+VAULTPWD: VeryComplexPasswd1234!
+#
+# NOCHECKSSH are ssh options used to dialog with appliances
+# By default avoid checking Host keys and Host file as they may change on a regular base
+#
+NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+#
+# Branding management - Use if you want to customize Logo and Notebooks branding
+#
+BRANDING: "WoD Developer"
+BRANDINGWOD: "WoD Developer"
+BRANDINGLOGO: "![HPEDEVlogo](Pictures/hpe-dev-logo.png)"
+BRANDINGURL: "https://wod.io"
+#
+# Survey management - Use if you want to ask for feedbacks on your Workshops - Look at existing conclusion notebooks
+SURVEYURL: TBD
+SURVEYCHALURL: TBD
+#
+# These variables are defined in ansible playbooks, do not change without knowing what you do
+#
 STUDDIR: "{{ ansible_env.STUDDIR }}"
 WODBEDIR: "{{ ansible_env.WODBEDIR }}"
 WODPRIVDIR: "{{ ansible_env.WODPRIVDIR }}"
 WODNOBO: "{{ ansible_env.WODNOBO }}"
 WODAPIDBDIR: "{{ ansible_env.WODAPIDBDIR }}"
 WODFEDIR: "{{ ansible_env.WODFEDIR }}"
-WODPRIVNOBO: "{{ WODPRIVDIR }}/notebooks"
 SCRIPTDIR: "{{ WODBEDIR }}/scripts"
 ANSIBLEDIR: "{{ WODBEDIR }}/ansible"
+# This is the predefined structure for a private repo
+WODPRIVNOBO: "{{ WODPRIVDIR }}/notebooks"
 SCRIPTPRIVDIR: "{{ WODPRIVDIR }}/scripts"
 ANSIBLEPRIVDIR: "{{ WODPRIVDIR }}/ansible"
-SENDER: sender@example.org
-JPHUB: /opt/jupyterhub
-CLEAN: false
-USERMIN: 1
-USERMAX: 20
-GIDBASE: 2000
-UIDBASE: 2000
-VAULTPWD: VeryComplexPasswd1234!
-SURVEYURL: TBD
-SURVEYCHALURL: TBD
-TEMPTOKEN: TokenToBeDefined
-NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
-# Painful Brranding !!
-BRANDING: "WoD Developer"
-BRANDINGWOD: "WoD Developer"
-BRANDINGLOGO: "![HPEDEVlogo](Pictures/hpe-dev-logo.png)"
-BRANDINGURL: "https://wod.io"
