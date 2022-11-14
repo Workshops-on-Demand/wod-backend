@@ -505,7 +505,19 @@
         - powershell
         - dotnet
         - dotnet-interactive
-      
+       
+    - name: Remove old MS tools to be sure a good one will be available v2
+      become: yes
+      become_user: root
+      file:
+        path: /usr/bin/{{ item }}
+        state: absent
+      with_items:
+        - pwsh
+        - powershell
+        - dotnet
+        - dotnet-interactive       
+        
     - name: Remove pwsh components to be sure a good one will be available
       become: yes
       become_user: root
@@ -532,12 +544,12 @@
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install --global powershell
+      command: dotnet tool install -g powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install --global Microsoft.dotnet-interactive
+      command: dotnet tool install -g Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
