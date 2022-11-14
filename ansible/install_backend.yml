@@ -496,7 +496,7 @@
         path: '{{ ansible_env.HOME }}/.local/share/jupyter/kernels'
         state: absent
       
-    - name: Remove MS tools to be sure a good one will be available
+    - name: Remove old MS tools to be sure a good one will be available
       become: yes
       become_user: root
       file:
@@ -507,6 +507,13 @@
         - powershell
         - dotnet
         - dotnet-interactive
+      
+    - name: Remove other old MS tools to be sure a good one will be available
+      become: yes
+      become_user: root
+      file:
+        path: /usr/share/dotnet
+        state: absent
 
     - name: Remove pwsh components to be sure a good one will be available
       become: yes
@@ -534,12 +541,12 @@
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install --tool-path /usr/local/bin powershell
+      command: dotnet tool install powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
+      command: dotnet tool install Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
