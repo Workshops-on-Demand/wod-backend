@@ -1,4 +1,4 @@
-#!/usr/local/bin/pwsh
+#!/usr/bin/pwsh
 #
 # This script will install all required Powershell modules for the jupyter notebooks run
 #
@@ -26,7 +26,7 @@ Install-Module -Name HPEOneView.540
 Install-Module -Name HPEOneView.550
 
 echo "Make these modules accessible for all users"
-mv $HOME/.local/share/powershell/Modules/* /usr/local/share/powershell/Modules/
+mv $HOME/.local/share/powershell/Modules/* /opt/microsoft/powershell/Modules/7/
 
 echo "install vmware powercli"
 Install-Module -Name VMware.PowerCLI
