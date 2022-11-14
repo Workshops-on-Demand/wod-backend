@@ -508,13 +508,6 @@
         - dotnet
         - dotnet-interactive
       
-    - name: Remove other old MS tools to be sure a good one will be available
-      become: yes
-      become_user: root
-      file:
-        path: /usr/share/dotnet
-        state: absent
-
     - name: Remove pwsh components to be sure a good one will be available
       become: yes
       become_user: root
