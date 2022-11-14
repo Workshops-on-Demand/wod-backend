@@ -7,4 +7,5 @@ WODAPIREPO="git clone https://github.com/Workshops-on-Demand/wod-api-db.git"
 WODFEREPO="git clone https://github.com/Workshops-on-Demand/wod-frontend.git"
 WODNOBOREPO="git clone https://github.com/Workshops-on-Demand/wod-notebooks.git"
 WODBEREPO="git clone https://github.com/Workshops-on-Demand/wod-backend.git"
+# Modify that clone if using a private repo
 WODPRIVREPO="git clone https://github.com/Workshops-on-Demand/wod-private.git"
