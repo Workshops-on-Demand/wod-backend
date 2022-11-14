@@ -504,19 +504,7 @@
         - pwsh
         - powershell
         - dotnet
-        - dotnet-interactive
-       
-    - name: Remove old MS tools to be sure a good one will be available v2
-      become: yes
-      become_user: root
-      file:
-        path: /usr/bin/{{ item }}
-        state: absent
-      with_items:
-        - pwsh
-        - powershell
-        - dotnet
-        - dotnet-interactive       
+        - dotnet-interactive      
         
     - name: Remove pwsh components to be sure a good one will be available
       become: yes
