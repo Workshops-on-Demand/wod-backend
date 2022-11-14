@@ -529,12 +529,12 @@
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install -g powershell
+      command: dotnet tool install --global powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install -g Microsoft.dotnet-interactive
+      command: dotnet tool install --global Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
