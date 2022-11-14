@@ -379,8 +379,6 @@
       with_items:
         - /usr/local/bin
         - /usr/local/share
-        - /usr/local/share/powershell
-        - /usr/local/share/powershell/Modules
 
 #    - name: Make gophernotes available under /usr/local/bin
 #      become: yes
@@ -534,12 +532,12 @@
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install powershell
+      command: dotnet tool install --global powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: dotnet tool install Microsoft.dotnet-interactive
+      command: dotnet tool install --global Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
