@@ -176,6 +176,12 @@
       package:
         pkg:
         - kubectl
+        - aspnetcore-runtime-3.1
+        - aspnetcore-runtime-5.0
+        - dotnet-runtime-3.1
+        - dotnet-runtime-5.0
+        - dotnet-sdk-3.1
+        - dotnet-sdk-5.0
         state: absent
 
     - name: Ensure all required packages are installed
@@ -207,16 +213,10 @@
         - cmake
         - golang
         - texlive-xetex
-        - aspnetcore-runtime-3.1
-        - aspnetcore-runtime-5.0
         - aspnetcore-runtime-6.0
         - aspnetcore-runtime-7.0
-        - dotnet-runtime-3.1
-        - dotnet-runtime-5.0
         - dotnet-runtime-6.0
         - dotnet-runtime-7.0
-        - dotnet-sdk-3.1
-        - dotnet-sdk-5.0
         - dotnet-sdk-6.0
         - dotnet-sdk-7.0
         - dotnet-host
