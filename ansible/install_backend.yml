@@ -529,6 +529,16 @@
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
+    - name: Ensure powershell is removed through dotnet  before installing
+      become: yes
+      become_user: root
+      command: /usr/share/dotnet/dotnet tool uninstall --global powershell
+
+    - name: Ensure dotnet interactive is removed through dotnet before installing
+      become: yes
+      become_user: root
+      command: /usr/share/dotnet/dotnet tool uninstall --global Microsoft.dotnet-interactive
+
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
