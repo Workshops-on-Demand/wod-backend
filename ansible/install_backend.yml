@@ -529,10 +529,10 @@
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
- #   - name: Ensure powershell is installed through dotnet
- #    become: yes
- #    become_user: root
- #    command: /usr/share/dotnet/dotnet tool install --global powershell
+    - name: Ensure powershell is installed through dotnet
+     become: yes
+     become_user: root
+     command: /usr/share/dotnet/dotnet tool install --global powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
@@ -542,7 +542,7 @@
     - name: Ensure dotnet kernel is installed
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
+      command: /usr/share/dotnet/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
