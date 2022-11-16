@@ -552,7 +552,7 @@
     - name: Ensure dotnet kernel is installed
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
+      command: /usr/share/dotnet/dotnet interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
