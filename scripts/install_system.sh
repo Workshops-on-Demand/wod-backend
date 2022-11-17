@@ -42,6 +42,7 @@ cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # they are placed as sister dirs wrt WODBEDIR
 PWODBEDIR=`dirname $WODBEDIR`
 export WODPRIVDIR=$PWODBEDIR/wod-private
+export ANSIBLEPRIVDIR=$WODPRIVDIR/ansible
 export WODAPIDBDIR=$PWODBEDIR/wod-api-db
 export WODFEDIR=$PWODBEDIR/wod-frontend
 WODANSOPT=""
@@ -97,13 +98,26 @@ then
 	$WODPRIVDIR/$SCRIPTREL
 fi
 
+ANSIBLEPRIVOPT=""
+if [ -f "$ANSIBLEPRIVDIR/group_vars/all.yml" ]; then
+	ANSIBLEPRIVOPT="$ANSIBLEPRIVOPT -e $ANSIBLEPRIVDIR/group_vars/all.yml"
+fi
+if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
+	ANSIBLEPRIVOPT="$ANSIBLEPRIVOPT -e $ANSIBLEPRIVDIR/group_vars/$PBKDIR"
+fi
+cat > $SCRIPTDIR/wod.sh << EOF
+export ANSIBLEPRIVOPT=$ANSIBLEPRIVOPT
+EOF
+export ANSIBLEPRIVOPT
+
+
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
 elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0"
 fi
 # Automatic Installation script for the system 
-ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
+ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT $ANSIBLEPRIVOPT install_$WODTYPE.yml
 
 if [ $WODTYPE = "api-db" ]; then
 	cd $WODAPIDBDIR
@@ -152,5 +166,5 @@ fi
 
 cd $SCRIPTDIR/../ansible
 
-ansible-playbook -i inventory --limit $PBKDIR -e "PBKDIR=$PBKDIR" check_$WODTYPE.yml
+ansible-playbook -i inventory --limit $PBKDIR -e "PBKDIR=$PBKDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml
 date
