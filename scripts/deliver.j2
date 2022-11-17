@@ -16,6 +16,7 @@ for d in {{ WODBEDIR }}/skel  {{ WODPRIVDIR }}/skel; do
 	fi
 done
 #
+
 cd {{ ANSIBLEDIR }}
 
-ansible-playbook -i inventory --limit {{ PBKDIR }} -e "PBKDIR={{ PBKDIR }}" check_backend.yml
+ansible-playbook -i inventory --limit {{ PBKDIR }} -e "PBKDIR={{ PBKDIR }}" $ANSIBLEPRIVOPT check_backend.yml
