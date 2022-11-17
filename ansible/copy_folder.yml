@@ -4,6 +4,7 @@
   gather_facts: true
   vars:
     VARDIR: "{{ ANSIBLEDIR }}/{{ PBKDIR }}"
+    VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}"
 
   tasks:
     - fail:
@@ -33,6 +34,14 @@
         group: "{{ WODUSER }}"
         mode: 0751
 
+    - name: check VARPRIVDIR exists
+      file:
+        path: "{{ VARPRIVDIR }}/pass"
+        state: directory
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
+        mode: 0751
+
     - name: check variables file exists
       stat:
         path: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
@@ -42,6 +51,16 @@
     - include_vars:
         file: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
       when: variables_file.stat.exists
+
+    - name: check private variables file exists
+      stat:
+        path: "{{ VARPRIVDIR }}/variables_{{ CHALLENGE }}.yml"
+      ignore_errors: true
+      register: privvariables_file
+
+    - include_vars:
+        file: "{{ VARPRIVDIR }}/variables_{{ CHALLENGE }}.yml"
+      when: privvariables_file.stat.exists
 
     - name: check GreenLake API CLient variables file exists
       stat:
