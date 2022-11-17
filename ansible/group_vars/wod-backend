@@ -19,10 +19,10 @@ POSTPORT: "10025"
 #
 # In case we have a LDAP server to use, flag as such the corresponding workshops in the DB and use the following values:
 #
-LDAPSRVNAME: ldap.example.org
-LDAPDMN: example.org
-LDAPPWD: MotDePasseLDAPCompliquéAussi123!!!##
-LDAPPORT: "389"
+#LDAPSRVNAME: ldap.example.org
+#LDAPDMN: example.org
+#LDAPPWD: MotDePasseLDAPCompliquéAussi123!!!##
+#LDAPPORT: "389"
 #
 # For various existing public WoDs - needed. Adapt but do not remove !
 #
