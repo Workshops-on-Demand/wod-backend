@@ -220,7 +220,7 @@
     - name: Deliver private notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}  "
+        dest: "{{ item.path | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}"
       with_items: "[{{ notebookspriv.files }}] "
       when:
         - nobopriv_path.rc == 0
