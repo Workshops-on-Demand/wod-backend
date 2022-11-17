@@ -19,6 +19,3 @@ done
 cd {{ ANSIBLEDIR }}
 
 ansible-playbook -i inventory --limit {{ PBKDIR }} -e "PBKDIR={{ PBKDIR }}" check_backend.yml
-if [ -f {{ ANSIBLEPRIVDIR }}/check_backend.yml ]; then
-        ansible-playbook -i inventory $WODANOPT --limit {{ PBKDIR }} -e "PBKDIR={{ PBKDIR }}" {{ ANSIBLEPRIVDIR }}/check_backend.yml
-fi

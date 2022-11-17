@@ -151,14 +151,6 @@ elif [ $WODTYPE = "frontend" ]; then
 fi
 
 cd $SCRIPTDIR/../ansible
-ANSPLAYOPT=""
-if [ -f $WODPRIVDIR/ansible/install_$WODTYPE.yml ]; then
-	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR $ANSPLAYOPT install_$WODTYPE.yml
-fi
 
-ansible-playbook -i inventory --limit $PBKDIR check_$WODTYPE.yml
-# Manages private part if any
-if [ -f $WODPRIVDIR/ansible/check_$WODTYPE.yml ]; then
-	ansible-playbook -i inventory $WODANSOPT --limit $PBKDIR check_$WODTYPE.yml
-fi
+ansible-playbook -i inventory --limit $PBKDIR -e "PBKDIR=$PBKDIR" check_$WODTYPE.yml
 date
