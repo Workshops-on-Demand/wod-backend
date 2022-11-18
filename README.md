@@ -1,9 +1,13 @@
 # wod-backend
-This project is the back-end part of our Workshop-on-Demand setup.
+This project is the back-end part of our Workshop-on-Demand setup. It will setup :
+* A complete jupyterhub with extensions on your system, ready to host Workshops on demand that you can find at https://github.com/Workshops-on-Demand/wod-notebooks.git
+* A postfix server used for the procmail API
+* An Ansible engine to allow automation
+* A fail2ban server
+* An Admin user to manage everything
 
-Instruction for installation are in INSTALL.md
+Instructions for installation are in INSTALL.md
 
-It will setup a complete jupyterhub with extensions on your system, ready to host Workshops on demand that you can find at https://github.com/Workshops-on-Demand/wod-notebooks.git
 
 # deliver
 This command has to be run whenever some changes are made to any .j2 or ansible file. It will update scripts and relevants files related to the platform on which the deliver script is launched.
