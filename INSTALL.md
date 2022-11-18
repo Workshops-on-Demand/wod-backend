@@ -43,6 +43,7 @@ To customize default installation parameters: Please modify the following files 
 If private based Workshops-on-Demand (private backend + private workshops)
 
 Please edit the install.repo file located in install directory if using a private repo : 
+* Uncomment line :  token=`cat $EXEPATH/token`
 * Update accordingly the last line with the correct url to clone 
 WODPRIVREPO="git clone https://.....................wod-private.git wod-private"
 
