@@ -42,43 +42,65 @@ To customize default installation parameters: Please modify the following files 
 
 If private based Workshops-on-Demand (private backend + private workshops)
 
-Please edit the install.repo file located in install directory if using a private repo : 
-* Uncomment line :  token=`cat $EXEPATH/token`
-* Update accordingly the last line with the correct url to clone 
-WODPRIVREPO="git clone https://.....................wod-private.git wod-private"
+* Please edit the install.repo file located in install directory if using a private repo : 
+* PLease refer to the following urk to generate token :
 
-PLease refer to the following urk to generate token :
 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-Ans uncomment the token line in th repo file
 
-
+ * Uncomment line :  token=`cat $EXEPATH/token`
+ * Update accordingly the last line with the correct url to clone 
+WODPRIVREPO="git clone https://.....................wod-private.git wod-private"
 
 
 install script:
 usage() {
         echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user]"
+        
         echo " "
+        
         echo "where:"
+        
         echo "type      is the installation type"
+        
         echo "          example: backend, frontend or api-db"
-        echo "          if empty using 'backend'                "
+        
+        echo "          if empty using 'backend'               "
+        
         echo "groupname is the ansible group_vars name to be used"
+        
         echo "          example: production, staging, test, ...  "
+        
         echo "          if empty using 'production'                "
+        
         echo "backend   is the FQDN of the back-end JupyterHub server"
+        
         echo "          example: be.internal.example.org  "
+        
         echo "          if empty using the local name for the back-end                "
+        
         echo "frontend  is the FQDN of the front-end Web server"
+        
         echo "          example: fe.example.org  "
+        
         echo "          if empty using the external name for the back-end                "
+        
         echo "api-db    is the FQDN of the API/DB server "
+        
         echo "          example: api.internal.example.org  "
+        
         echo "          if empty using the name for the front-end                "
+        
         echo "external  is the external FQDN of the back-end JupyterHub server, reachable from the Internet"
+        
         echo "          example: jphub.example.org  "
+        
         echo "          if empty using the internal name of the back-end                "
+        
         echo "user      is the name of the admin user for the WoD project"
+        
         echo "          example: mywodamin "
+        
+        
         echo "          if empty using wodadmin               "
 }
 
