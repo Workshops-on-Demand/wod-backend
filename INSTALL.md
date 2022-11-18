@@ -99,17 +99,16 @@ usage() {
         echo "user      is the name of the admin user for the WoD project"
         
         echo "          example: mywodamin "
-        
-        
+          
         echo "          if empty using wodadmin               "
 }
 
+Example : 
 
 sudo ./install.sh -t backend -g staging -b jup.example.net -f notebooks.example.io -a api.example.io -e notebooks.example.io
 
 
 Install process details:
-
 
 At the end of the installation process:
  * you will have a jupyterhub server running on port http 8000 
