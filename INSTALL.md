@@ -14,45 +14,41 @@ Create a linux  account with sudo priviledges on your linux distro.
 
 As created user:
 
-sshd server, up to date git and ansible installer
+# For public only based Workshops-on-Demand (No private backend nor workshops)
 
-* Ubuntu: 
-   * sudo apt install -y ansible git openssh-server
-* Centos7:
-   * sudo yum -y install epel-release
-   * sudo yum install -y ansible git openssh-server
-   * sudo yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
-   * sudo yum update git
+* git clone https://github.com/Workshops-on-Demand/wod-backend.git
+* cd wod-backend/install
 
-setup ssh for installer user account
-* ssh-keygen -t rsa -b 4096
+To examine default installation parameters: Please look at the following files within ansible/group_vars directory:
+  *  all.yml file
+  *  wod-system file
+  *  wod-backend file
+ 
+# For private based Workshops-on-Demand (private backend + private workshops) or if you need to modify defaults
+* Fork private repo (https://github.com/Workshops-on-Demand/wod-private.git) on github under your own github account
+* Clone the forked repo:
 
+git clone https://github.com/...................../wod-private.git wod-private
 
-# If public only based Workshops-on-Demand (No private backend nor workshops)
+cd wod-private/ansible/group_vars
+* Please edit the all.yml and << groupname >> files to customize your setup.
+* Commit and push changes to your repo
 
-git clone https://github.com/Workshops-on-Demand/wod-backend.git
+cd $HOME/wod-backend/install
+* edit the install.repo file located in install directory if using a private repo :
+  * Update accordingly the last line with the correct url to clone 
+WODPRIVREPO="git clone https://github.com/.........../wod-private.git wod-private"
 
-cd wod-backend/install
-
-To customize default installation parameters: Please modify the following files :
-* within ansible/group_vars directory
-  * please edit all.yml file and adapt accordingly
-  * please edit wod-system file and adapt accordingly
-  * please edit wod-backend file and adapt accordingly
-
-If private based Workshops-on-Demand (private backend + private workshops)
-
-* Please edit the install.repo file located in install directory if using a private repo : 
-* PLease refer to the following urk to generate token :
-
+** Note If using a token**
+ PLease refer to the following url to generate token :
 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-
- * Uncomment line :  token=`cat $EXEPATH/token`
- * Update accordingly the last line with the correct url to clone 
-WODPRIVREPO="git clone https://.....................wod-private.git wod-private"
-
-
-install script:
+* edit the install.repo file located in install directory of wod-backend:
+  * Uncomment line :  token=`cat $EXEPATH/token`
+  * use the token in the url
+  WODPRIVREPO="git clone https://user:$token@github.com/....../wod-private.git wod-private"
+ 
+Install process details:
+install script: install.sh
 usage() {
         echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user]"
         
@@ -108,11 +104,30 @@ Example :
 sudo ./install.sh -t backend -g staging -b jup.example.net -f notebooks.example.io -a api.example.io -e notebooks.example.io
 
 
-Install process details:
+Install.sh calls :
+* install-system-<< distribution name >>.sh
+  * Install minimal requirered (Ansible, git, jq, openssh server, npm)
+* creates an admin user as defined upper (default is wodadmin) with sudo rights
+* install-system-common.sh
+  * cleanup 
+  * github repos cloning  (leveraging install.repo file) : Backend and Private
+  * Create ssh keys for wodadmin
+  * Creates GROUPNAME variables
+  * Creates ansible inventory files
+* install_system.sh with type (Backend, Frontend, etc..)
+  * Install the necessary stack based on selected type
+  * Create a wod.sh script in wod-backend directory to be used by all other scrits
+  * Source the wod.sh file
+  * Setup ansible-galaxies (community.general and posix)
+  * Setup Ansible and call the playbook  install_<<TYPE>>.yml followed by the ansible_check_<<TYPE>>.yml
+
+ Playbooks are self documented. Please check for details.
+
 
 At the end of the installation process:
  * you will have a jupyterhub server running on port http 8000 
  * You will get a new wodadmin user
+ * You will get a set of students
 
 
 
