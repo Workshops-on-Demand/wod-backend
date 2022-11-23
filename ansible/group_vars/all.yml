@@ -1,9 +1,5 @@
 ---
-#
-# SENDER is the e-mail address used in the front-end to send API procmail mails to the backed
-#
-SENDER: sender@example.org
-# We create fixed user accounts to provide an isolated execution environemnt to run the jupyter notebooks
+# We create fixed user accounts to provide an isolated execution environment to run the jupyter notebooks
 # They are called studentXXX where XXX is comprised between USERMIN and USERMAX defined below poentially with the addition of an offset (UIDBASE) for their uid/gid
 # Their home directory is located under /student and is thus named /student/studentXXX
 # Corresponding JupyterHub accounts are also created

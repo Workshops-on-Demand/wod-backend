@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-	echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user]"
+	echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user][-s sender]"
 	echo " "
 	echo "where:"
 	echo "type      is the installation type"
@@ -14,21 +14,24 @@ usage() {
 	echo "groupname is the ansible group_vars name to be used"
 	echo "          example: production, staging, test, ...  "
 	echo "          if empty using 'production'                "
-	echo "backend   is the FQDN of the back-end JupyterHub server"
+	echo "backend   is the FQDN of the backend JupyterHub server"
 	echo "          example: be.internal.example.org  "
-	echo "          if empty using the local name for the back-end                "
-	echo "frontend  is the FQDN of the front-end Web server"
+	echo "          if empty using the local name for the backend                "
+	echo "frontend  is the FQDN of the frontend Web server"
 	echo "          example: fe.example.org  "
-	echo "          if empty using the external name for the back-end                "
+	echo "          if empty using the external name for the backend                "
 	echo "api-db    is the FQDN of the API/DB server "
 	echo "          example: api.internal.example.org  "
-	echo "          if empty using the name for the front-end                "
-	echo "external  is the external FQDN of the back-end JupyterHub server, reachable from the Internet"
+	echo "          if empty using the name for the frontend                "
+	echo "external  is the external FQDN of the backend JupyterHub server, reachable from the Internet"
 	echo "          example: jphub.example.org  "
-	echo "          if empty using the internal name of the back-end                "
+	echo "          if empty using the internal name of the backend                "
 	echo "user      is the name of the admin user for the WoD project"
 	echo "          example: mywodamin "
 	echo "          if empty using wodadmin               "
+	echo "sender    is the e-mail address used in the WoD frontend to send API procmail mails to the WoD backend
+	echo "          example: sender@example.org "
+	echo "          if empty using wodadmin@localhost"
 }
 
 echo "install.sh called with $*"
@@ -41,7 +44,7 @@ a=""
 g=""
 u=""
 
-while getopts "t:f:e:b:a:g:u:h" option; do
+while getopts "t:f:e:b:a:g:u:s:h" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -68,6 +71,9 @@ while getopts "t:f:e:b:a:g:u:h" option; do
             ;;
         u)
             u=${OPTARG}
+            ;;
+        s)
+            s=${OPTARG}
             ;;
         h)
             usage
@@ -113,6 +119,11 @@ if [ ! -z "${u}" ]; then
 else
 	export WODUSER="wodadmin"
 fi
+if [ ! -z "${s}" ]; then
+	export WODSENDER="${s}"
+else
+	export WODSENDER="wodadmin@localhost"
+fi
 if [ ! -z "${g}" ]; then
 	WODGROUP="${g}"
 else
@@ -122,6 +133,7 @@ export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 echo "WODUSER: $WODUSER" > /etc/wod.yml
+echo "WODSENDER: $WODSENDER" > /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using frontend $WODFEFQDN"
@@ -190,10 +202,11 @@ export WODBEREPO="$WODBEREPO"
 export WODAPIREPO="$WODAPIREPO"
 export WODNOBOREPO="$WODNOBOREPO"
 export WODPRIVREPO="$WODPRIVREPO"
+export WODSENDER="$WODSENDER"
 EOF
 	chmod 644 /tmp/wodexports
 	su - $WODUSER -c "source /tmp/wodexports ; $EXEPATH/install-system-common.sh"
 	rm -f /tmp/wodexports
 else
-	su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO -c "$EXEPATH/install-system-common.sh"
+	su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODSENDER -c "$EXEPATH/install-system-common.sh"
 fi

@@ -122,7 +122,7 @@ ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT $ANSIBLEPRIVOPT instal
 if [ $WODTYPE = "api-db" ]; then
 	cd $WODAPIDBDIR
 	cat > .env << EOF
-FROM_EMAIL_ADDRESS='sender@example.org'
+FROM_EMAIL_ADDRESS="$WODSENDER"
 SENDGRID_API_KEY="None"
 API_PORT=8021
 DB_PW=TrèsCompliqué!!##123

@@ -3,25 +3,25 @@ DEFAULT=$MAILDIR/mbox
 LOGFILE=$MAILDIR/from
 
 :0b
-#* ^From.*{{ SENDER }}.*
+#* ^From.*{{ WODSENDER }}.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CREATE \/[1-9]+.*
 | {{ SCRIPTDIR }}/procmail-action.sh CREATE $MATCH
 
 :0b
-#* ^From.*{{ SENDER }}.*
+#* ^From.*{{ WODSENDER }}.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CLEANUP \/[1-9]+.*
 | {{ SCRIPTDIR }}/procmail-action.sh CLEANUP $MATCH
 
 :0b
-#* ^From.*{{ SENDER }}.*
+#* ^From.*{{ WODSENDER }}.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *RESET \/[1-9]+.*
 | {{ SCRIPTDIR }}/procmail-action.sh RESET $MATCH
 
 :0b
-#* ^From.*{{ SENDER }}.*
+#* ^From.*{{ WODSENDER }}.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *PURGE student\/[1-9]+.*
 | {{ SCRIPTDIR }}/procmail-action.sh PURGE $MATCH
