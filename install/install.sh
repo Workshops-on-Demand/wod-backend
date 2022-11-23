@@ -131,9 +131,14 @@ echo "Using external backend $WODBEEXTFQDN"
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
 
-# redirect stdout/stderr to a file
-mkdir -p $HOME/.jupyter
-exec &> >(tee $HOME/.jupyter/install.log)
+# redirect stdout/stderr to a file in the launching user directory
+HDIR=`grep -E "$SUDO_USER" /etc/passwd | cut -d: -f6`
+if [ _"$HDIR" = _"" ]; then
+	echo "You need to use sudo to launch this script"
+	exit -1
+fi
+mkdir -p $HDIR/.wodinstall
+exec &> >(tee $HDIR/.wodinstall/install.log)
 
 # Get path of execution
 EXEPATH=`dirname "$0"`
@@ -151,6 +156,11 @@ if grep -qE "^$WODUSER:" /etc/passwd; then
         userdel -f -r $WODUSER
 fi
 useradd -U -m -s /bin/bash $WODUSER
+# Manage passwd
+WODPWD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
+echo $WODUSER:$WODPWD | chpasswd
+echo "$WODUSER is $WODPWD" > $HDIR/.wodinstall/$WODUSER
+
 # setup sudo for $WODUSER
 cat > /etc/sudoers.d/$WODUSER << EOF
 Defaults:$WODUSER !fqdn
