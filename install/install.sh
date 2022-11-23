@@ -133,7 +133,7 @@ export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
 export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 echo "WODUSER: $WODUSER" > /etc/wod.yml
-echo "WODSENDER: $WODSENDER" > /etc/wod.yml
+echo "WODSENDER: $WODSENDER" >> /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using frontend $WODFEFQDN"
@@ -144,7 +144,7 @@ echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
 
 # redirect stdout/stderr to a file in the launching user directory
-HDIR=`grep -E "$SUDO_USER" /etc/passwd | cut -d: -f6`
+HDIR=`grep -E "^$SUDO_USER" /etc/passwd | cut -d: -f6`
 if [ _"$HDIR" = _"" ]; then
 	echo "You need to use sudo to launch this script"
 	exit -1
