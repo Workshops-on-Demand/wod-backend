@@ -29,7 +29,7 @@ usage() {
 	echo "user      is the name of the admin user for the WoD project"
 	echo "          example: mywodamin "
 	echo "          if empty using wodadmin               "
-	echo "sender    is the e-mail address used in the WoD frontend to send API procmail mails to the WoD backend
+	echo "sender    is the e-mail address used in the WoD frontend to send API procmail mails to the WoD backend"
 	echo "          example: sender@example.org "
 	echo "          if empty using wodadmin@localhost"
 }
