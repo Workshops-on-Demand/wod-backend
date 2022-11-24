@@ -143,12 +143,18 @@ echo "Using external backend $WODBEEXTFQDN"
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
 
-# redirect stdout/stderr to a file in the launching user directory
-HDIR=`grep -E "^$SUDO_USER" /etc/passwd | cut -d: -f6`
-if [ _"$HDIR" = _"" ]; then
+# Needs to be root
+if [ _"$SUDO_USER" = _"" ]; then
 	echo "You need to use sudo to launch this script"
 	exit -1
 fi
+HDIR=`grep -E "^$SUDO_USER" /etc/passwd | cut -d: -f6`
+if [ _"$HDIR" = _"" ]; then
+	echo "$SUDO_USER has no home directory"
+	exit -1
+fi
+
+# redirect stdout/stderr to a file in the launching user directory
 mkdir -p $HDIR/.wodinstall
 exec &> >(tee $HDIR/.wodinstall/install.log)
 
@@ -158,20 +164,18 @@ export EXEPATH=`( cd "$EXEPATH" && pwd )`
 
 source $EXEPATH/install.repo
 export WODFEREPO WODBEREPO WODAPIREPO WODNOBOREPO WODPRIVREPO
-# Needs to be root
-# Call the distribution specific install script
-echo "Installing $WODDISTRIB specificities for $WODTYPE"
-$EXEPATH/install-system-$WODDISTRIB.sh
 
 # Create the WODUSER user
 if grep -qE "^$WODUSER:" /etc/passwd; then
-	pkill -u $WODUSER
+	if ps auxww | grep -qE "^$WODUSER:"; then
+		pkill -u $WODUSER
+	fi
     userdel -f -r $WODUSER
 fi
 useradd -U -m -s /bin/bash $WODUSER
 # Manage passwd
-WODPWD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
-echo $WODUSER:$WODPWD | chpasswd
+export WODPWD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
+echo "$WODUSER:$WODPWD" | chpasswd
 echo "$WODUSER is $WODPWD" > $HDIR/.wodinstall/$WODUSER
 
 # setup sudo for $WODUSER
@@ -182,6 +186,11 @@ $WODUSER ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 440 /etc/sudoers.d/$WODUSER
 chown $WODUSER /etc/wod.yml
+
+# Call the distribution specific install script
+echo "Installing $WODDISTRIB specificities for $WODTYPE"
+$EXEPATH/install-system-$WODDISTRIB.sh
+
 
 # Now drop priviledges
 # Call the common install script to finish install
