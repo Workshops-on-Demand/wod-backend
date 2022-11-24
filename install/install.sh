@@ -165,7 +165,8 @@ $EXEPATH/install-system-$WODDISTRIB.sh
 
 # Create the WODUSER user
 if grep -qE "^$WODUSER:" /etc/passwd; then
-        userdel -f -r $WODUSER
+	pkill -u $WODUSER
+    userdel -f -r $WODUSER
 fi
 useradd -U -m -s /bin/bash $WODUSER
 # Manage passwd
