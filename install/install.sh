@@ -158,6 +158,7 @@ fi
 mkdir -p $HDIR/.wodinstall
 exec &> >(tee $HDIR/.wodinstall/install.log)
 
+echo "Install starting at `date`"
 # Get path of execution
 EXEPATH=`dirname "$0"`
 export EXEPATH=`( cd "$EXEPATH" && pwd )`
@@ -220,3 +221,4 @@ EOF
 else
 	su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODSENDER -c "$EXEPATH/install-system-common.sh"
 fi
+echo "Install ending at `date`"
