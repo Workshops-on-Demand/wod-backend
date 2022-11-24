@@ -14,6 +14,11 @@ This command has to be run whenever some changes are made to any .j2 or ansible 
 
 
 ## Setup Appliances for Workshops:
+Pre reqs for appliance :
+* Needs a centos 7 vm
+* Needs admin account with sudo priviledges ( wodadmin in our case)
+* Needs ssh keys setup from account (backend server) setup on the appliance
+
 Necessary scripts to run set up for workshops appliances 
 pre reqs:
 - Workshop entry in front end DB
