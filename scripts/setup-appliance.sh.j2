@@ -39,9 +39,9 @@ export accessToken=`get_session_token`
 # If that doesn't fail, then export the workshop name
 export wid=`get_workshop_id $w`
 #export WKSHP=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`
-export RTARGET=`grep IP-$w {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+export RTARGET=`grep IP-$w {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
 if [ _"$RTARGET" = _"" ]; then
-	export RTARGET=`grep IP-$w {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	export RTARGET=`grep IP-$w {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
 	if [ _"$RTARGET" = _"" ]; then
 		echo "Unable to find the RTARGET for $w"
 		exit -1
