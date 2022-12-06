@@ -236,6 +236,21 @@
         - /usr/local/share/jupyter/nbconvert/templates/latex/
         - "{{ JPHUB }}/share/jupyter/nbconvert/templates/html/"
 
+    # Perform private part before users management to allow interruption of the deliver script
+    # during normal operations - waiting till end of users management can take hours for 2000 users.
+    # Potential impact: private scripts are run before users creation, so may miss some part of setup.
+    - name: Test private tasks YAML file
+      command: ls "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
+      register: acj_path
+      failed_when: false
+      changed_when: false
+
+    - name: Now call private tasks if available
+      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
+      when:
+        - acj_path.rc == 0
+
+    # Users management
     - name: Remove existing jupyterhub users
       command:
         cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
@@ -309,14 +324,3 @@
         state: present
         recalculate_mask: no_mask
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
-
-    - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
-      register: acj_path
-      failed_when: false
-      changed_when: false
-
-    - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
-      when:
-        - acj_path.rc == 0
