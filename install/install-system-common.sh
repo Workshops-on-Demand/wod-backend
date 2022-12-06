@@ -7,25 +7,58 @@ set -e
 set -u
 set -o pipefail
 
+clean_clone_log() {
+
+		# Now get the directory in which we cloned
+		REPODIR=`echo "$*" | tr ' ' '\n' | tail -1`
+		res=`echo $REPODIR | { grep "://" || true; }`
+		if [ _"$res" != _"" ]; then
+			# REPODIR points to URL not dir
+			# dir is then computed automatically
+			NREPODIR=`echo "$REPODIR" | tr '/' '\n' | tail -1 | sed 's/\.git$//'`
+		else
+			NREPODIR="$REPODIR"
+		fi
+
+		if [ _"$NREPODIR" = _"" ]; then
+			echo "Directory into which to clone is empty"
+			exit -1
+		fi
+		if [ _"$NREPODIR" = _"/" ]; then
+			echo "Directory into which to clone is /"
+			exit -1
+		fi
+		if [ _"$NREPODIR" = _"$HOME" ]; then
+			echo "Directory into which to clone is $HOME"
+			exit -1
+		fi
+
+		# Remove directory first
+		rm -rf $NREPODIR
+
+		# This line will clone the repo
+		$*
+
+		# Store commit Ids for these repos
+		(cd $NREPODIR ; echo "$NREPODIR: `git show --oneline | awk '{print $1}'`")
+}
+
 # This is run as WODUSER user
 
 # Get content for WoD - now in private mode
-rm -rf wod-backend wod-private .ssh
+rm -rf .ssh
 if [ $WODTYPE = "api-db" ]; then
-	rm -rf wod-api-db
 	# using branch rename/migrationfiles for now - rebased on it
-	$WODAPIREPO
+	clean_clone_log $WODAPIREPO
 elif [ $WODTYPE = "frontend" ]; then
-	rm -rf wod-frontend
-	$WODFEREPO
+	clean_clone_log $WODFEREPO
 elif [ $WODTYPE = "backend" ]; then
-	rm -rf wod-notebooks
-	$WODNOBOREPO
+	clean_clone_log $WODNOBOREPO
 fi
 
 # We'll store in backend dir the data we need whatever the type we're building
-$WODBEREPO
-$WODPRIVREPO
+clean_clone_log $WODBEREPO
+clean_clone_log $WODPRIVREPO
 
 #Setup ssh for WODUSER
 ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa
