@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -x
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-DataVisu101'] }}
+/home/jupyter/jupyter-procmail/scripts/reset-appliance.sh
+
+NAME=datavisulab
+TMPDIR=/tmp/$NAME.$stdid
+
+# Stop/Remove existing content first - these commands could fail so protect with true from set -e
+mkdir -p $TMPDIR
+cat > $TMPDIR/stop-compose << EOF
+cd $TMPDIR
+docker-compose down
+EOF
+
+chmod 755 $TMPDIR/stop-compose
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET mkdir -p $TMPDIR
+scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $TMPDIR/stop-compose $RTARGET:$TMPDIR
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo su - student$stdid -c \'$TMPDIR/stop-compose\' && /bin/true
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo rm -rf $TMPDIR
+exit 0
+

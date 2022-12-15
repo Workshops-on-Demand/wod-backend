@@ -1,0 +1,106 @@
+#!/bin/bash
+
+set -x
+
+source /home/jupyter/jupyter-procmail/scripts/functions.sh
+
+export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-DataVisu101'] }}
+
+#export RTARGET=16.31.86.98
+# Start by cleaning up stuff - do it early as after we setup .ssh content
+/home/jupyter/jupyter-procmail/scripts/reset-$ws.sh
+/home/jupyter/jupyter-procmail/scripts/create-appliance.sh
+
+NAME=datavisulab
+TMPDIR=/tmp/$NAME.$stdid
+
+
+mkdir -p $TMPDIR
+
+# Define local variables
+echo wid=$wid
+APPMIN=`get_range_min $wid`
+echo stdid=$stdid
+echo APPMIN=$APPMIN
+
+
+datavisuport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATAVISUPORT1-WKSHP-DataVisu101'] }}))
+datavisuport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['DATAVISUPORT2-WKSHP-DataVisu101'] }}))
+httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-DataVisu101'] }}))
+
+cat > $TMPDIR/dockerd-entrypoint.sh << EOF
+export HTTPPORT
+tini -g -- start-notebook.sh &
+sleep 3
+jupyter lab list | tail -1 | cut -d'=' -f2 | cut -d' ' -f1 > /student/student$stdid/datavisutoken
+sleep infinity
+EOF
+
+cat > $TMPDIR/Dockerfile << EOF
+FROM ${NAME}:latest
+USER root
+COPY dockerd-entrypoint.sh /usr/local/bin/
+ENTRYPOINT /usr/local/bin/dockerd-entrypoint.sh
+RUN mkdir -p /student/student$stdid
+RUN useradd student$stdid -u $stdid -g 100 -d /student/student$stdid
+RUN chown student$stdid:users /student/student$stdid
+# Unlock the account
+RUN perl -pi -e "s|^student$stdid:!:|student$stdid:\$6\$rl1WNGdr\$qHyKDW/prwoj5qQckWh13UH3uE9Sp7w43jPzUI9mEV6Y1gZ3MbDDMUX/1sP7ZRnItnGgBEklmsD8vAKgMszkY.:|" /etc/shadow
+# In case we need sudo
+#RUN echo "student$stdid   ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+WORKDIR /student/student$stdid
+USER student$stdid
+ENV NB_USER student$stdid
+ENV NB_UID $stdid
+ENV HTTPPORT $httpport
+RUN git clone https://github.com/hpe-dev-incubator/HPE-DATAVISU101.git /student/student$stdid/
+RUN /opt/conda/bin/jupyter-nbconvert --clear-output --inplace /student/student$stdid/*.ipynb
+EOF
+
+
+# Look at https://stackoverflow.com/questions/34264348/docker-inside-docker-container
+# and http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
+# For security consider using https://github.com/nestybox/sysbox
+cat > $TMPDIR/docker-compose.yml << EOF
+version: '3.5'
+services:
+  $NAME$stdid:
+    image: $NAME$stdid
+    build: .
+    #privileged: true
+    ports:
+      - "$httpport:8888"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+EOF
+cat > $TMPDIR/launch-$NAME << EOF
+#!/bin/bash
+cd $TMPDIR
+docker-compose up --build -d
+EOF
+
+# Copy content and start container
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET mkdir -p $TMPDIR
+scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/dockerd-entrypoint.sh $RTARGET:$TMPDIR
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET chmod 755 $TMPDIR $TMPDIR/dockerd-entrypoint.sh
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/Dockerfile
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
+
+# ssh to get token from running container
+container_id=$(ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET docker ps -aqf "name=$NAME$stdid")
+# We need time to let jupyterhub start before getting token
+sleep 5
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET "docker cp $container_id:/student/student$stdid/datavisutoken $TMPDIR"
+scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET:$TMPDIR/datavisutoken $TMPDIR
+
+# ansible-vault to store it in the pass file creating a DATAVISUTOK ansible variable
+if [ ! -d "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass" ]; then
+	mkdir -p "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass"
+fi
+# We can overwrite the existing variables file as we don't need PASSSTU 
+ansible-vault encrypt_string --vault-password-file "/home/jupyter/jupyter-procmail/ansible-jupyter/vault_secret" `cat $TMPDIR/datavisutoken` --name "'DATAVISUTOK'" > "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "/home/jupyter/jupyter-procmail/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass/variables_${w}_${stdid}.yml"
+
+# Cleanup
+# ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo rm -rf $TMPDIR
+rm -rf $TMPDIR
