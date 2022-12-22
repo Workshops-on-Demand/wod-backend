@@ -35,9 +35,9 @@ cd wod-private/ansible/group_vars
 * Commit and push changes to your repo
 
 cd $HOME/wod-backend/install
-* edit the install.repo file located in install directory if using a private repo :
-  * Update accordingly the last line with the correct url to clone 
-WODPRIVREPO="git clone https://github.com/.........../wod-private.git wod-private"
+* create an install.priv file located in install directory if using a private repo :
+  * Define the WODPRIVREPO with the correct url to clone (example in last line of install.repo)
+WODPRIVREPO="git clone git@github.com:Account/Private-Repo.git wod-private"
 
 ** Note If using a token**
  PLease refer to the following url to generate token :
