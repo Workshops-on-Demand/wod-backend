@@ -43,6 +43,7 @@ b=""
 a=""
 g=""
 u=""
+s=""
 
 while getopts "t:f:e:b:a:g:u:s:h" option; do
     case "${option}" in
