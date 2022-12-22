@@ -497,7 +497,7 @@
       file:
         path: '{{ ansible_env.HOME }}/.local/share/jupyter/kernels'
         state: absent
-      
+
     - name: Remove old MS tools to be sure a good one will be available
       become: yes
       become_user: root
@@ -537,11 +537,13 @@
       become: yes
       become_user: root
       command: /usr/share/dotnet/dotnet tool uninstall --global powershell
+      ignore_errors: yes
 
     - name: Ensure dotnet interactive is removed through dotnet before installing
       become: yes
       become_user: root
       command: /usr/share/dotnet/dotnet tool uninstall --global Microsoft.dotnet-interactive
+      ignore_errors: yes
 
     - name: Ensure powershell is installed through dotnet
       become: yes
