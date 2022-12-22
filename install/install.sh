@@ -167,9 +167,14 @@ export EXEPATH=`( cd "$EXEPATH" && pwd )`
 source $EXEPATH/install.repo
 # Overload WODPRIVREPO if using a private one
 if [ -f $EXEPATH/install.priv ]; then
-	source $EXEPATH/install.repo
+	source $EXEPATH/install.priv
 fi
 export WODFEREPO WODBEREPO WODAPIREPO WODNOBOREPO WODPRIVREPO
+echo "Installation environment :"
+echo "---------------------------"
+env | grep WOD
+echo "---------------------------"
+
 
 # Create the WODUSER user
 if grep -qE "^$WODUSER:" /etc/passwd; then
