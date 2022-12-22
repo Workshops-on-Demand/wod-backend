@@ -164,6 +164,10 @@ EXEPATH=`dirname "$0"`
 export EXEPATH=`( cd "$EXEPATH" && pwd )`
 
 source $EXEPATH/install.repo
+# Overload WODPRIVREPO if using a private one
+if [ -f $EXEPATH/install.priv ]; then
+	source $EXEPATH/install.repo
+fi
 export WODFEREPO WODBEREPO WODAPIREPO WODNOBOREPO WODPRIVREPO
 
 # Create the WODUSER user
