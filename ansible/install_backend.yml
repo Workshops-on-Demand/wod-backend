@@ -553,12 +553,12 @@
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive
+      command: /usr/share/dotnet/dotnet tool install --global --tool-path /usr/local/bin Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
       become_user: root
-      command: /root/.dotnet/tools/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
+      command: dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
