@@ -548,12 +548,12 @@
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool install --global powershell
+      command: /usr/share/dotnet/dotnet tool install --tool-path /usr/local/bin powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool install --global --tool-path /usr/local/bin Microsoft.dotnet-interactive
+      command: /usr/share/dotnet/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
