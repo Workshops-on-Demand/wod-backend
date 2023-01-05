@@ -502,11 +502,13 @@
       become: yes
       become_user: root
       command: /usr/share/dotnet/dotnet tool uninstall --global powershell
+      ignore_errors: yes
 
     - name: Ensure dotnet interactive is removed through dotnet before installing
       become: yes
       become_user: root
       command: /usr/share/dotnet/dotnet tool uninstall --global Microsoft.dotnet-interactive
+      ignore_errors: yes
 
     - name: Remove old MS tools to be sure a good one will be available
       become: yes
