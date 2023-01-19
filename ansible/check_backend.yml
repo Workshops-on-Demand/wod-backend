@@ -170,17 +170,6 @@
       template: src={{ item }} dest={{ ANSIBLEDIR }}/{{ PBKDIR }}/{{ item | basename | regex_replace('\.j2$') }} mode=0644
       with_fileglob: [ '{{ ANSIBLEDIR }}/{{ PBKDIR }}/*.yml.j2' ]
 
-    - name: Enable backend WoD services
-      become: yes
-      become_user: root
-      systemd:
-        state: restarted
-        daemon_reload: yes
-        enabled: yes
-        name: "{{ item }}"
-      with_items:
-        - jupyterhub
-
     - name: Ensure that directory {{ STUDDIR }} exists
       become: yes
       become_user: root
@@ -249,6 +238,18 @@
       include_tasks: "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
       when:
         - acj_path.rc == 0
+
+    # Done after private part, which may affect branding
+    - name: Enable backend WoD services
+      become: yes
+      become_user: root
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+        name: "{{ item }}"
+      with_items:
+        - jupyterhub
 
     # Users management
     - name: Remove existing jupyterhub users
