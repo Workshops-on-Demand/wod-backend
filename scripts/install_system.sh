@@ -36,6 +36,7 @@ cat > $SCRIPTDIR/wod.sh << EOF
 # This main dir is computed
 export WODBEDIR=`dirname $SCRIPTDIR`
 export WODUSER=$WODUSER
+export WODTYPE=$WODTYPE
 EOF
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # These 3 dirs have fixed names by default that you can change in this file
@@ -45,11 +46,11 @@ export WODPRIVDIR=$PWODBEDIR/wod-private
 export ANSIBLEPRIVDIR=$WODPRIVDIR/ansible
 export WODAPIDBDIR=$PWODBEDIR/wod-api-db
 export WODFEDIR=$PWODBEDIR/wod-frontend
-WODANSOPT=""
+WODPRIVINV=""
 # Manages private inventory if any
 if [ -f $WODPRIVDIR/ansible/inventory ]; then
-	WODANSOPT="-i $WODPRIVDIR/ansible/inventory"
-	export WODANSOPT
+	WODPRIVINV="-i $WODPRIVDIR/ansible/inventory"
+	export WODPRIVINV
 fi
 EOF
 if [ $WODTYPE = "backend" ]; then
@@ -110,14 +111,16 @@ export ANSIBLEPRIVOPT="$ANSIBLEPRIVOPT"
 EOF
 export ANSIBLEPRIVOPT
 
-
+ANSPLAYOPT="PBKDIR=$PBKDIR WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR WODAPIDBDIR=$WODAPIDBDIR WODFEDIR=$WODFEDIR STUDDIR=$STUDDIR"
+ANSPLAYOPT="-e $ANSPLAYOPT "
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
 elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="-e LDAPSETUP=0"
 fi
+
 # Automatic Installation script for the system 
-ansible-playbook -i inventory --limit $PBKDIR $ANSPLAYOPT $ANSIBLEPRIVOPT install_$WODTYPE.yml
+ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSIBLEPRIVOPT install_$WODTYPE.yml
 
 if [ $WODTYPE = "api-db" ]; then
 	cd $WODAPIDBDIR
@@ -166,5 +169,5 @@ fi
 
 cd $SCRIPTDIR/../ansible
 
-ansible-playbook -i inventory --limit $PBKDIR -e "PBKDIR=$PBKDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml
+ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR -e "PBKDIR=$PBKDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml
 date

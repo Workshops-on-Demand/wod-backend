@@ -1,5 +1,8 @@
 #!/bin/bash
 
+WODPRIVINV=""
+ANSIBLEPRIVOPT=""
+
 source {{ SCRIPTDIR }}/wod.sh
 
 # Git doesn't collect file rights and we need to have correct ones here so forcing
@@ -19,4 +22,4 @@ done
 
 cd {{ ANSIBLEDIR }}
 
-ansible-playbook -i inventory --limit {{ PBKDIR }} -e "PBKDIR={{ PBKDIR }}" $ANSIBLEPRIVOPT check_backend.yml
+ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} -e "PBKDIR={{ PBKDIR }} WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR WODAPIDBDIR=$WODAPIDBDIR WODFEDIR=$WODFEDIR STUDDIR=$STUDDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml

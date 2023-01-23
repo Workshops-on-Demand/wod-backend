@@ -53,12 +53,12 @@ JPHUB: /opt/jupyterhub
 #
 # These variables are defined in ansible playbooks, do not change without knowing what you do
 #
-STUDDIR: "{{ ansible_env.STUDDIR }}"
-WODBEDIR: "{{ ansible_env.WODBEDIR }}"
-WODPRIVDIR: "{{ ansible_env.WODPRIVDIR }}"
-WODNOBO: "{{ ansible_env.WODNOBO }}"
-WODAPIDBDIR: "{{ ansible_env.WODAPIDBDIR }}"
-WODFEDIR: "{{ ansible_env.WODFEDIR }}"
+#STUDDIR: "{{ ansible_env.STUDDIR }}"
+#WODBEDIR: "{{ ansible_env.WODBEDIR }}"
+#WODPRIVDIR: "{{ ansible_env.WODPRIVDIR }}"
+#WODNOBO: "{{ ansible_env.WODNOBO }}"
+#WODAPIDBDIR: "{{ ansible_env.WODAPIDBDIR }}"
+#WODFEDIR: "{{ ansible_env.WODFEDIR }}"
 SCRIPTDIR: "{{ WODBEDIR }}/scripts"
 ANSIBLEDIR: "{{ WODBEDIR }}/ansible"
 # This is the predefined structure for a private repo
