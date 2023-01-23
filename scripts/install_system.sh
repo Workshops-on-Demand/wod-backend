@@ -169,5 +169,5 @@ fi
 
 cd $SCRIPTDIR/../ansible
 
-ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR -e "PBKDIR=$PBKDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml
+ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT -e "PBKDIR=$PBKDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml
 date
