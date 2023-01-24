@@ -1,7 +1,8 @@
 - hosts: all
   tasks:
-    - fail:
-      msg: COMPILE variable is empty ! Fat fingers ?!?
+    - name: Script Compilation Issue
+      fail:
+        msg: COMPILE variable is empty ! Fat fingers ?!?
       when: COMPILE is not defined
 
     - name: Create list of files to compile
