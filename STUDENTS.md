@@ -33,10 +33,7 @@ Last seat for speaker
 
   
 
-
-151- 225 OneView 
-
-[151-170] challenges Location :  Grenoble 
+171-225 OneView 
 
 [171-224] workshops Location :  Mougins 
 
@@ -356,7 +353,7 @@ Last seat for speaker
 
 
 
-1776-1799 HPE Cray CCPE 101
+1776-1799 GreenLake Compute Ops API 101
 
 
 [1776-1799] workshops Location :  Greenlake
