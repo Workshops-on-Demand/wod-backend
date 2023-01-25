@@ -115,10 +115,10 @@ if [ $action != "RESET" ]; then
                                 compile=""
                         fi
 			if [ _"$compile" != _"" ]; then
-				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compile\"" $ANSPLAYOPT $ANSPRIVOPT
+				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compile\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" $ANSPLAYOPT $ANSPRIVOPT
 				if [ -f {{ ANSIBLEPRIVDIR }}/compile_scripts.yml ]; then
-					# YAML file not duplicated, just overload SCRIPTDIR var to support private complied scripts
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compile\"" -e "SCRIPTDIR={{ SCRIPTPRIVDIR }}" $ANSPLAYOPT $ANSPRIVOPT
+					# YAML file not duplicated, just overload SCRIPTDIRECTORY var to support private compiled scripts
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compile\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" $ANSPLAYOPT $ANSPRIVOPT
 				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
