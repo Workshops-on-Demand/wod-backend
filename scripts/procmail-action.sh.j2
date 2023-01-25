@@ -119,11 +119,13 @@ if [ $action != "RESET" ]; then
 				compilepriv=""
 				for s in `echo $compile | tr ',' '\n'`; do
 					if [ -f "{{ SCRIPTDIR }}/$s" ]; then
-						compilepub="$compilepub $s"
+						compilepub="$s,$compilepub"
 					elif  [ -f "{{ SCRIPTPRIVDIR }}/$s" ]; then
-						compilepriv="$compilepriv $s"
+						compilepriv="$s,$compilepriv"
 					fi
 				done
+				compilepub=`echo $compilepub | sed 's|,$||'`
+				compilepriv=`echo $compilepriv | sed 's|,$||'`
 				# Same compile_scripts.yml used with different calls for public/private
 				if [ _"$compilepub" != _"" ]; then
 					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" $ANSPLAYOPT $ANSPRIVOPT
