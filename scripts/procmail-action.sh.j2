@@ -115,10 +115,10 @@ if [ $action != "RESET" ]; then
                                 compile=""
                         fi
 			if [ _"$compile" != _"" ]; then
-				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\"" $ANSIBLEPRIVOPT
+				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\" WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR STUDDIR=$STUDDIR" $ANSIBLEPRIVOPT
 				if [ -f {{ ANSIBLEPRIVDIR }}/compile_scripts.yml ]; then
 					# YAML file not duplicated, just overload SCRIPTDIR var
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\" SCRIPTDIR={{ SCRIPTPRIVDIR }}" $ANSIBLEPRIVOPT
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\" SCRIPTDIR={{ SCRIPTPRIVDIR }} WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR STUDDIR=$STUDDIR" $ANSIBLEPRIVOPT
 				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
