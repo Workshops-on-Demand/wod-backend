@@ -25,7 +25,7 @@ usage() if ($help || defined $ARGV[0] || (not defined $wodtype));
 my %machines = (
 	'api-db' => "wod-api-ubuntu-20.04",
 	'frontend' => "wod-fe-ubuntu-20.04",
-	'backend' => "wod-be-centos-7",
+	'backend' => "wodbec7",
 	'appliance' => "wod-$wkshp-centos-7",
 );
 
@@ -57,6 +57,6 @@ foreach my $m (@mtypes) {
 		my $cmd = "sudo su - $WODUSER -c \"./wod-backend/scripts/setup-appliance $wkshp\"";
 		system("vagrant ssh $h->{'backend'} -c \"sudo su - $WODUSER -c $cmd\"");
 	} else {
-		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -g production -b wod-be-centos-7 -f wod-fe-ubuntu-20.04 -a wod-api-ubuntu-20.04\"");
+		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -g production -b wodbec7 -f wod-fe-ubuntu-20.04 -a wod-api-ubuntu-20.04\"");
 	}
 }

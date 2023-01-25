@@ -10,6 +10,8 @@ set -o pipefail
 clean_clone_log() {
 
 		# Now get the directory in which we cloned
+		BRANCH=$1
+		shift
 		REPODIR=`echo "$*" | tr ' ' '\n' | tail -1`
 		res=`echo $REPODIR | { grep "://" || true; }`
 		if [ _"$res" != _"" ]; then
@@ -37,7 +39,10 @@ clean_clone_log() {
 		rm -rf $NREPODIR
 
 		# This line will clone the repo
-		$*
+		git clone $*
+
+		# This line checks the correct branch out
+		(cd $NREPODIR ; git checkout $BRANCH)
 
 		# Store commit Ids for these repos
 		(cd $NREPODIR ; echo "$NREPODIR: `git show --oneline | awk '{print $1}'`")
@@ -49,16 +54,16 @@ clean_clone_log() {
 rm -rf .ssh
 if [ $WODTYPE = "api-db" ]; then
 	# using branch rename/migrationfiles for now - rebased on it
-	clean_clone_log $WODAPIREPO
+	clean_clone_log $WODAPIBRANCH $WODAPIREPO
 elif [ $WODTYPE = "frontend" ]; then
-	clean_clone_log $WODFEREPO
+	clean_clone_log $WODFEBRANCH $WODFEREPO
 elif [ $WODTYPE = "backend" ]; then
-	clean_clone_log $WODNOBOREPO
+	clean_clone_log $WODNOBOBRANCH $WODNOBOREPO
 fi
 
 # We'll store in backend dir the data we need whatever the type we're building
-clean_clone_log $WODBEREPO
-clean_clone_log $WODPRIVREPO
+clean_clone_log $WODBEBRANCH $WODBEREPO
+clean_clone_log $WODPRIVBRANCH $WODPRIVREPO
 
 #Setup ssh for WODUSER
 ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa

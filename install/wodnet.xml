@@ -9,7 +9,7 @@
   <domain name='wodnet.local' localOnly='yes'/>
   <dns>
     <host ip='10.1.0.3'>
-      <hostname>wod-be-centos-7.wodnet.local</hostname>
+      <hostname>wodbec7.wodnet.local</hostname>
     </host>
     <host ip='10.1.0.4'>
       <hostname>wod-fe-ubuntu-20.04.wodnet.local</hostname>
