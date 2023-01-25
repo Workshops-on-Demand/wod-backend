@@ -94,9 +94,6 @@ export STUDDIR=/student
 EOF
 fi
 
-chmod 755 $SCRIPTDIR/wod.sh
-source $SCRIPTDIR/wod.sh
-
 cd $SCRIPTDIR/../ansible
 SHORTNAME="`hostname -s`"
 FULLNAME=`ansible-inventory -i inventory --list | jq -r '._meta.hostvars | to_entries[] | .key' | grep -E "^$SHORTNAME(\.|$)"`
@@ -149,6 +146,9 @@ cat >> $SCRIPTDIR/wod.sh << EOF
 export ANSPRIVOPT="$ANSPRIVOPT"
 EOF
 export ANSPRIVOPT
+
+chmod 755 $SCRIPTDIR/wod.sh
+source $SCRIPTDIR/wod.sh
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
