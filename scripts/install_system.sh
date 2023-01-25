@@ -109,7 +109,7 @@ PBKDIR=`ansible-inventory -i inventory --list | jq -r "._meta.hostvars | to_entr
 # Declares shell variables as ansible variables as well
 # then they can be used in playbooks
 ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=$WODPRIVNOBO -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR -e ANSIBLEDIR=$ANSIBLEDIR -e ANSIBLEPRIVDIR=$ANSIBLEPRIVDIR -e SCRIPTPRIVDIR=$SCRIPTPRIVDIR "
-EOF
+
 # For future wod.sh usage by other scripts
 cat >> $SCRIPTDIR/wod.sh << EOF
 export ANSPLAYOPT="$ANSPLAYOPT"
