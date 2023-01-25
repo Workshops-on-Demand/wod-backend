@@ -117,7 +117,7 @@ if [ $action != "RESET" ]; then
 			if [ _"$compile" != _"" ]; then
 				compilepub=""
 				compilepriv=""
-				for s in `echo $compile | cut-d,`; do
+				for s in `echo $compile | tr ',' '\n'`; do
 					if [ -f "{{ SCRIPTDIR }}/$s" ]; then
 						compilepub="$compilepub $s"
 					elif  [ -f "{{ SCRIPTPRIVDIR }}/$s" ]; then
