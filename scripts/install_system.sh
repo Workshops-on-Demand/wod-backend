@@ -33,31 +33,64 @@ if [ $WODTYPE = "backend" ]; then
 fi
 
 cat > $SCRIPTDIR/wod.sh << EOF
-# This main dir is computed
-export WODBEDIR=`dirname $SCRIPTDIR`
+# This is athe wod.sh script, generated at install
+#
+# Name of the admin user
 export WODUSER=$WODUSER
+
+# Name of the wod machine type (backend, api-db, frontend, appliance)
 export WODTYPE=$WODTYPE
+
+# This main dir is computed and is the backend main dir
+export WODBEDIR=`dirname $SCRIPTDIR`
+
 EOF
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
+# BACKEND PART
+# The backend dir has some fixed subdirs 
+# wod-backend (WODBEDIR)
+#    |---------- ansible (ANSIBLEDIR)
+#    |---------- scripts (SCRIPTDIR defined in all.yml not here to allow overloading)
+#    |---------- install
+#    |---------- conf
+#    |---------- skel
+#
+export ANSIBLEDIR=$WODBEDIR/ansible
+
+# PRIVATE PART
 # These 3 dirs have fixed names by default that you can change in this file
 # they are placed as sister dirs wrt WODBEDIR
+# This is the predefined structure for a private repo
+# wod-private (WODPRIVDIR)
+#    |---------- ansible (ANSIBLEPRIVDIR)
+#    |---------- notebooks (WODPRIVNOBO)
+#    |---------- scripts (SCRIPTPRIVDIR)
+#
 PWODBEDIR=`dirname $WODBEDIR`
 export WODPRIVDIR=$PWODBEDIR/wod-private
 export ANSIBLEPRIVDIR=$WODPRIVDIR/ansible
-export WODAPIDBDIR=$PWODBEDIR/wod-api-db
-export WODFEDIR=$PWODBEDIR/wod-frontend
+export SCRIPTPRIVDIR=$WODPRIVDIR/scripts
+export WODPRIVNOBO=$WODPRIVDIR/notebooks
 WODPRIVINV=""
 # Manages private inventory if any
 if [ -f $WODPRIVDIR/ansible/inventory ]; then
 	WODPRIVINV="-i $WODPRIVDIR/ansible/inventory"
 	export WODPRIVINV
 fi
+
+# AIP-DB PART
+export WODAPIDBDIR=$PWODBEDIR/wod-api-db
+
+# FRONTEND PART
+export WODFEDIR=$PWODBEDIR/wod-frontend
 EOF
 if [ $WODTYPE = "backend" ]; then
 	cat >> $SCRIPTDIR/wod.sh << 'EOF'
-# This dir is also fixed by default and can be changed as needed
+
+# These dirs are also fixed by default and can be changed as needed
 export WODNOBO=$PWODBEDIR/wod-notebooks
 export STUDDIR=/student
+#
 EOF
 fi
 
@@ -72,6 +105,12 @@ if [ _"$FULLNAME" = _"" ]; then
         exit -1
 fi
 PBKDIR=`ansible-inventory -i inventory --list | jq -r "._meta.hostvars | to_entries[] | select(.key == \"$FULLNAME\") | .value.PBKDIR"`
+
+# Declares shell variables as ansible variables as well
+# then they can be used in playbooks
+	cat >> $SCRIPTDIR/wod.sh << EOF
+export ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=$WODPRIVNOBO -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR -e ANSIBLEDIR=$ANSIBLEDIR -e ANSIBLEPRIVDIR=$ANSIBLEPRIVDIR -e SCRIPTPRIVDIR=$SCRIPTPRIVDIR "
+EOF
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 # Another way using ansible
@@ -99,19 +138,18 @@ then
 	$WODPRIVDIR/$SCRIPTREL
 fi
 
-ANSIBLEPRIVOPT=""
+ANSPRIVOPT=""
 if [ -f "$ANSIBLEPRIVDIR/group_vars/all.yml" ]; then
-	ANSIBLEPRIVOPT="$ANSIBLEPRIVOPT -e @$ANSIBLEPRIVDIR/group_vars/all.yml"
+	ANSPRIVOPT="$ANSPRIVOPT -e @$ANSIBLEPRIVDIR/group_vars/all.yml"
 fi
 if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
-	ANSIBLEPRIVOPT="$ANSIBLEPRIVOPT -e @$ANSIBLEPRIVDIR/group_vars/$PBKDIR"
+	ANSPRIVOPT="$ANSPRIVOPT -e @$ANSIBLEPRIVDIR/group_vars/$PBKDIR"
 fi
 cat >> $SCRIPTDIR/wod.sh << EOF
-export ANSIBLEPRIVOPT="$ANSIBLEPRIVOPT"
+export ANSPRIVOPT="$ANSPRIVOPT"
 EOF
-export ANSIBLEPRIVOPT
+export ANSPRIVOPT
 
-ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR "
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
 elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
@@ -119,7 +157,7 @@ elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 fi
 
 # Automatic Installation script for the system 
-ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSIBLEPRIVOPT install_$WODTYPE.yml
+ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT install_$WODTYPE.yml
 
 if [ $WODTYPE = "api-db" ]; then
 	cd $WODAPIDBDIR
@@ -168,5 +206,5 @@ fi
 
 cd $SCRIPTDIR/../ansible
 
-ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT -e "PBKDIR=$PBKDIR" $ANSIBLEPRIVOPT check_$WODTYPE.yml
+ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml
 date

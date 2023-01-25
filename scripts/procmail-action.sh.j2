@@ -115,10 +115,10 @@ if [ $action != "RESET" ]; then
                                 compile=""
                         fi
 			if [ _"$compile" != _"" ]; then
-				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\" WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR STUDDIR=$STUDDIR" $ANSIBLEPRIVOPT
+				ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compile\"" $ANSPLAYOPT $ANSPRIVOPT
 				if [ -f {{ ANSIBLEPRIVDIR }}/compile_scripts.yml ]; then
-					# YAML file not duplicated, just overload SCRIPTDIR var
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\" SCRIPTDIR={{ SCRIPTPRIVDIR }} WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR STUDDIR=$STUDDIR" $ANSIBLEPRIVOPT
+					# YAML file not duplicated, just overload SCRIPTDIR var to support private complied scripts
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compile\"" -e "SCRIPTDIR={{ SCRIPTPRIVDIR }}" $ANSPLAYOPT $ANSPRIVOPT
 				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
@@ -130,7 +130,7 @@ if [ $action != "RESET" ]; then
 				{{ SCRIPTPRIVDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  WODUSER=$WODUSER WODBEDIR=$WODBEDIR WODNOBO=$WODNOBO WODPRIVNOBO=\"$WODPRIVDIR/notebooks\" WODPRIVDIR=$WODPRIVDIR STUDDIR=$STUDDIR CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSIBLEPRIVOPT --vault-password-file {{ ANSIBLEDIR }}/vault_secret
+			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEDIR }}/vault_secret
 			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				{{ SCRIPTDIR }}/post-copy-$ws.sh

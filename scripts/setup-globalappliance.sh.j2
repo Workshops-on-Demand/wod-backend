@@ -2,6 +2,7 @@
 
 #set -x
 
+source {{ SCRIPTDIR }}/wod.sh
 source {{ SCRIPTDIR }}/functions.sh
 
 # Do we need LDAP setup or not
@@ -13,10 +14,10 @@ else
 fi
 
 echo "Use ansible to setup generic remote appliance at $RTARGET"
-ansible-playbook {{ ANSIBLEDIR }}/setup_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET STUDDIR=$STUDDIR ANSIBLEDIR={{ ANSIBLEDIR }} WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP PBKDIR={{ PBKDIR }} WODBEDIR={{ WODBEDIR }} LDAPDMN={{ LDAPDMN }} LDAPSRVNAME={{ LDAPSRVNAME }} WODUSER=$WODUSER" $ANSIBLEPRIVOPT
+ansible-playbook {{ ANSIBLEDIR }}/setup_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP LDAPDMN={{ LDAPDMN }} LDAPSRVNAME={{ LDAPSRVNAME }}" $ANSPLAYOPT $ANSPRIVOPT
 if [ -f "{{ ANSIBLEDIR }}/setup_${w}_appliance.yml" ]; then
 	echo "Use ansible to setup specificities for $w on remote appliance $RTARGET"
-	ansible-playbook {{ ANSIBLEDIR }}/setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET STUDDIR=$STUDDIR ANSIBLEDIR={{ ANSIBLEDIR }} WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP PBKDIR={{ PBKDIR }} WODBEDIR={{ WODBEDIR }} LDAPDMN={{ LDAPDMN }} LDAPSRVNAME={{ LDAPSRVNAME }} WODUSER=$WODUSER" $ANSIBLEPRIVOPT
+	ansible-playbook {{ ANSIBLEDIR }}/setup_${w}_appliance.yml -i $RTARGET, -e "RTARGET=$RTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP LDAPDMN={{ LDAPDMN }} LDAPSRVNAME={{ LDAPSRVNAME }}" $ANSPLAYOPT $ANSPRIVOPT
 fi
 
 echo "Final script setup phase for $w on remote appliance $RTARGET"
