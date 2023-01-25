@@ -33,7 +33,7 @@ if [ $WODTYPE = "backend" ]; then
 fi
 
 cat > $SCRIPTDIR/wod.sh << EOF
-# This is athe wod.sh script, generated at install
+# This is the wod.sh script, generated at install
 #
 # Name of the admin user
 export WODUSER=$WODUSER
@@ -94,6 +94,9 @@ export STUDDIR=/student
 EOF
 fi
 
+chmod 755 $SCRIPTDIR/wod.sh
+source $SCRIPTDIR/wod.sh
+
 cd $SCRIPTDIR/../ansible
 SHORTNAME="`hostname -s`"
 FULLNAME=`ansible-inventory -i inventory --list | jq -r '._meta.hostvars | to_entries[] | .key' | grep -E "^$SHORTNAME(\.|$)"`
@@ -105,9 +108,13 @@ PBKDIR=`ansible-inventory -i inventory --list | jq -r "._meta.hostvars | to_entr
 
 # Declares shell variables as ansible variables as well
 # then they can be used in playbooks
-	cat >> $SCRIPTDIR/wod.sh << EOF
-export ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=$WODPRIVNOBO -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR -e ANSIBLEDIR=$ANSIBLEDIR -e ANSIBLEPRIVDIR=$ANSIBLEPRIVDIR -e SCRIPTPRIVDIR=$SCRIPTPRIVDIR "
+ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=$WODPRIVNOBO -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR -e ANSIBLEDIR=$ANSIBLEDIR -e ANSIBLEPRIVDIR=$ANSIBLEPRIVDIR -e SCRIPTPRIVDIR=$SCRIPTPRIVDIR "
 EOF
+# For future wod.sh usage by other scripts
+cat >> $SCRIPTDIR/wod.sh << EOF
+export ANSPLAYOPT="$ANSPLAYOPT"
+EOF
+export ANSPLAYOPT
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 # Another way using ansible
@@ -127,7 +134,7 @@ else
 fi
 ansible-galaxy collection install ansible.posix
 
-
+# Execute private script if any
 SCRIPTREL=`echo $SCRIPT | perl -p -e "s|$WODBEDIR||"`
 if [ -x $WODPRIVDIR/$SCRIPTREL ];
 then
@@ -142,13 +149,11 @@ fi
 if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
 	ANSPRIVOPT="$ANSPRIVOPT -e @$ANSIBLEPRIVDIR/group_vars/$PBKDIR"
 fi
+# For future wod.sh usage by other scripts
 cat >> $SCRIPTDIR/wod.sh << EOF
 export ANSPRIVOPT="$ANSPRIVOPT"
 EOF
 export ANSPRIVOPT
-
-chmod 755 $SCRIPTDIR/wod.sh
-source $SCRIPTDIR/wod.sh
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
