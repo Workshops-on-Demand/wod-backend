@@ -128,10 +128,10 @@ if [ $action != "RESET" ]; then
 				compilepriv=`echo $compilepriv | sed 's|,$||'`
 				# Same compile_scripts.yml used with different calls for public/private
 				if [ _"$compilepub" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" -e "VARDIRECTORY={{ ANSIBLEDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
 				fi
 				if [ _"$compilepriv" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
 				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
