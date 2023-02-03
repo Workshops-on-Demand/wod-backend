@@ -182,6 +182,7 @@
         - dotnet-runtime-5.0
         - dotnet-sdk-3.1
         - dotnet-sdk-5.0
+        - powershell
         state: absent
 
     - name: Ensure all required packages are installed
@@ -190,7 +191,6 @@
       package:
         pkg:
         - ansible
-        - powershell
         - python3
         - python3-pip
         - python3-jmespath
