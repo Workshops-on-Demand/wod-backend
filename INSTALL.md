@@ -11,6 +11,7 @@
 From Jupyterhub server
 
 Create a linux  account with sudo priviledges on your linux distro.
+Make sure Home directory of that user is at least in mode 711
 
 As created user:
 
