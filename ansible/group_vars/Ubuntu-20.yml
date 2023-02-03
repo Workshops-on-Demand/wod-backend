@@ -1,3 +1,4 @@
 # Ubuntu 20.04 needs that
 virtualenv_command: "virtualenv"
+virtualenv_python: "python3"
 python_lib: lib/python3.8/site-packages

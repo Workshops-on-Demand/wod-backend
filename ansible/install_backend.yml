@@ -316,6 +316,7 @@
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
+        virtualenv_python: "{{ virtualenv_python }}"
       when: CLEAN|bool
       ignore_errors: true
 
@@ -344,6 +345,7 @@
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
+        virtualenv_python: "{{ virtualenv_python }}"
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
@@ -367,6 +369,7 @@
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
+        virtualenv_python: "{{ virtualenv_python }}"
 
 #    - name: Ensure Go kernel is installed
 #      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes

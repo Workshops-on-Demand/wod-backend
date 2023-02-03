@@ -1,3 +1,4 @@
 # CentOS 7 needs that
 virtualenv_command: "virtualenv-3"
+virtualenv_python: "python3"
 python_lib: lib/python3.6/site-packages
