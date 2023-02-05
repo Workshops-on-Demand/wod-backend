@@ -1,13 +1,40 @@
 #
 # Commands to clone the repositories needed at install time
 #
+# Derive this file as a install.priv in the install subdirectory of your provate repo 
+# in order to overload these variables with those of your choice using
+# the folliwng rules:
 #
+# When using a private repo modify the WODPRIV* variable to point to your repository
+# and not the public one as seen in the example below
+#
+# You can point to a local branch instead of master/main one 
+# to test a feature branch during deployment
+#
+# You can add the name of the directory at the end 
+# if the repo name is different from the upstream setup
+# example in the last line
+#
+# In case you use a local token, uncomment this one and use with WODPRIVREPO
 #token=`cat $EXEPATH/token`
-WODAPIREPO="git clone https://github.com/Workshops-on-Demand/wod-api-db.git"
-WODFEREPO="git clone https://github.com/Workshops-on-Demand/wod-frontend.git"
-WODNOBOREPO="git clone https://github.com/Workshops-on-Demand/wod-notebooks.git"
-WODBEREPO="git clone https://github.com/Workshops-on-Demand/wod-backend.git"
+#
+WODAPIBRANCH="master"
+WODAPIREPO="https://github.com/Workshops-on-Demand/wod-api-db.git"
+#
+WODFEBRANCH="master"
+WODFEREPO="https://github.com/Workshops-on-Demand/wod-frontend.git"
+#
+WODNOBOBRANCH="main"
+WODNOBOREPO="https://github.com/Workshops-on-Demand/wod-notebooks.git"
+#
+WODBEBRANCH="main"
+WODBEREPO="https://github.com/Workshops-on-Demand/wod-backend.git"
 # Pointing to the generic private repo upstream
-WODPRIVREPO="git clone https://github.com/Workshops-on-Demand/wod-private.git"
+WODPRIVBRANCH="main"
+WODPRIVREPO="https://github.com/Workshops-on-Demand/wod-private.git"
+#
 # Uncomment to use your private repo
-#WODPRIVREPO="git clone git@github.com:Account/Private-Repo.git wod-private"
+#WODPRIVBRANCH="master"
+#WODPRIVREPO="git@github.com:Account/Private-Repo.git wod-private"
+# with token
+#WODPRIVREPO="https://account:$token@github.com:/Account/Private-Repo.git wod-private"
