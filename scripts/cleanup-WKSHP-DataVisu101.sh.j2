@@ -6,4 +6,4 @@ export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-DataVisu101'] }}
 export NAME=datavisulab
 export TMPDIR=/tmp/$NAME.$stdid.ret
 
-$JUPPROC/scripts/cleanup-container-ratio.sh
+{{ SCRIPTDIR }}/cleanup-container-ratio.sh
