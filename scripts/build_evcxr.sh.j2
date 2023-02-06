@@ -11,7 +11,7 @@ mkdir -p $HOME/.mail
 source {{ SCRIPTDIR }}/wod.sh
 
 v=`rustc --version | awk '{ print $2 }' | cut -d. -f2`
-if [ _"$v"  = _"" ] || [ $v -le 43 ]; then
+if [ _"$v"  = _"" ] || [ $v -le 65 ]; then
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rust-init-$$.sh
 	chmod 755 /tmp/rust-init-$$.sh
 	/tmp/rust-init-$$.sh -y
