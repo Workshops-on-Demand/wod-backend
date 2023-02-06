@@ -354,7 +354,7 @@
       pip:
         name:
         - jupyterhub
-        - jupyterlab>=3.5.2
+        - jupyterlab
         - jupyterhub-idle-culler
         - ansible-kernel>=0.9.0
         - bash_kernel>=0.7.2
