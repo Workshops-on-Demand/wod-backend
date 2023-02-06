@@ -5,7 +5,6 @@ source {{ SCRIPTDIR }}/functions.sh
 
 export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-DataVisu101'] }}
 
-#export RTARGET=16.31.86.98
 # Start by cleaning up stuff - do it early as after we setup .ssh content
 {{ SCRIPTDIR }}//reset-$ws.sh
 {{ SCRIPTDIR }}//create-appliance.sh
@@ -93,12 +92,12 @@ ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET "doc
 scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET:$TMPDIR/datavisutoken $TMPDIR
 
 # ansible-vault to store it in the pass file creating a DATAVISUTOK ansible variable
-if [ ! -d "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass" ]; then
-	mkdir -p "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass"
+if [ ! -d "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass" ]; then
+	mkdir -p "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass"
 fi
 # We can overwrite the existing variables file as we don't need PASSSTU 
-ansible-vault encrypt_string --vault-password-file "{{/vault_secret" `cat $TMPDIR/datavisutoken` --name "'DATAVISUTOK'" > "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "/home/jupyter/jupyter-procmail/ansible-jupyter/vault_secret" $httpport --name "'HTTPPORT'" >> "/home/jupyter/jupyter-procmail/ansible-jupyter/staging/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}/vault_secret" `cat $TMPDIR/datavisutoken` --name "'DATAVISUTOK'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 # ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo rm -rf $TMPDIR
