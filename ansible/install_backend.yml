@@ -431,6 +431,12 @@
         group: "{{ WODUSER }}"
         mode: 0751
 
+    - name: Deliver build scripts under /usr/local/bin
+      become: yes
+      become_user: root
+      template: src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} mode=0755
+      with_fileglob: [ '{{ SCRIPTDIR }}//build*.sh.j2' ]
+
     - name: Ensure Rust kernel is installed
       shell: . '{{ JPHUB }}/bin/activate' && "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
 
