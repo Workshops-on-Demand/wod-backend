@@ -4,23 +4,43 @@
 #
 # Cleanup force before building - longer but safer
 #
-rm -rf $HOME/.cargo
+set -e
+set -u
+set -o pipefail
 
 mkdir -p $HOME/.mail
 
 source {{ SCRIPTDIR }}/wod.sh
 
+ansible-playbook {{ ANSIBLEDIR }}/distrib.yml
+DISTRIB=`cat $HOME/.mail/distrib`
+if [ -f "{{ SCRIPTDIR }}/../evcxr_jupyter.$DISTRIB" ]; then
+	echo "Not erasing existing evcxr_jupyter.$DISTRIB. Do it manually if you want to regenerate it"
+	exit -1
+fi
+
+# Cleanup first
+rm -rf $HOME/.cargo
+
+# Check Rust version and update if needed
 v=`rustc --version | awk '{ print $2 }' | cut -d. -f2`
 if [ _"$v"  = _"" ] || [ $v -le 65 ]; then
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rust-init-$$.sh
 	chmod 755 /tmp/rust-init-$$.sh
 	/tmp/rust-init-$$.sh -y
 fi
+
+# Build evcxr kernel
 . $HOME/.profile && cargo install cargo-script && cargo install evcxr_jupyter --no-default-features
-ansible-playbook {{ ANSIBLEDIR }}/distrib.yml
-DISTRIB=`cat $HOME/.mail/distrib`
-cp ~/.cargo/bin/evcxr_jupyter  {{ SCRIPTDIR }}/evcxr_jupyter.$DISTRIB
-if [ _"$v"  = _"" ] || [ $v -le 43 ]; then
+
+# Install it
+strip ~/.cargo/bin/evcxr_jupyter
+mv ~/.cargo/bin/evcxr_jupyter  {{ SCRIPTDIR }}/../evcxr_jupyter.$DISTRIB
+echo "You may want to cd {{ SCRIPTDIR }}/.. ; git add evcxr_jupyter.$DISTRIB"
+
+# Cleanup
+if [ _"$v"  = _"" ] || [ $v -le 65 ]; then
 	/tmp/rust-init-$$.sh self uninstall
 	rm -f /tmp/rust-init-$$.sh
 fi
+rm -rf $HOME/.cargo
