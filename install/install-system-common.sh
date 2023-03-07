@@ -65,10 +65,27 @@ fi
 clean_clone_log $WODBEBRANCH $WODBEREPO
 clean_clone_log $WODPRIVBRANCH $WODPRIVREPO
 
-#Setup ssh for WODUSER
-ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa
-install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
-cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+if [ $WODGENKEYS -eq 0 ] && [ -f "$WODTMPDIR/id_rsa" ]; then
+	# We do not have to regenerate keys and reuse existing one preserved
+	echo "Keep existing ssh keys for $WODUSER"
+	ls -al $WODTMPDIR
+	mkdir -p .ssh
+	chmod 700 .ssh
+	cp $WODTMPDIR/[a-z]* .ssh
+	chmod 644 .ssh/*
+	chmod 600 .ssh/id_rsa
+	if [ -f .ssh/authorized_keys ]; then
+		chmod 600 .ssh/authorized_keys
+	fi
+else
+	# Setup ssh for WODUSER
+	echo "Generating ssh keys for $WODUSER"
+	ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa
+	install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
+	cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+# In any case remove the temp dir
+rm -rf $WODTMPDIR
 
 if [ $WODTYPE = "backend" ]; then
 	# Setup this using the group for WoD
