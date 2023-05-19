@@ -87,7 +87,7 @@ fi
 # In any case remove the temp dir
 rm -rf $WODTMPDIR
 
-if [ $WODTYPE = "backend" ]; then
+if [ $WODTYPE != "appliance" ]; then
 	# Setup this using the group for WoD
 	cat > $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
 PBKDIR: $WODGROUP
