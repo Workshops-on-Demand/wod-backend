@@ -191,11 +191,11 @@ SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 SOURCE_ORIGIN="http://localhost:3000,http://localhost:8000"
 EOF
-	# Start the PostgreSQL DB stack
-	# We need to relog as $WODUSER so it's really in the docker group
-	# and be able to communicate with docker
 	echo "Launching docker PostgreSQL stack"
-	(cd $WODAPIDBDIR ; docker-compose up -d)
+	# Start the PostgreSQL DB stack
+	# We need to relog with sudo as $WODUSER so it's really in the docker group
+	# and be able to communicate with docker
+	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Start the API server"
