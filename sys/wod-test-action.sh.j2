@@ -64,7 +64,7 @@ EOF
 
 
 i=$STDMIN
-{%if JPHUB is defined %}
+{% if WODTYPE == 'backend' %}
 if [ $ACTION = "PDF" ]; then
 	source "{{ JPHUB }}/bin/activate"
 	for nb in {{ STUDDIR }}/student$i/$WKSHP/*.ipynb; do
@@ -84,12 +84,10 @@ if [ $ACTION = "WORD" ]; then
 fi
 {% else %}
 if [ $ACTION = "PDF" ] || [ $ACTION = "WORD" ]; then
-	echo "Action PDF|WORD is only available on the backend server"
+	echo "Action PDF|WORD is not available for your type of server ({{ WODTYPE }})"
 	exit -1
 fi
 {% endif %}
-
-
 
 # do we have a range
 echo $STDRANGE | grep -q ','
