@@ -273,7 +273,7 @@
   become: true
   become_user: root
   template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-  with_fileglob: [ '{{ SYSDIR }}//*.service.j2', '{{ SYSPRIVDIR }}//*.service.j2' ]
+  with_fileglob: [ '{{ SYSDIR }}//wod-*.service.j2', '{{ SYSPRIVDIR }}//wod-*.service.j2' ]
 
 - name: Enable WoD services
   become: true
