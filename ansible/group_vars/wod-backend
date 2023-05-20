@@ -13,9 +13,9 @@
 #
 BASESTDID: 0
 #
-# POSTPORT is the Postfix Port on which the smtp service is listening to receive API mail requests from the frontend
+# JPHUB  is the directory used to install the JupyterHub stack (a python venv)
 #
-POSTPORT: "10025"
+JPHUB: /opt/jupyterhub
 #
 # In case we have a LDAP server to use, flag as such the corresponding workshops in the DB and use the following values:
 #

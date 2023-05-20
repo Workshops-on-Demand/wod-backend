@@ -58,7 +58,7 @@ $WKSHP
 QUIT
 EOF
 	echo "Sending a mail to $ACTION student $1 for workshop $WKSHP"
-	cat /tmp/mail.$$ | netcat {{ WODBEFQDN }} {{ POSTPORT }}
+	cat /tmp/mail.$$ | netcat {{ WODBEFQDN }} {{ WODPOSTPORT }}
 	rm -f /tmp/mail.$$
 }
 
