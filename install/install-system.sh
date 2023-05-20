@@ -195,7 +195,7 @@ EOF
 	# We need to relog as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
 	echo "Launching docker PostgreSQL stack"
-	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose up -d"
+	(cd $WODAPIDBDIR ; docker-compose up -d)
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Start the API server"
