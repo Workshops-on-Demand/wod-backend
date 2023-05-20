@@ -216,6 +216,12 @@ if grep -qE "^$WODUSER:" /etc/passwd; then
         chown -R $WODUSER $WODTMPDIR
     fi
     userdel -f -r $WODUSER
+    if [ -d $WODHDIR ] && [ _"$WODHDIR" != _"/" ]; then
+        echo $WODHDIR | grep -qE '^/home'
+        if [ $? -eq 0 ]; then
+            rm -rf $WODHDIR
+        fi
+    fi
 
     # If we do not have to regenerate keys
     if [ $WODGENKEYS -eq 0 ] && [ -d $WODTMPDIR ]; then
