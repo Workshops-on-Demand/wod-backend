@@ -113,7 +113,7 @@
       become: true
       become_user: root
       copy:
-        src: "{{ WODFEDIR }}/sys/fail2ban.conf"
+        src: "{{ WODBEDIR }}/sys/fail2ban.conf"
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
@@ -123,7 +123,7 @@
       become: true
       become_user: root
       copy:
-        src: "{{ WODFEDIR }}/sys/fail2ban.jail"
+        src: "{{ WODBEDIR }}/sys/fail2ban.jail"
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
@@ -133,7 +133,7 @@
       become: true
       become_user: root
       copy:
-        src: "{{ WODFEDIR }}/sys/fail2ban.action"
+        src: "{{ WODBEDIR }}/sys/fail2ban.action"
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root
