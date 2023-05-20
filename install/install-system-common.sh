@@ -129,6 +129,7 @@ fi
 
 if [ $WODTYPE = "api-db" ] ||  [ $WODTYPE = "frontend" ]; then
 	cd wod-$WODTYPE
+	echo "Launching npm install..."
 	npm install
 fi
 
