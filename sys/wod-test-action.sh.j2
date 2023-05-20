@@ -49,7 +49,7 @@ send_mail() {
 
 	cat > /tmp/mail.$$ << EOF
 MAIL FROM: {{ WODSENDER }}
-RCPT TO: {{ WODUSER }}@`hostname -f`
+RCPT TO: {{ WODUSER }}@{{ WODBEFQDN }}
 DATA
 Subject: $ACTION $1 0
 
@@ -58,7 +58,7 @@ $WKSHP
 QUIT
 EOF
 	echo "Sending a mail to $ACTION student $1 for workshop $WKSHP"
-	cat /tmp/mail.$$ | netcat localhost {{ POSTPORT }}
+	cat /tmp/mail.$$ | netcat {{ WODBEFQDN }}{{ POSTPORT }}
 	rm -f /tmp/mail.$$
 }
 
