@@ -204,19 +204,21 @@ if grep -qE "^$WODUSER:" /etc/passwd; then
     fi
     WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
     echo "$WODUSER home directory: $WODHDIR"
-    echo "Original SSH keys"
-    ls -al $WODHDIR/.ssh/
-    mkdir -p $WODTMPDIR
-    chmod 700 $WODTMPDIR
-    if [ $WODGENKEYS -eq 0 ] && [ -f $WODHDIR/.ssh/id_rsa ]; then
-        echo "Copying existing SSH keys for $WODUSER in $WODTMPDIR"
-        cp -a $WODHDIR/.ssh/[a-z]* $WODTMPDIR
+    if [ -d $WODHDIR/.ssh ]; then
+        echo "Original SSH keys"
+        ls -al $WODHDIR/.ssh/
+        mkdir -p $WODTMPDIR
+        chmod 700 $WODTMPDIR
+        if [ $WODGENKEYS -eq 0 ] && [ -f $WODHDIR/.ssh/id_rsa ]; then
+            echo "Copying existing SSH keys for $WODUSER in $WODTMPDIR"
+            cp -a $WODHDIR/.ssh/[a-z]* $WODTMPDIR
+        fi
+        chown -R $WODUSER $WODTMPDIR
     fi
-    chown -R $WODUSER $WODTMPDIR
     userdel -f -r $WODUSER
 
     # If we do not have to regenerate keys
-    if [ $WODGENKEYS -eq 0 ]; then
+    if [ $WODGENKEYS -eq 0 ] && [ -d $WODTMPDIR ]; then
         echo "Preserved SSH keys"
         ls -al $WODTMPDIR
     else
