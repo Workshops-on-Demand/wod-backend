@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-    echo "install.sh [-h][-t type][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user][-s sender][-k]"
+    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user][-s sender][-k]"
     echo " "
     echo "where:"
     echo "type      is the installation type"
@@ -14,6 +14,8 @@ usage() {
     echo "groupname is the ansible group_vars name to be used"
     echo "          example: production, staging, test, ...  "
     echo "          if empty using 'production'                "
+    echo "ip        IP address of the server being deployed"
+    echo "          Used in particuler when the IP can't be guessed such as with Vagrant"
     echo "backend   is the FQDN of the backend JupyterHub server"
     echo "          example: be.internal.example.org  "
     echo "          if empty using the local name for the backend                "
@@ -48,9 +50,10 @@ g=""
 u=""
 s=""
 k=""
+i=""
 WODGENKEYS=0
 
-while getopts "t:f:e:b:a:g:u:s:hk" option; do
+while getopts "t:f:e:b:a:g:i:u:s:hk" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -62,6 +65,9 @@ while getopts "t:f:e:b:a:g:u:s:hk" option; do
             ;;
         f)
             f=${OPTARG}
+            ;;
+        i)
+            i=${OPTARG}
             ;;
         e)
             e=${OPTARG}
@@ -123,6 +129,17 @@ if [ ! -z "${a}" ]; then
 else
     WODAPIDBFQDN=$WODFEFQDN
 fi
+if [ ! -z "${i}" ]; then
+    WODBEIP="${i}"
+else
+    export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
+    res=`echo $WODBEIP | { grep -E '^127\.' || true; }`
+    if [ _"$res" != _"" ]; then
+        # With vagrant we do not get the right IP address in /etc/hosts for the VM
+        # We know the net dvice is eth0, so grab the IP obtained from it
+        export WODBEIP=`ifconfig eth0 | grep inet | awk '{print $2}'`
+    fi
+fi
 if [ ! -z "${u}" ]; then
     export WODUSER="${u}"
 else
@@ -140,7 +157,7 @@ else
     WODGROUP="production"
 fi
 export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
-export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
+
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 res=`echo $WODDISTRIB | { grep -i rocky || true; }`
 if [ _"$res" != _"" ]; then

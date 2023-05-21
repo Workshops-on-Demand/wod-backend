@@ -21,13 +21,14 @@ sub usage {
 my $wodtype = undef;
 my $wkshp = "";
 my $woduser = "wodadmin";
+my $localnet = "wodnet.local";
 my $help;
 my $genkeys;
 # Automate Wod systems creation
 my %machines = (
-	'api-db' => "wodapiu2204.wodnet.local",
-	'frontend' => "wodfeu2204.wodnet.local",
-	'backend' => "wodbec7.wodnet.local",
+	'api-db' => "wodapiu2204",
+	'frontend' => "wodfeu2204",
+	'backend' => "wodbec7",
 );
 my $machines = \%machines;
 GetOptions("type|t=s" => \$wodtype,
@@ -74,6 +75,8 @@ foreach my $m (@mtypes) {
 	system("vagrant halt $h->{$m}");
 	print "Starting vagrant machine $h->{$m}\n";
 	system("vagrant up $h->{$m}");
+	print "Getting IP address for vagrant machine $h->{$m}\n";
+	my $srvip = `"vagrant ssh-config $h->{$m}  | grep HostName | awk '{print $2}'"`;
 	print "Installing vagrant machine $h->{$m}\n";
 	my $kk = "";
 	$kk = "-k" if ($genkeys);
@@ -83,6 +86,6 @@ foreach my $m (@mtypes) {
 		my $cmd = "\"./wod-backend/scripts/setup-appliance $wkshp\"";
 		system("vagrant ssh $h->{'backend'} -c \"sudo su - $woduser -c $cmd\"");
 	} else {
-		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -g production -b $machines{'backend'} -f $machines{'frontend'} -a $machines{'api-db'} -e localhost -u $woduser -s wod\@flossita.org\" $kk");
+		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -i $srvip -g production -b $machines{'backend'}.$localnet -f $machines{'frontend'}.$localnet -a $machines{'api-db'}.$localnet -e localhost -u $woduser -s wod\@flossita.org\" $kk");
 	}
 }
