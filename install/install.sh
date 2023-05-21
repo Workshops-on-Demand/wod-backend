@@ -15,6 +15,7 @@ usage() {
     echo "          example: production, staging, test, ...  "
     echo "          if empty using 'production'                "
     echo "ip        IP address of the server being deployed"
+    echo "          if empty, try to be autodetected from FQDN"
     echo "          Used in particuler when the IP can't be guessed such as with Vagrant"
     echo "backend   is the FQDN of the backend JupyterHub server"
     echo "          example: be.internal.example.org  "
@@ -132,14 +133,10 @@ fi
 if [ ! -z "${i}" ]; then
     WODBEIP="${i}"
 else
-    export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
-    res=`echo $WODBEIP | { grep -E '^127\.' || true; }`
-    if [ _"$res" != _"" ]; then
-        # With vagrant we do not get the right IP address in /etc/hosts for the VM
-        # We know the net dvice is eth0, so grab the IP obtained from it
-        export WODBEIP=`ifconfig eth0 | grep inet | awk '{print $2}'`
-    fi
+    WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
 fi
+export WODBEIP
+
 if [ ! -z "${u}" ]; then
     export WODUSER="${u}"
 else
