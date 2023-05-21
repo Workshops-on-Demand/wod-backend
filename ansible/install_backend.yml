@@ -428,7 +428,7 @@
       when:
         - ansible_distribution == "CentOS"
 
-    - name: Ensure all required pip packages are installed
+    - name: Ensure jupyterhub pip packages is installed
       pip:
         name:
         - jupyterhub==3.1.1
@@ -439,6 +439,7 @@
       when:
         - ansible_distribution != "CentOS"
 
+    - name: Ensure all required pip packages are installed
       pip:
         name:
         - jupyterlab
@@ -458,8 +459,6 @@
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
         virtualenv_python: "{{ virtualenv_python }}"
-      when:
-        - ansible_distribution != "CentOS"
 
     - name: Ensure Go kernel is installed
       shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
