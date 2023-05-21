@@ -25,9 +25,9 @@ my $help;
 my $genkeys;
 # Automate Wod systems creation
 my %machines = (
-	'api-db' => "wodapiu2204",
-	'frontend' => "wodfeu2204",
-	'backend' => "wodbec7",
+	'api-db' => "wodapiu2204.wodnet.local",
+	'frontend' => "wodfeu2204.wodnet.local",
+	'backend' => "wodbec7.wodnet.local",
 );
 my $machines = \%machines;
 GetOptions("type|t=s" => \$wodtype,
