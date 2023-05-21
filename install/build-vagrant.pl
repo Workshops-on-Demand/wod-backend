@@ -76,7 +76,18 @@ foreach my $m (@mtypes) {
 	print "Starting vagrant machine $h->{$m}\n";
 	system("vagrant up $h->{$m}");
 	print "Getting IP address for vagrant machine $h->{$m}\n";
-	my $srvip = `"vagrant ssh-config $h->{$m}  | grep HostName | awk '{print $2}'"`;
+	open(CMD,"vagrant ssh-config $h->{$m} |") || die "Unable to execute vagrant ssh-config $h->{$m}";
+	my $srvip = "";
+	my $void;
+	while (<CMD>) {
+		next if ($_ !~ /HostName/);
+		chomp($_);
+		$srvip = $_;
+		$srvip =~ s/\s+HostName\s+([0-9.]+)\s*/$1/;
+		($void,$void,$srvip) = split(/ +/,$_);
+		last;
+	}
+	print "Got $srvip\n";
 	print "Installing vagrant machine $h->{$m}\n";
 	my $kk = "";
 	$kk = "-k" if ($genkeys);
