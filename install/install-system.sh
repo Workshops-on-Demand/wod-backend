@@ -190,12 +190,14 @@ SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_CODING_CHALLENGE="None"
 SLACK_CHANNEL_CHALLENGES="None"
 SOURCE_ORIGIN="http://localhost:3000,http://localhost:8000"
+WODUID=`id -u`
+WODGID=`id -g`
 EOF
 	echo "Launching docker PostgreSQL stack"
 	# Start the PostgreSQL DB stack
 	# We need to relog with sudo as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
-	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose up -d"
+	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Start the API server"

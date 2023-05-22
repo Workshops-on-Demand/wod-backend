@@ -5,7 +5,6 @@
     - name: Ensure that this a compliant WoD system
       include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
-
     - name: Setup ufw firewall TCP rules
       become: true
       become_user: root
