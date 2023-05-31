@@ -98,7 +98,7 @@
       become: yes
       become_user: root
       apt_key:
-        url: https://packages.cloud.google.com/apt/doc//apt-key.gpg.asc
+        url: https://packages.cloud.google.com/apt/doc//apt-key.gpg
         state: present
       when:
        - ansible_os_family == "Debian"
@@ -124,6 +124,16 @@
       when:
        - ansible_distribution == "Ubuntu"
        - ansible_distribution_major_version == "20"
+
+    - name: Add Golang APT repository
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: ppa:longsleep/golang-backports
+        state: present
+      when:
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version <= "20"
 
     - name: Add K8s YUM repository
       become: yes
@@ -205,6 +215,16 @@
         - powershell
         state: absent
 
+    - name: Ensure all non-required APT packages are uninstalled
+      become: yes
+      become_user: root
+      package:
+        name:
+        - golang
+      when:
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version <= "20"
+
     - name: Ensure all required packages are installed
       become: yes
       become_user: root
@@ -232,7 +252,6 @@
         - pandoc
         - clang
         - cmake
-        - golang
         - texlive-xetex
         - aspnetcore-runtime-6.0
         - dotnet-runtime-6.0
@@ -284,6 +303,26 @@
       when:
         - ansible_os_family == "Debian"
 
+    - name: Ensure all required APT packages are installed
+      become: yes
+      become_user: root
+      package:
+        name:
+        - golang
+      when:
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version > "20"
+
+    - name: Ensure all required APT packages are installed
+      become: yes
+      become_user: root
+      package:
+        name:
+        - golang-go
+      when:
+       - ansible_distribution == "Ubuntu"
+       - ansible_distribution_major_version <= "20"
+
     - name: Ensure all required RPM packages are installed
       become: yes
       become_user: root
@@ -301,6 +340,7 @@
         - perl-Proc-ProcessTable
         - perl-Data-Dumper
         - psacct
+        - golang
         state: present
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
@@ -376,10 +416,27 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Ensure all required pip packages are installed
+    - name: Ensure jupyterhub pip packages is installed on CentOS
+      pip:
+        name:
+        - jupyterhub
+        state: present
+        virtualenv: "{{ JPHUB }}"
+        virtualenv_command: "{{ virtualenv_command }}"
+        virtualenv_python: "{{ virtualenv_python }}"
+      when:
+        - ansible_distribution == "CentOS"
+
+    - name: Ensure jupyterhub pip packages is installed
       pip:
         name:
         - jupyterhub==3.1.1
+      when:
+        - ansible_distribution != "CentOS"
+
+    - name: Ensure all required pip packages are installed
+      pip:
+        name:
         - jupyterlab
         - jupyterhub-idle-culler
         - ansible-kernel>=0.9.0
@@ -398,8 +455,8 @@
         virtualenv_command: "{{ virtualenv_command }}"
         virtualenv_python: "{{ virtualenv_python }}"
 
-#    - name: Ensure Go kernel is installed
-#      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+    - name: Ensure Go kernel is installed
+      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
 
     - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: yes
@@ -414,23 +471,23 @@
         - /usr/local/bin
         - /usr/local/share
 
-#    - name: Make gophernotes available under /usr/local/bin
-#      become: yes
-#      become_user: root
-#      copy:
-#        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
-#        dest: /usr/local/bin/gophernotes
-#        owner: "{{ WODUSER }}"
-#        group: "{{ WODUSER }}"
-#        mode: 0755
+    - name: Make gophernotes available under /usr/local/bin
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
+        dest: /usr/local/bin/gophernotes
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
+        mode: 0755
 
-#    - name: Cleanup intermediate go directory
-#      become: yes
-#      become_user: root
-#      file:
-#        path: '{{ ansible_env.HOME }}/go'
-#        state: absent
-#
+    - name: Cleanup intermediate go directory
+      become: yes
+      become_user: root
+      file:
+        path: '{{ ansible_env.HOME }}/go'
+        state: absent
+
     - name: Ensure that this a compliant WoD system
       include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
@@ -499,7 +556,7 @@
       shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
 
     - name: Ensure jupyterhub docx bundle is installed
-      shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && jupyter bundlerextension enable --py jupyter_docx_bundler --prefix={{ JPHUB }}
+      shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && jupyter bundlerextension enable --py jupyter_docx_bundler --sys-prefix
 
     - name: Ensure jupyterhub ssh kernel is installed
       shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
