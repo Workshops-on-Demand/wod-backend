@@ -431,6 +431,10 @@
       pip:
         name:
         - jupyterhub==3.1.1
+        state: present
+        virtualenv: "{{ JPHUB }}"
+        virtualenv_command: "{{ virtualenv_command }}"
+        virtualenv_python: "{{ virtualenv_python }}"
       when:
         - ansible_distribution != "CentOS"
 
