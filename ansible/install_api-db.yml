@@ -43,6 +43,7 @@
         - fail2ban
         - libproc-processtable-perl
         - acct
+        - libjson-perl
       when:
         - ansible_os_family == "Debian"
 
@@ -57,6 +58,7 @@
         - perl-Proc-ProcessTable
         - perl-Data-Dumper
         - psacct
+        - perl-JSON
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
