@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Build the workshop seeder file to create the correct Workshops during install time
-# Need to ba called after wod.sh has been sourced
+# Need to be called after wod.sh has been sourced
 # Done automatically at intalls time
 
 use strict;
@@ -13,6 +13,7 @@ my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js";
 my $h = {};
 
 # Analyses metadata stored within Workshops
+# TODO: WODPRIVNOBO
 opendir(DIR,$ENV{'WODNOBO'}) || die "Unable to open directory $ENV{'WODNOBO'}";
 while (my $wkshp = readdir(DIR)) {
 	next if ($wkshp =~ /^\./);
@@ -34,6 +35,7 @@ print(WKSHP "'use strict';\n\n");
 print(WKSHP "module.exports = {\n");
 print(WKSHP "  up: (queryInterface, Sequelize) => {\n");
 print(WKSHP "    return queryInterface.bulkInsert('workshops', [\n");
+# TODO: generate 06_replays or merge with 01_workshop
 foreach my $w (keys %$h) {
 	print(WKSHP "      {\n");
 	foreach my $f (keys %{$h->{$w}}) {
