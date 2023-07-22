@@ -198,12 +198,33 @@ EOF
 	# We need to relog with sudo as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
+	# Before we need to generate what is under seeders
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Start the API server"
 	npm start &
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
+		cat > .env << EOF
+API_PORT=8082
+DB_PW=TrèsCompliqué!!##123
+PRODUCTION_API_SERVER=$WODFEFQDN
+GATSBY_SENDGRID_API_KEY=""
+GATSBY_NEWSLETTER_API=""
+GATSBY_WORKSHOPCHALLENGE_API_ENDPOINT=''
+GATSBY_USERNAME=''
+GATSBY_PASSWORD=''
+GATSBY_SLACK_INVITE_URL=''
+GATSBY_SLACK_TOKEN=''
+SLACK_COMMUNITY_NAME=''
+CLOUDINARY_CLOUD_NAME=''
+CLOUDINARY_API_KEY=''
+CLOUDINARY_USERNAME=''
+CLOUD_NAME=''
+CLOUDINARY_API_SECRET=''
+WODUID=`id -u`
+WODGID=`id -g`
+EOF
 	echo "Start the Frontend server"
 	npm start &
 fi
