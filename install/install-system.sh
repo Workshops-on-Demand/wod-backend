@@ -152,6 +152,10 @@ export ANSPRIVOPT
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
+	# We can now generate the seeders files 
+	# for the api-db server install later after the backend is done
+	# This is done on the backend and generated on the appropriate directories
+	$INSTALLDIR/build-seeders.sh
 elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0"
 fi
