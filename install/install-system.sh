@@ -152,12 +152,13 @@ export ANSPRIVOPT
 
 if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
-	# We can now generate the seeders files 
-	# for the api-db server install later after the backend is done
-	# This is done on the backend and generated on the appropriate directories
-	$INSTALLDIR/build-seeders.sh
 elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0"
+	if [ $WODTYPE = "api-db" ]; then
+		# We can now generate the seeders files 
+		# for the api-db server using the backend content installed as well
+		$INSTALLDIR/build-seeders.sh
+	fi
 fi
 
 if [ $WODTYPE != "appliance" ]; then
@@ -202,7 +203,6 @@ EOF
 	# We need to relog with sudo as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
-	# Before we need to generate what is under seeders
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Start the API server"
