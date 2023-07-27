@@ -58,8 +58,6 @@ elif [ $WODTYPE = "frontend" ]; then
 	clean_clone_log $WODFEBRANCH $WODFEREPO
 elif [ $WODTYPE = "backend" ]; then
 	clean_clone_log $WODNOBOBRANCH $WODNOBOREPO
-	# We also need the api-db cloned version in order to generate seeders later on
-	clean_clone_log $WODAPIBRANCH $WODAPIREPO
 fi
 
 # We'll store in backend dir the data we need whatever the type we're building
