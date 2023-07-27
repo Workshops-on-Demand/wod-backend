@@ -98,6 +98,6 @@ foreach my $m (@mtypes) {
 		my $cmd = "\"./wod-backend/scripts/setup-appliance $wkshp\"";
 		system("vagrant ssh $h->{'backend'} -c \"sudo su - $woduser -c $cmd\"");
 	} else {
-		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -i $srvip -g production -b $machines{'backend'}.$localnet -f $machines{'frontend'}.$localnet -a $machines{'api-db'}.$localnet -e localhost -u $woduser -s wod\@flossita.org\" $kk");
+		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -i $srvip -g production -b $machines{'backend'}.$localnet -f $machines{'frontend'}.$localnet -a $machines{'api-db'}.$localnet -e localhost -u $woduser -s wod\@flossita.org $kk\"");
 	}
 }
