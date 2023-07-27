@@ -53,6 +53,7 @@ if ((defined $wodtype) && ($wodtype =~ /appliance/)) {
 }
 
 # Manages the private network for machines and DHCP/DNS setup
+# TODO: managing this depends on hypervisor type
 my $wodnet = `sudo virsh net-list --name`;
 if ($wodnet =~ /^vagrant-libvirt$/) {
 	system("sudo virsh net-start --network vagrant-libvirt");
