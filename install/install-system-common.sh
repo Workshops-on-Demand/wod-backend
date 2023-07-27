@@ -53,7 +53,6 @@ clean_clone_log() {
 # Get content for WoD - now in private mode
 rm -rf .ssh
 if [ $WODTYPE = "api-db" ]; then
-	# using branch rename/migrationfiles for now - rebased on it
 	clean_clone_log $WODAPIBRANCH $WODAPIREPO
 elif [ $WODTYPE = "frontend" ]; then
 	clean_clone_log $WODFEBRANCH $WODFEREPO
