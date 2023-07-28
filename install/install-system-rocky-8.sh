@@ -12,7 +12,7 @@ if grep -qv 'ip_resolve=4' /etc/yum.conf; then
 	echo "ip_resolve=4" >> /etc/yum.conf
 fi
 
-PKGLIST="epel-release ansible openssh-server"
+PKGLIST="epel-release perl ansible openssh-server"
 
 if [ $WODTYPE != "appliance" ]; then
     PKGLIST="$PKGLIST git jq npm"

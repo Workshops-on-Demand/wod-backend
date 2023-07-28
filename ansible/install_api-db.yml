@@ -44,6 +44,7 @@
         - libproc-processtable-perl
         - acct
         - libjson-perl
+        - libyaml-tiny-perl
       when:
         - ansible_os_family == "Debian"
 
@@ -59,6 +60,7 @@
         - perl-Data-Dumper
         - psacct
         - perl-JSON
+        - perl-YAML-Tiny
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
