@@ -154,11 +154,6 @@ if [ $WODTYPE = "backend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0 -e APPMIN=0 -e APPMAX=0"
 elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0"
-	if [ $WODTYPE = "api-db" ]; then
-		# We can now generate the seeders files 
-		# for the api-db server using the backend content installed as well
-		$INSTALLDIR/build-seeders.sh
-	fi
 fi
 
 if [ $WODTYPE != "appliance" ]; then
@@ -167,6 +162,10 @@ if [ $WODTYPE != "appliance" ]; then
 fi
 
 if [ $WODTYPE = "api-db" ]; then
+	# We can now generate the seeders files 
+	# for the api-db server using the backend content installed as well
+	$INSTALLDIR/build-seeders.sh
+
 	cd $WODAPIDBDIR
 	cat > .env << EOF
 FROM_EMAIL_ADDRESS="$WODSENDER"
