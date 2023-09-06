@@ -50,10 +50,11 @@ clean_clone_log() {
 
 # This is run as WODUSER user
 
-# Get content for WoD - now in private mode
+# Get content for WoD
 rm -rf .ssh
 if [ $WODTYPE = "api-db" ]; then
 	clean_clone_log $WODAPIBRANCH $WODAPIREPO
+	clean_clone_log $WODNOBOBRANCH $WODNOBOREPO
 elif [ $WODTYPE = "frontend" ]; then
 	clean_clone_log $WODFEBRANCH $WODFEREPO
 elif [ $WODTYPE = "backend" ]; then
