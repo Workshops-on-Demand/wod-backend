@@ -87,12 +87,12 @@ export WODAPIDBDIR=$PWODBEDIR/wod-api-db
 
 # FRONTEND PART
 export WODFEDIR=$PWODBEDIR/wod-frontend
+export WODNOBO=$PWODBEDIR/wod-notebooks
 EOF
 if [ $WODTYPE = "backend" ]; then
 	cat >> $SCRIPTDIR/wod.sh << 'EOF'
 
 # These dirs are also fixed by default and can be changed as needed
-export WODNOBO=$PWODBEDIR/wod-notebooks
 export STUDDIR=/student
 #
 EOF
