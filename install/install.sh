@@ -218,7 +218,7 @@ if grep -qE "^$WODUSER:" /etc/passwd; then
     fi
     WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
     echo "$WODUSER home directory: $WODHDIR"
-    if [ -d $WODHDIR/.ssh ]; then
+    if [ -d "$WODHDIR/.ssh" ]; then
         echo "Original SSH keys"
         ls -al $WODHDIR/.ssh/
         mkdir -p $WODTMPDIR
