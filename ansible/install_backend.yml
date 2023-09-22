@@ -603,13 +603,13 @@
     - name: Ensure powershell is removed through dotnet before installing
       become: yes
       become_user: root
-      command: /usr/{{ mslib }}/dotnet/dotnet tool uninstall --global powershell
+      command: {{ dotnetpath }}/dotnet tool uninstall --global powershell
       ignore_errors: yes
 
     - name: Ensure dotnet interactive is removed through dotnet before installing
       become: yes
       become_user: root
-      command: /usr/{{ mslib }}/dotnet/dotnet tool uninstall --global Microsoft.dotnet-interactive
+      command: {{ dotnetpath }}/dotnet tool uninstall --global Microsoft.dotnet-interactive
       ignore_errors: yes
 
     - name: Remove old MS tools to be sure a good one will be available
@@ -636,7 +636,7 @@
       become: yes
       become_user: root
       file:
-        src: /usr/{{ mslib }}/dotnet/dotnet
+        src: {{ dotnetpath }}/dotnet
         dest: /usr/local/bin/dotnet
         state: link
         owner: "{{ WODUSER }}"
@@ -649,12 +649,12 @@
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/{{ mslib }}/dotnet/dotnet tool install --tool-path /usr/local/bin powershell
+      command: {{ dotnetpath }}/dotnet tool install --tool-path /usr/local/bin powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/{{ mslib }}/dotnet/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
+      command: {{ dotnetpath }}/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes

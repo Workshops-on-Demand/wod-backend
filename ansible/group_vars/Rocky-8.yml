@@ -2,4 +2,4 @@
 virtualenv_command: "virtualenv-3"
 virtualenv_python: "python3"
 python_lib: lib/python3.6/site-packages
-mslib: lib64
+dotnetpath: /usr/lib64/dotnet
