@@ -65,9 +65,13 @@ foreach my $w (keys %$h) {
 	foreach my $f (keys %{$h->{$w}}) {
 		#print "Looking at $f: ***$h->{$w}->{$f}***\n";
 		if (($h->{$w}->{$f} =~ /true/) || ($h->{$w}->{$f} =~ /false/) || ($h->{$w}->{$f} =~ /^[0-9]+$/)) {
-		print(WKSHP "        $f: $h->{$w}->{$f},\n");
+			print(WKSHP "        $f: $h->{$w}->{$f},\n");
 		} else {
-			print(WKSHP "        $f: '$h->{$w}->{$f}',\n");
+			if ($h->{$w}->{$f} =~ /'/) {
+				print(WKSHP "        $f: \"$h->{$w}->{$f}\",\n");
+			} else {
+				print(WKSHP "        $f: '$h->{$w}->{$f}',\n");
+			}
 		}
 	}
 	if ($seederfile =~ /01-/) {
