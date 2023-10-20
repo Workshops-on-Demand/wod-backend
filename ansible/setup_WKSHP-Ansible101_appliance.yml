@@ -4,7 +4,7 @@
   hosts: '{{ RTARGET }}'
   tasks:
     - name: Ensure all required packages are installed
-      become: yes
+      become: true
       become_user: root
       package:
         name:
@@ -12,12 +12,12 @@
         state: present
 
     - name: Setup firewalld TCP rules
-      become: yes
+      become: true
       become_user: root
       ansible.posix.firewalld:
         port: "{{ item }}/tcp"
         zone: public
-        permanent: yes
+        permanent: true
         state: enabled
       with_items:
         - "443"
@@ -28,19 +28,19 @@
         - ansible_distribution_major_version >= "7"
 
     - name: Enable firewalld service
-      become: yes
+      become: true
       become_user: root
       systemd:
         state: restarted
-        daemon_reload: yes
-        enabled: yes
+        daemon_reload: true
+        enabled: true
         name: firewalld
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
     - name: Ensure that directory /var/www/student exists
-      become: yes
+      become: true
       become_user: root
       file:
         path: "/var/www/student"
@@ -50,7 +50,7 @@
         mode: 0711
 
     - name: Configure httpd for passwd usage
-      become: yes
+      become: true
       become_user: root
       template:
         src: "{{ WODBEDIR }}/conf/WKSHP-Ansible101-httpd.conf.j2"
@@ -60,7 +60,7 @@
         mode: 0644
 
     - name: Configure htpasswd
-      become: yes
+      become: true
       become_user: root
       file:
         path: /etc/httpd/conf/htpasswd
@@ -70,7 +70,7 @@
         state: touch
  
     - name: Ensure students web dir exist
-      become: yes
+      become: true
       become_user: root
       file:
         path: "/var/www/student/{{ 'student%s' | format(item) }}"
@@ -81,7 +81,7 @@
       loop: "{{ range( APPMIN|int, APPMAX|int + 1)|list }}"
  
     - name: Ensure students index.html file exist
-      become: yes
+      become: true
       become_user: root
       template:
         src: "{{ WODBEDIR }}/conf/WKSHP-Ansible101-index.html.j2"
@@ -92,10 +92,10 @@
       loop: "{{ range( APPMIN|int, APPMAX|int + 1)|list }}"
 
     - name: Enable httpd service
-      become: yes
+      become: true
       become_user: root
       systemd:
         state: restarted
-        daemon_reload: yes
-        enabled: yes
+        daemon_reload: true
+        enabled: true
         name: httpd

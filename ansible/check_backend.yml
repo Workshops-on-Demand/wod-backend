@@ -6,7 +6,7 @@
       include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
     - name: Setup backend ufw firewall TCP rules
-      become: yes
+      become: true
       become_user: root
       community.general.ufw:
         rule: allow
@@ -17,29 +17,29 @@
         - "8000"
         - "443"
         - "80"
-        - "{{POSTPORT}}"
+        - "{{ POSTPORT }}"
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
 
     - name: Setup backend firewalld TCP rules
-      become: yes
+      become: true
       become_user: root
       ansible.posix.firewalld:
         port: "{{ item }}/tcp"
-        permanent: yes
+        permanent: true
         state: enabled
       with_items:
         - "8000"
         - "443"
         - "80"
-        - "{{POSTPORT}}"
+        - "{{ POSTPORT }}"
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
     - name: Create directory "{{ JPHUB }}" if needed
-      become: yes
+      become: true
       become_user: root
       file:
         path: "{{ JPHUB }}"
@@ -57,7 +57,7 @@
         mode: 0751
 
     - name: Ensure listening port in postfix master.cf is configured correctly
-      become: yes
+      become: true
       become_user: root
       lineinfile:
         path: /etc/postfix/master.cf
@@ -66,7 +66,7 @@
         state: present
 
     - name: Ensure myhostname in postfix main.cf is configured correctly
-      become: yes
+      become: true
       become_user: root
       lineinfile:
         path: /etc/postfix/main.cf
@@ -75,7 +75,7 @@
         state: present
 
     - name: Ensure listening addresses in postfix main.cf is configured correctly
-      become: yes
+      become: true
       become_user: root
       lineinfile:
         path: /etc/postfix/main.cf
@@ -84,7 +84,7 @@
         state: present
 
     - name: Ensure the mailbox command is correct
-      become: yes
+      become: true
       become_user: root
       lineinfile:
         path: /etc/postfix/main.cf
@@ -93,7 +93,7 @@
         state: present
 
     - name: Ensure mydestination in postfix main.cf is configured correctly
-      become: yes
+      become: true
       become_user: root
       lineinfile:
         path: /etc/postfix/main.cf
@@ -102,7 +102,7 @@
         state: present
 
     - name: Ensure hostname is not modified (useful for vagrant setup e.g.)
-      become: yes
+      become: true
       become_user: root
       lineinfile:
         path: /etc/postfix/main.cf
@@ -117,16 +117,16 @@
         mode: 0600
 
     - name: Enable postfix service
-      become: yes
+      become: true
       become_user: root
       systemd:
         state: restarted
-        daemon_reload: yes
-        enabled: yes
+        daemon_reload: true
+        enabled: true
         name: postfix
 
     - name: Setup crontab for daily delivery of ansible instantiated files
-      become: yes
+      become: true
       become_user: root
       cron:
         name: wod-deliver
@@ -138,7 +138,7 @@
         state: present
 
     - name: Setup crontab for daily check of template in dev user home dir
-      become: yes
+      become: true
       become_user: root
       cron:
         name: wod-check-template
@@ -163,7 +163,7 @@
       with_fileglob: [ '{{ ANSIBLEDIR }}/{{ PBKDIR }}/*.yml.j2', '{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/*.yml.j2' ]
 
     - name: Ensure that directory {{ STUDDIR }} exists
-      become: yes
+      become: true
       become_user: root
       file:
         path: "{{ STUDDIR }}"
@@ -173,7 +173,7 @@
         mode: 0711
 
     - name: Lockdown /home
-      become: yes
+      become: true
       become_user: root
       file:
         path: "/home"
@@ -202,7 +202,7 @@
         mode: 0600
 
     - name: Ensure that required nbconvert directories exists
-      become: yes
+      become: true
       become_user: root
       file:
         path: "{{ item }}"
@@ -233,12 +233,12 @@
 
     # Done after private part, which may affect branding
     - name: Enable backend WoD services
-      become: yes
+      become: true
       become_user: root
       systemd:
         state: restarted
-        daemon_reload: yes
-        enabled: yes
+        daemon_reload: true
+        enabled: true
         name: "{{ item }}"
       with_items:
         - jupyterhub
@@ -252,18 +252,18 @@
       when: CLEAN|bool
 
     - name: Remove Linux users and their home directory
-      become: yes
+      become: true
       become_user: root
       user:
         name: "{{ 'student%s' | format(item) }}"
         state: absent
-        remove: yes
-        force: yes
+        remove: true
+        force: true
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
       when: CLEAN|bool
 
     - name: Ensure dedicated students groups exist
-      become: yes
+      become: true
       become_user: root
       group:
         name: "{{ 'student%s' | format(item) }}"
@@ -272,7 +272,7 @@
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Ensure Linux students users exists with their home dir
-      become: yes
+      become: true
       become_user: root
       user:
         name: "{{ 'student%s' | format(item) }}"
@@ -286,34 +286,34 @@
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Ensure jupyterhub students users exist
-      command:
-        cmd: "curl -X POST --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
-        warn: false
+      command: "curl -X POST --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
+      register: my_output
+      changed_when: my_output.rc != 0
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
-    - name: Setup ACL for students with jupyterhub account
-      become: yes
+    - name: Setup ACL for students with {{ WODUSER }} account
+      become: true
       become_user: root
       ansible.posix.acl:
         path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
-        recursive: yes
+        recursive: true
         entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         state: present
-        recalculate_mask: no_mask
+        recalculate_mask: mask
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
-    - name: Setup default ACL for students with jupyterhub account
-      become: yes
+    - name: Setup default ACL for students with {{ WODUSER }} account
+      become: true
       become_user: root
       ansible.posix.acl:
         path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
-        recursive: yes
+        recursive: true
         entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
-        default: yes
+        default: true
         state: present
-        recalculate_mask: no_mask
+        recalculate_mask: mask
       loop: "{{ range( USERMIN, USERMAX + 1)|list }}"

@@ -3,12 +3,11 @@
     include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
 
   - name: Ensure Linux students users belong to the docker group
-    become: yes
+    become: true
     become_user: root
     user:
       name: "{{ 'student%s' | format(item) }}"
       state: present
-      append: yes
+      append: true
       groups: "podman"
     loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
-

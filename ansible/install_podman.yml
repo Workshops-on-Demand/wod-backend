@@ -2,7 +2,7 @@
 
 
   - name: Add EPEL repository into repo list
-    become: yes
+    become: true
     become_user: root
     yum:
       name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
@@ -11,7 +11,7 @@
       - ansible_distribution == "CentOS" 
 
   - name: Add EPEL repository into repo list
-    become: yes
+    become: true
     become_user: root
     yum:
       name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
@@ -23,19 +23,19 @@
 
   - name: Disable Podman service
     register: service_stop
-    become: yes
+    become: true
     become_user: root
     failed_when:
       - '"Could not find the requested service" not in service_stop.stdout'
       - service_stop.rc != 0
     systemd:
       state: stopped
-      enabled: no
+      enabled: false
       name: podman
     ignore_errors: true
 
   - name: Ensure all required packages are installed
-    become: yes
+    become: true
     become_user: root
     package:
       name:
@@ -44,19 +44,19 @@
       state: present
 
   - name: Enable Podman service
-    become: yes
+    become: true
     become_user: root
     systemd:
       state: started
-      daemon_reload: yes
-      enabled: yes
+      daemon_reload: true
+      enabled: true
       name: podman
 
   - name: Ensure "{{ WODUSER }}" user belong to the Podman group
-    become: yes
+    become: true
     become_user: root
     user:
       name: "{{ WODUSER }}"
       state: present
-      append: yes
+      append: true
       groups: "podman"

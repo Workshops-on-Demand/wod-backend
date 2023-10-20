@@ -2,7 +2,7 @@
   include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
 
 - name: Ensure that student directory exists
-  become: yes
+  become: true
   become_user: root
   file:
     path: "{{ STUDDIR }}"
@@ -22,18 +22,18 @@
   when: APPMAX is not defined
 
 - name: Remove Linux users and their home directory
-  become: yes
+  become: true
   become_user: root
   user:
     name: "{{ 'student%s' | format(item) }}"
     state: absent
-    remove: yes
-    force: yes
+    remove: true
+    force: true
   loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
   when: CLEAN|bool
 
 - name: Ensure dedicated students groups exist
-  become: yes
+  become: true
   become_user: root
   group:
     name: "{{ 'student%s' | format(item) }}"
@@ -43,7 +43,7 @@
   when: LDAPSETUP != "1"
 
 - name: Ensure Linux students users exists with their home dir
-  become: yes
+  become: true
   become_user: root
   user:
     name: "{{ 'student%s' | format(item) }}"
@@ -58,7 +58,7 @@
   when: LDAPSETUP != "1"
 
 - name: Disable SELinux for now as our students are non-standard
-  become: yes
+  become: true
   become_user: root
   selinux:
     policy: targeted
@@ -70,7 +70,7 @@
   # However, that doesn't seem to work on CentOS as dirs remains with mode 770
   # However, for rsync to work, we need to keep 770 !!
 - name: Ensure Linux students users home dir exist with correct mode
-  become: yes
+  become: true
   become_user: root
   file:
     path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"

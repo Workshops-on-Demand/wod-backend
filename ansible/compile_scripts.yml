@@ -45,7 +45,7 @@
       when: COMPILE | length > 0
 
     - name: Make compiled shc scripts available to student
-      become: yes
+      become: true
       become_user: root
       file:
         path: "{{ item }}"
@@ -56,11 +56,11 @@
       when: COMPILE | length > 0
 
     - name: setup ACL for the scripts
-      become: yes
+      become: true
       become_user: root
       ansible.posix.acl:
         path: "{{ item }}"
-        recursive: no
+        recursive: false
         entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
@@ -73,7 +73,7 @@
       when: COMPILE | length > 0
 
     - name: Remove .x.c scripts in place
-      become: yes
+      become: true
       become_user: root
       command: "rm -f {{ item }}"
       with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x.c"

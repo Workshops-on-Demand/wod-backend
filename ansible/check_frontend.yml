@@ -6,7 +6,7 @@
       include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
     - name: Setup frontend ufw firewall TCP rules
-      become: yes
+      become: true
       become_user: root
       community.general.ufw:
         rule: allow
@@ -21,11 +21,11 @@
         - ansible_distribution_major_version >= "20"
 
     - name: Setup firewalld TCP rules
-      become: yes
+      become: true
       become_user: root
       ansible.posix.firewalld:
         port: "{{ item }}/tcp"
-        permanent: yes
+        permanent: true
         state: enabled
       with_items:
         - "80"
@@ -34,12 +34,12 @@
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
           #- name: Enable frontend WoD services
-          #become: yes
+          #become: true
           #become_user: root
           #systemd:
           #state: restarted
-          #daemon_reload: yes
-          #enabled: yes
+          #daemon_reload: true
+          #enabled: true
           #name: "{{ item }}"
           #with_items:
           #- httpd

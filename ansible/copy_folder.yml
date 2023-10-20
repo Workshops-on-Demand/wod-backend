@@ -68,7 +68,7 @@
     - name: find jupyter notebooks
       find:
         paths: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
-        recurse: yes
+        recurse: true
         # Add other file types to process them as ansible templates
         patterns:
           - "*.ipynb"
@@ -85,7 +85,7 @@
     - name: find jupyter private notebooks
       find:
         paths: "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
-        recurse: yes
+        recurse: true
         # Add other file types to process them as ansible templates
         patterns:
           - "*.ipynb"
@@ -129,14 +129,14 @@
         #when: item.path is not search("Variables.ps1")
 
     - name: Purge potential remaining workshop (no CLEANUP done)
-      become: yes
+      become: true
       become_user: root
       file:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         state: absent
 
     - name: Create workspace directory for jupyter
-      become: yes
+      become: true
       become_user: root
       file:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces"
@@ -147,7 +147,7 @@
         recurse: true
 
     - name: Deliver workspace setup to point to README
-      become: yes
+      become: true
       become_user: root
       template:
         src: "{{ SYSDIR }}/lab-a511.jupyterlab-workspace.j2"
@@ -237,7 +237,7 @@
         mode: 0751
 
     - name: Copy the wod-generate-pdf script in the workshop dir
-      become: yes
+      become: true
       become_user: root
       copy:
         src: "{{ SYSDIR }}/wod-generate-pdf.sh"
@@ -255,34 +255,34 @@
         mode: 0644
 
     - name: Adapt owner/group/modes for target workshop
-      become: yes
+      become: true
       become_user: root
       file:
         path: '{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        recurse: yes
+        recurse: true
         mode: u+rwx
 
     - name: setup ACL for the Workshop
-      become: yes
+      become: true
       become_user: root
       ansible.posix.acl:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
-        recursive: yes
+        recursive: true
         entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
         state: present
 
     - name: setup default ACL for the Workshop
-      become: yes
+      become: true
       become_user: root
       ansible.posix.acl:
         path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
-        recursive: yes
+        recursive: true
         entity: "{{ WODUSER }}"
         etype: user
         permissions: rwx
-        default: yes
+        default: true
         state: present
