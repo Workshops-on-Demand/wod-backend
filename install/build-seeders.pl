@@ -42,65 +42,63 @@ if (-d $ENV{'WODPRIVNOBO'}) {
 print "Data gathered from YAML files wod.yml under $ENV{'WODNOBO'}\n";
 print Dumper($h);
 
-# For now we generate identical files for workshops and replays. TODO: They should be merge IMHO.
-my @seederfiles = ("$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js", "$ENV{'WODAPIDBDIR'}/seeders/06-replays.js");
+# Generating workshop seeder file
+my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js";
 
-foreach my $seederfile (@seederfiles) {
-	print "Generate the seeder file from collected data under $seederfile\n";
-	open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
-	print(WKSHP "'use strict';\n\n") if ($seederfile =~ /01-/);
-	print(WKSHP "module.exports = {\n");
-	if ($seederfile =~ /01-/) {
-		print(WKSHP "  up: (queryInterface, Sequelize) => {\n    return ");
-	} else {
-		print(WKSHP "  up: (queryInterface) => \n");
-	}
-	print(WKSHP "    queryInterface.bulkInsert('");
-	if ($seederfile =~ /01-/) {
-		print(WKSHP "workshops', [\n");
-	} else {
-		print(WKSHP "replays', [\n");
-	}
-	foreach my $w (keys %$h) {
-		print(WKSHP "      {\n");
-		foreach my $f (keys %{$h->{$w}}) {
-			#print "Looking at $f: ***$h->{$w}->{$f}***\n";
-			if (($h->{$w}->{$f} =~ /true/) || ($h->{$w}->{$f} =~ /false/) || ($h->{$w}->{$f} =~ /^[0-9]+$/)) {
-				print(WKSHP "        $f: $h->{$w}->{$f},\n");
-			} else {
-				print(WKSHP "        $f: '$h->{$w}->{$f}',\n");
-			}
-		}
-		if ($seederfile =~ /01-/) {
-			print(WKSHP "        notebook: '$w',\n");
-			print(WKSHP "        active: true,\n");
-			print(WKSHP "        sessionType: 'Workshops-on-Demand',\n");
-		}
-		print(WKSHP "        createdAt: new Date(),\n");
-		print(WKSHP "        updatedAt: new Date(),\n");
-		print(WKSHP "      },\n");
-	}
-	if ($seederfile =~ /01-/) {
-		print(WKSHP "    ]);\n");
-		print(WKSHP "  },\n");
-		print(WKSHP "  down: (queryInterface, Sequelize) => {\n");
-		print(WKSHP "    return queryInterface.bulkDelete('Workshops', null, {});\n");
-		print(WKSHP "  },\n");
-	} else {
-		print(WKSHP "    ],\n");
-		print(WKSHP "  {\n");
-		print(WKSHP "      returning: true, \n");
-		print(WKSHP "  }\n");
-		print(WKSHP "),\n\n");
-		print(WKSHP "  down: (queryInterface) => queryInterface.bulkDelete('replays', null, {}),\n");
-		print(WKSHP "  },\n");
-	}
-	print(WKSHP "};\n");
-	close(WKSHP);
+print "Generate the seeder file from collected data under $seederfile\n";
+open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
+print(WKSHP "'use strict';\n\n") if ($seederfile =~ /01-/);
+print(WKSHP "module.exports = {\n");
+if ($seederfile =~ /01-/) {
+	print(WKSHP "  up: (queryInterface, Sequelize) => {\n    return ");
+} else {
+	print(WKSHP "  up: (queryInterface) => \n");
 }
+print(WKSHP "    queryInterface.bulkInsert('");
+if ($seederfile =~ /01-/) {
+	print(WKSHP "workshops', [\n");
+} else {
+	print(WKSHP "replays', [\n");
+}
+foreach my $w (keys %$h) {
+	print(WKSHP "      {\n");
+	foreach my $f (keys %{$h->{$w}}) {
+		#print "Looking at $f: ***$h->{$w}->{$f}***\n";
+		if (($h->{$w}->{$f} =~ /true/) || ($h->{$w}->{$f} =~ /false/) || ($h->{$w}->{$f} =~ /^[0-9]+$/)) {
+		print(WKSHP "        $f: $h->{$w}->{$f},\n");
+		} else {
+			print(WKSHP "        $f: '$h->{$w}->{$f}',\n");
+		}
+	}
+	if ($seederfile =~ /01-/) {
+		print(WKSHP "        notebook: '$w',\n");
+		print(WKSHP "        active: true,\n");
+		print(WKSHP "        sessionType: 'Workshops-on-Demand',\n");
+	}
+	print(WKSHP "        createdAt: new Date(),\n");
+	print(WKSHP "        updatedAt: new Date(),\n");
+	print(WKSHP "      },\n");
+}
+if ($seederfile =~ /01-/) {
+	print(WKSHP "    ]);\n");
+	print(WKSHP "  },\n");
+	print(WKSHP "  down: (queryInterface, Sequelize) => {\n");
+	print(WKSHP "    return queryInterface.bulkDelete('Workshops', null, {});\n");
+	print(WKSHP "  },\n");
+} else {
+	print(WKSHP "    ],\n");
+	print(WKSHP "  {\n");
+	print(WKSHP "      returning: true, \n");
+	print(WKSHP "  }\n");
+	print(WKSHP "),\n\n");
+	print(WKSHP "  down: (queryInterface) => queryInterface.bulkDelete('replays', null, {}),\n");
+	print(WKSHP "  },\n");
+}
+print(WKSHP "};\n");
+close(WKSHP);
 
 # Now deal with students
-my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/04-students.js";
+$seederfile = "$ENV{'WODAPIDBDIR'}/seeders/04-students.js";
 
 print "Generate the seeder file from collected data under $seederfile\n";
 open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
