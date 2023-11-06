@@ -84,8 +84,7 @@ else
 	install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
 	cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
-# In any case remove the temp dir
-rm -rf $WODTMPDIR
+# temp dir remove in caller by root to avoid issues
 
 if [ $WODTYPE != "appliance" ]; then
 	# Setup this using the group for WoD
