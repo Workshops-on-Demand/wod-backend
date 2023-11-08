@@ -686,6 +686,7 @@
         group: "{{ WODUSER }}"
         mode: 0751
 
+
     - name: Disable WoD services
       become: true
       become_user: root
@@ -784,6 +785,12 @@
             ]
           #####################################################################################
    
+    - name: Copy WoD service file as ansible template for variable expansion
+      become: yes
+      become_user: root
+      template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+      with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
+
     - name: Enable WoD service
       become: true
       become_user: root
