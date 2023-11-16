@@ -1,4 +1,7 @@
 #
+# This is file a template used to generate PBKDIR ansible variable files used by wod-deliver e.g.
+# It is appended to your PBKDIR ansible file by the installer.
+#
 # Backend API management
 #
 # Do not change as the port is fixed in JupyterHub install
