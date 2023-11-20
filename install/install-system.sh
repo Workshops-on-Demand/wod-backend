@@ -231,7 +231,7 @@ EOF
 	echo "Launching npm install..."
 	npm install
 	echo "Start the Frontend server"
-	npm start &
+	#npm start &
 fi
 
 if [ $WODTYPE != "appliance" ]; then
