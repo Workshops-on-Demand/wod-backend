@@ -126,7 +126,7 @@ $WODFEFQDN ansible_connection=local
 EOF
 fi
 
-cd wod-$WODTYPE
+cd $HOME/wod-$WODTYPE
 if [ $WODTYPE = "api-db" ]; then
 	echo "Launching npm install..."
 	npm install
