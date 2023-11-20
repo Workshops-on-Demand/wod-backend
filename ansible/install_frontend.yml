@@ -9,8 +9,10 @@
       include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
 
     - name: nodejs 16.x repo needs to be used
+      become: true
+      become_user: root
       ansible.builtin.apt_repository:
-        repo: ppa:node_16.x
+        repo: deb https://deb.nodesource.com/node_16.x jammy main
         state: present
       when:
         - ansible_os_family == "Debian"
