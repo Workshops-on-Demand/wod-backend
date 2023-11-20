@@ -8,6 +8,13 @@
     - name: Base setup for a base system
       include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
 
+    - name: nodejs 16.x repo needs to be used
+      ansible.builtin.apt_repository:
+        repo: ppa:node_16.x
+        state: present
+      when:
+        - ansible_os_family == "Debian"
+
     - name: Ensure all required packages are installed
       become: true
       become_user: root
