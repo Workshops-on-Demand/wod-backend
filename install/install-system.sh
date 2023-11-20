@@ -228,8 +228,10 @@ CLOUDINARY_API_SECRET=''
 WODUID=`id -u`
 WODGID=`id -g`
 EOF
+	echo "Launching yarn install..."
+	npm install
 	echo "Start the Frontend server"
-	yarn start &
+	npm start &
 fi
 
 if [ $WODTYPE != "appliance" ]; then

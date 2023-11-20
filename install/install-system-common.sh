@@ -126,14 +126,10 @@ $WODFEFQDN ansible_connection=local
 EOF
 fi
 
-cd $HOME/wod-$WODTYPE
 if [ $WODTYPE = "api-db" ]; then
+	cd $HOME/wod-$WODTYPE
 	echo "Launching npm install..."
 	npm install
-fi
-if [ $WODTYPE = "frontend" ]; then
-	echo "Launching yarn install..."
-	yarn install
 fi
 
 # Change default passwd for vagrant and root
