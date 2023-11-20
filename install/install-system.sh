@@ -229,7 +229,7 @@ WODUID=`id -u`
 WODGID=`id -g`
 EOF
 	echo "Start the Frontend server"
-	npm start &
+	yarn start &
 fi
 
 if [ $WODTYPE != "appliance" ]; then
