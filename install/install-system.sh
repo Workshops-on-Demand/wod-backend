@@ -228,7 +228,7 @@ CLOUDINARY_API_SECRET=''
 WODUID=`id -u`
 WODGID=`id -g`
 EOF
-	echo "Launching yarn install..."
+	echo "Launching npm install..."
 	npm install
 	echo "Start the Frontend server"
 	npm start &
