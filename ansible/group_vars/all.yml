@@ -51,7 +51,3 @@ SURVEYCHALURL: TBD
 # This is the only one remaining, so we can easily overload it with -e for private script compilation e.g.
 #
 SCRIPTDIR: "{{ WODBEDIR }}/scripts"
-#
-# POSTPORT is the Postfix Port on which the smtp service is listening to receive API mail requests from the frontend typically
-#
-POSTPORT: "10025"
