@@ -120,7 +120,7 @@ fi
 WODBEPORT=8000
 if [ ! -z "${b}" ]; then
     WODBEFQDN="`echo ${b} | cut -d: -f1`"
-	res=`echo "${b}" | { grep -q ':' || true; }`
+	res=`echo "${b}" | { grep ':' || true; }`
 	if [ _"$res" != _"" ]; then
 		WODBEPORT="`echo ${b} | cut -d: -f2`"
 	fi
@@ -130,7 +130,7 @@ fi
 WODBEEXTPORT=8000
 if [ ! -z "${e}" ]; then
     WODBEEXTFQDN="`echo ${e} | cut -d: -f1`"
-	res=`echo "${e}" | { grep -q ':' || true; }`
+	res=`echo "${e}" | { grep ':' || true; }`
 	if [ _"$res" != _"" ]; then
 		WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
 	fi
@@ -140,7 +140,7 @@ fi
 WODFEPORT=8000
 if [ ! -z "${f}" ]; then
     WODFEFQDN="`echo ${f} | cut -d: -f1`"
-	res=`echo "${f}" | { grep -q ':' || true; }`
+	res=`echo "${f}" | { grep ':' || true; }`
 	if [ _"$res" != _"" ]; then
 		WODFEPORT="`echo ${f} | cut -d: -f2`"
 	fi
@@ -150,7 +150,7 @@ fi
 WODAPIDBPORT=8021
 if [ ! -z "${a}" ]; then
     WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
-	res=`echo "${a}" | { grep -q ':' || true; }`
+	res=`echo "${a}" | { grep ':' || true; }`
 	if [ _"$res" != _"" ]; then
 		WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
 	fi
