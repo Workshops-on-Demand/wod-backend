@@ -14,9 +14,7 @@
         proto: tcp
         state: enabled
       with_items:
-        - "8000"
-        - "443"
-        - "80"
+        - "{{ WODBEPORT }}"
         - "{{ WODPOSTPORT }}"
       when:
         - ansible_distribution == "Ubuntu"
@@ -30,9 +28,7 @@
         permanent: true
         state: enabled
       with_items:
-        - "8000"
-        - "443"
-        - "80"
+        - "{{ WODBEPORT }}"
         - "{{ WODPOSTPORT }}"
       when:
         - ansible_distribution == "CentOS"

@@ -14,9 +14,7 @@
         proto: tcp
         state: enabled
       with_items:
-        - "8083"
-        - "8021"
-        - "5432"
+        - "{{ WODAPIDBPORT }}"
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
@@ -29,9 +27,7 @@
         permanent: true
         state: enabled
       with_items:
-        - "8021"
-        - "8083"
-        - "5432"
+        - "{{ WODAPIDBPORT }}"
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
