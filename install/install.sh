@@ -194,7 +194,7 @@ echo "Using WoD user $WODUSER"
 
 if [ ${t} != "appliance" ]; then
     echo "Using frontend $WODFEFQDN on port $WODFEPORT"
-    echo "Using external backend $WODBEEXTFQDN on port $WODFEEXTPORT"
+    echo "Using external backend $WODBEEXTFQDN on port $WODBEEXTPORT"
 fi
 
 # Needs to be root
