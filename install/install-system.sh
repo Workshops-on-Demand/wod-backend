@@ -208,7 +208,7 @@ EOF
 	npm start &
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
-		cat > .env << EOF
+	cat > .env << EOF
 API_PORT=$WODAPIDBPORT
 DB_PW=TrèsCompliqué!!##123
 PRODUCTION_API_SERVER=$WODFEFQDN
@@ -230,6 +230,8 @@ WODGID=`id -g`
 EOF
 	echo "Launching npm install..."
 	npm install
+	echo "Patching package.json to allow listening on the right host:port"
+	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p WODFEPORT|" package.json
 	echo "Start the Frontend server"
 	#npm start &
 fi
