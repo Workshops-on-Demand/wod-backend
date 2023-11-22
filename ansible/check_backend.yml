@@ -17,7 +17,7 @@
         - "8000"
         - "443"
         - "80"
-        - "{{ POSTPORT }}"
+        - "{{ WODPOSTPORT }}"
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
@@ -33,7 +33,7 @@
         - "8000"
         - "443"
         - "80"
-        - "{{ POSTPORT }}"
+        - "{{ WODPOSTPORT }}"
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
@@ -62,7 +62,7 @@
       lineinfile:
         path: /etc/postfix/master.cf
         regex: '^smtp\s*inet'
-        line: '{{ POSTPORT }}      inet  n       -       y       -       -       smtpd'
+        line: '{{ WODPOSTPORT }}      inet  n       -       y       -       -       smtpd'
         state: present
 
     - name: Ensure myhostname in postfix main.cf is configured correctly
