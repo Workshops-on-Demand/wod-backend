@@ -23,9 +23,9 @@ WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 #
 # Do not change as the port is fixed in JupyterHub install
 #
-WODFEAPIURL: https://{{ WODAPIDBFQDN }}/api
+WODAPIDBURL: https://{{ WODAPIDBFQDN }}/api
 #
 # Adapt to your setup - Used by installer to setup the frontend
 #
-WODFEAPIUSER: moderator
-WODFEAPIPWD: MotDePasseCompliquéAussi123!!!##
+WODAPIDBUSER: moderator
+WODAPIDBPWD: MotDePasseCompliquéAussi123!!!##
