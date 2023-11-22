@@ -4,7 +4,7 @@ use strict;
 use Getopt::Long;
 
 sub usage {
-	print "Syntax: build-vagrant.pl [-t (backend|frontend|api-db|appliance)][-w WKSHP-Name][-m key=value][-k]\n";
+	print "Syntax: build-vagrant.pl [-t (backend|frontend|api-db|appliance)][-w WKSHP-Name][-m key=value][-p key=value][-k]\n";
 	print "\n";
 	print "where you can give the type of wod system to build with the -t option\n";
 	print "(not specifying the option launch the build for all the 3 systems sequentially)\n";
@@ -13,6 +13,10 @@ sub usage {
 	print "\n";
 	print "If you want to use specific machine names, please specify the them with -m\n";
 	print "Example: -m backend=wodbec8\n";
+	print "\n";
+	print "If you want to use ports, please specify the them with -p\n";
+	print "Example: -p frontend=8010\n";
+	print "Example: -p postfix=10025\n";
 	print "\n";
 	print "If you want to regenerate admin user ssh keys, please specify the -k option\n";
 	exit(-1);
@@ -30,10 +34,17 @@ my %machines = (
 	'frontend' => "wodfeu2204",
 	'backend' => "wodbec7",
 );
+my %port = (
+	'api-db' => "8021",
+	'frontend' => "8000",
+	'backend' => "8000",
+	'postfix' => "10025",
+);
 my $machines = \%machines;
 GetOptions("type|t=s" => \$wodtype,
 	   "workshop|w" => \$wkshp,
 	   "machines|m=s%" => $machines,
+	   "ports|p=s%" => $ports,
 	   "help|h" => \$help,
 	   "gen-keys|k" => \$genkeys,
 );
@@ -98,6 +109,6 @@ foreach my $m (@mtypes) {
 		my $cmd = "\"./wod-backend/scripts/setup-appliance $wkshp\"";
 		system("vagrant ssh $h->{'backend'} -c \"sudo su - $woduser -c $cmd\"");
 	} else {
-		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -i $srvip -g production -b $machines{'backend'}.$localnet -f $machines{'frontend'}.$localnet -a $machines{'api-db'}.$localnet -e localhost -u $woduser -s wod\@flossita.org $kk\"");
+		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -i $srvip -g production -b $machines{'backend'}.$localnet:$ports{'backend'} -f $machines{'frontend'}.$localnet:$ports{'frontend'} -a $machines{'api-db'}.$localnet:$ports{'api-db'} -e localhost -u $woduser -p $ports{'postfix'} -s wod\@flossita.org $kk\"");
 	}
 }
