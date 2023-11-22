@@ -120,8 +120,8 @@ fi
 WODBEPORT=8000
 if [ ! -z "${b}" ]; then
     WODBEFQDN="`echo ${b} | cut -d: -f1`"
-	echo "${b}" | { grep -q ':' || true; }
-	if [ $? -eq 0 ]; then
+	res=`echo "${b}" | { grep -q ':' || true; }`
+	if [ _"$res" != _"" ]; then
 		WODBEPORT="`echo ${b} | cut -d: -f2`"
 	fi
 else
@@ -130,8 +130,8 @@ fi
 WODBEEXTPORT=8000
 if [ ! -z "${e}" ]; then
     WODBEEXTFQDN="`echo ${e} | cut -d: -f1`"
-	echo "${e}" | { grep -q ':' || true; }
-	if [ $? -eq 0 ]; then
+	res=`echo "${e}" | { grep -q ':' || true; }`
+	if [ _"$res" != _"" ]; then
 		WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
 	fi
 else
@@ -140,8 +140,8 @@ fi
 WODFEPORT=8000
 if [ ! -z "${f}" ]; then
     WODFEFQDN="`echo ${f} | cut -d: -f1`"
-	echo "${f}" | { grep -q ':' || true; }
-	if [ $? -eq 0 ]; then
+	res=`echo "${f}" | { grep -q ':' || true; }`
+	if [ _"$res" != _"" ]; then
 		WODFEPORT="`echo ${f} | cut -d: -f2`"
 	fi
 else
@@ -150,8 +150,8 @@ fi
 WODAPIDBPORT=8021
 if [ ! -z "${a}" ]; then
     WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
-	echo "${a}" | { grep -q ':' || true; }
-	if [ $? -eq 0 ]; then
+	res=`echo "${a}" | { grep -q ':' || true; }`
+	if [ _"$res" != _"" ]; then
 		WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
 	fi
 else
@@ -185,7 +185,7 @@ if [ ! -z "${g}" ]; then
 else
     WODGROUP="production"
 fi
-export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIPORT WODBEEXTPORT WODPOSTPORT
+export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIDBPORT WODBEEXTPORT WODPOSTPORT
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 res=`echo $WODDISTRIB | { grep -i rocky || true; }`
