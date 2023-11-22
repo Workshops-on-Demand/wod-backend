@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user][-s sender][-k]"
+    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user][-p postport][-k][-s sender]"
     echo " "
     echo "where:"
     echo "type      is the installation type"
@@ -32,6 +32,9 @@ usage() {
     echo "user      is the name of the admin user for the WoD project"
     echo "          example: mywodadmin "
     echo "          if empty using wodadmin               "
+    echo "postport  is the port on which listen the postfix service on the backend"
+    echo "          example: -p 10030 "
+    echo "          if empty using 10025               "
     echo "-k        is used, force the re-creation of ssh keys for the previously created admin user"
     echo "          if not used keep the existing keys in place if any (backed up and restored)"
     echo "          if the name of the admin user is changed, new keys are created"
@@ -52,9 +55,10 @@ u=""
 s=""
 k=""
 i=""
+p=""
 WODGENKEYS=0
 
-while getopts "t:f:e:b:a:g:i:u:s:hk" option; do
+while getopts "t:f:e:b:a:g:i:u:s:p:hk" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -87,6 +91,9 @@ while getopts "t:f:e:b:a:g:i:u:s:hk" option; do
             ;;
         s)
             s=${OPTARG}
+            ;;
+        p)
+            p=${OPTARG}
             ;;
         k)
             WODGENKEYS=1
