@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend][-f frontend][-a api-db][-e external][-u user][-p postport][-k][-s sender]"
+    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport]][-f frontend[:feport]][-a api-db[:apidbport]][-e external][-u user][-p postport][-k][-s sender]"
     echo " "
     echo "where:"
     echo "type      is the installation type"
@@ -17,13 +17,13 @@ usage() {
     echo "ip        IP address of the server being deployed"
     echo "          if empty, try to be autodetected from FQDN"
     echo "          Used in particuler when the IP can't be guessed such as with Vagrant"
-    echo "backend   is the FQDN of the backend JupyterHub server"
+    echo "backend   is the FQDN of the backend JupyterHub server, potentially with a port"
     echo "          example: be.internal.example.org  "
     echo "          if empty using the local name for the backend                "
-    echo "frontend  is the FQDN of the frontend Web server"
+    echo "frontend  is the FQDN of the frontend Web server, potentially with a port"
     echo "          example: fe.example.org  "
     echo "          if empty using the external name for the backend                "
-    echo "api-db    is the FQDN of the API/DB server "
+    echo "api-db    is the FQDN of the API/DB server, potentially with a port "
     echo "          example: api.internal.example.org  "
     echo "          if empty using the name for the frontend                "
     echo "external  is the external FQDN of the backend JupyterHub server, reachable from the Internet"
@@ -117,23 +117,31 @@ if [ ! -z "${t}" ]; then
 else
     WODTYPE="backend"
 fi
+WODBEPORT=8000
 if [ ! -z "${b}" ]; then
-    WODBEFQDN="${b}"
+    WODBEFQDN="`echo ${b} | cut -d: -f1`"
+    WODBEPORT="`echo ${b} | cut -d: -f2`"
 else
     WODBEFQDN=`hostname -f`
 fi
+WODBEEXTPORT=8000
 if [ ! -z "${e}" ]; then
-    WODBEEXTFQDN="${e}"
+    WODBEEXTFQDN="`echo ${e} | cut -d: -f1`"
+    WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
 else
     WODBEEXTFQDN=$WODBEFQDN
 fi
+WODFEPORT=8000
 if [ ! -z "${f}" ]; then
-    WODFEFQDN="${f}"
+    WODFEFQDN="`echo ${f} | cut -d: -f1`"
+    WODFEPORT="`echo ${f} | cut -d: -f2`"
 else
     WODFEFQDN=$WODBEFQDN
 fi
+WODAPIDBPORT=8021
 if [ ! -z "${a}" ]; then
-    WODAPIDBFQDN="${a}"
+    WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
+    WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
 else
     WODAPIDBFQDN=$WODFEFQDN
 fi
@@ -155,12 +163,17 @@ if [ ! -z "${s}" ]; then
 else
     export WODSENDER="wodadmin@localhost"
 fi
+if [ ! -z "${p}" ]; then
+    export WODPOSTPORT="${p}"
+else
+    export WODPOSTPORT="10025"
+fi
 if [ ! -z "${g}" ]; then
     WODGROUP="${g}"
 else
     WODGROUP="production"
 fi
-export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
+export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIPORT WODBEEXTPORT WODPOSTPORT
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 res=`echo $WODDISTRIB | { grep -i rocky || true; }`
@@ -174,14 +187,14 @@ echo "WODUSER: $WODUSER" > /etc/wod.yml
 echo "WODSENDER: $WODSENDER" >> /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
-echo "Using api-db $WODAPIDBFQDN"
-echo "Using backend $WODBEFQDN ($WODBEIP)"
+echo "Using api-db $WODAPIDBFQDN on port $WODAPIDBPORT"
+echo "Using backend $WODBEFQDN ($WODBEIP) on port $WODBEPORT"
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
 
 if [ ${t} != "appliance" ]; then
-    echo "Using frontend $WODFEFQDN"
-    echo "Using external backend $WODBEEXTFQDN"
+    echo "Using frontend $WODFEFQDN on port $WODFEPORT"
+    echo "Using external backend $WODBEEXTFQDN on port $WODFEEXTPORT"
 fi
 
 # Needs to be root
@@ -304,12 +317,17 @@ export WODPRIVBRANCH="$WODPRIVBRANCH"
 export WODSENDER="$WODSENDER"
 export WODGENKEYS="$WODGENKEYS"
 export WODTMPDIR="$WODTMPDIR"
+export WODFEPORT="$WODFEPORT"
+export WODBEPORT="$WODBEPORT"
+export WODBEEXTPORT="$WODBEEXTPORT"
+export WODAPIDBPORT="$WODAPIDBPORT"
+export WODPOSTPORT="$WODPOSTPORT"
 EOF
     chmod 644 /tmp/wodexports
     su - $WODUSER -c "source /tmp/wodexports ; $EXEPATH/install-system-common.sh"
     rm -f /tmp/wodexports
 else
-    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR -c "$EXEPATH/install-system-common.sh"
+    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODBEEXTPORT,WODAPIDBPORT,WODPOSTPORT -c "$EXEPATH/install-system-common.sh"
 fi
 
 # In any case remove the temp dir
