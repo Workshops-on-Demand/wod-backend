@@ -120,28 +120,40 @@ fi
 WODBEPORT=8000
 if [ ! -z "${b}" ]; then
     WODBEFQDN="`echo ${b} | cut -d: -f1`"
-    WODBEPORT="`echo ${b} | cut -d: -f2`"
+	echo "${b}" | grep -q ':'
+	if [ $? -eq 0 ]; then
+		WODBEPORT="`echo ${b} | cut -d: -f2`"
+	fi
 else
     WODBEFQDN=`hostname -f`
 fi
 WODBEEXTPORT=8000
 if [ ! -z "${e}" ]; then
     WODBEEXTFQDN="`echo ${e} | cut -d: -f1`"
-    WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
+	echo "${e}" | grep -q ':'
+	if [ $? -eq 0 ]; then
+		WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
+	fi
 else
     WODBEEXTFQDN=$WODBEFQDN
 fi
 WODFEPORT=8000
 if [ ! -z "${f}" ]; then
     WODFEFQDN="`echo ${f} | cut -d: -f1`"
-    WODFEPORT="`echo ${f} | cut -d: -f2`"
+	echo "${f}" | grep -q ':'
+	if [ $? -eq 0 ]; then
+		WODFEPORT="`echo ${f} | cut -d: -f2`"
+	fi
 else
     WODFEFQDN=$WODBEFQDN
 fi
 WODAPIDBPORT=8021
 if [ ! -z "${a}" ]; then
     WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
-    WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
+	echo "${a}" | grep -q ':'
+	if [ $? -eq 0 ]; then
+		WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
+	fi
 else
     WODAPIDBFQDN=$WODFEFQDN
 fi
