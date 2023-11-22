@@ -6,7 +6,7 @@
 #
 # Do not change as the port is fixed in JupyterHub install
 #
-WODBEAPIURL: http://{{ WODBEFQDN }}:8000
+WODBEAPIURL: http://{{ WODBEFQDN }}:{{ WODBEPORT }}
 #
 # Replace with a random one - TODO Do that automatically at install time
 #
@@ -23,7 +23,7 @@ WODBETOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 #
 # Do not change as the port is fixed in JupyterHub install
 #
-WODAPIDBURL: https://{{ WODAPIDBFQDN }}/api
+WODAPIDBURL: https://{{ WODAPIDBFQDN }}:{{ WODAPIDBPORT }}/api
 #
 # Adapt to your setup - Used by installer to setup the frontend
 #
