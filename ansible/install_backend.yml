@@ -259,7 +259,6 @@
         - aspnetcore-runtime-7.0
         - dotnet-runtime-7.0
         - dotnet-sdk-7.0
-        - dotnet-host-7.0
         - aspnetcore-runtime-8.0
         - dotnet-runtime-8.0
         - dotnet-sdk-8.0
@@ -326,6 +325,15 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
+
+    - name: Clean potential remaining dotnet rubish
+      become: true
+      become_user: root
+      package:
+        name:
+        - dotnet-host-7.0
+        state: absent
+        purge: true
 
     - name: Ensure all required RPM packages are installed
       become: true
