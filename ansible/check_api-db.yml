@@ -10,11 +10,9 @@
       become_user: root
       community.general.ufw:
         rule: allow
-        port: "{{ item }}"
+        port: "{{ WODAPIDBPORT }}"
         proto: tcp
         state: enabled
-      with_items:
-        - "{{ WODAPIDBPORT }}"
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
@@ -23,11 +21,9 @@
       become: true
       become_user: root
       ansible.posix.firewalld:
-        port: "{{ item }}/tcp"
+        port: "{{ WODAPIDBPORT }}/tcp"
         permanent: true
         state: enabled
-      with_items:
-        - "{{ WODAPIDBPORT }}"
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
