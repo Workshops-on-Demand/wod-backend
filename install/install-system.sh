@@ -159,6 +159,10 @@ fi
 if [ $WODTYPE != "appliance" ]; then
 	# Automatic Installation script for the system 
 	ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT install_$WODTYPE.yml
+	if [ $? -ne 0 ]; then
+		echo "Install had errors exiting before launching startup"
+		exit -1
+	fi
 fi
 
 if [ $WODTYPE = "api-db" ]; then
