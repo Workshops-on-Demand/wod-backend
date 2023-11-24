@@ -205,6 +205,8 @@ EOF
 	# Start the PostgreSQL DB stack
 	# We need to relog with sudo as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
+	# and we need to stop it before to be idempotent
+	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose down"
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
