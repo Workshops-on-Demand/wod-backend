@@ -219,7 +219,7 @@
         - powershell
         state: absent
 
-    - name: Clean potential remaining dotnet rubish in v7
+    - name: Clean potential remaining dotnet rubbish in v7
       become: true
       become_user: root
       package:
