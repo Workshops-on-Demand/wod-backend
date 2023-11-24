@@ -212,8 +212,6 @@
         - dotnet-runtime-5.0
         - dotnet-sdk-3.1
         - dotnet-sdk-5.0
-          # seems to conflict with dotnet 8
-        - dotnet-host-7.0
         - powershell
         state: absent
 
@@ -261,11 +259,11 @@
         - aspnetcore-runtime-7.0
         - dotnet-runtime-7.0
         - dotnet-sdk-7.0
-          # seems to conflict with dotnet 8
-          #- dotnet-host-7.0
+        - dotnet-host-7.0
         - aspnetcore-runtime-8.0
         - dotnet-runtime-8.0
         - dotnet-sdk-8.0
+        - dotnet-host
         - postfix
         - procmail
         - conda
