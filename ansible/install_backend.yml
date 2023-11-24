@@ -753,7 +753,7 @@
          c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
          c.JupyterHub.pid_file = 'jupyterhub.pid'
          c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
-         c.JupyterHub.port = "{{ WODBEPORT }}"
+         c.JupyterHub.port = {{ WODBEPORT }}
          c.JupyterHub.services = [
                 {
                 "name": "admintk",
