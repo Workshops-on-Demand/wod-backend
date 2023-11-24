@@ -237,7 +237,7 @@ EOF
 	echo "Launching npm install..."
 	npm install
 	echo "Patching package.json to allow listening on the right host:port"
-	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p WODFEPORT|" package.json
+	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p $WODFEPORT|" package.json
 	echo "Start the Frontend server"
 	#npm start &
 fi
