@@ -25,14 +25,14 @@
       ignore_errors: true
       register: token_file
 
-    - include_vars:
-        file: "{{ VARDIRECTORY }}/variables_{{ CHALLENGE }}.yml"
+    - ansible.builtin.include_vars:
+        ansible.builtin.file: "{{ VARDIRECTORY }}/variables_{{ CHALLENGE }}.yml"
       when: token_file.stat.exists
 
     # Allows usage of jinja2 variables in the script to compile
     # These variables should be protected as pre-processed by deliver
     - name: Expand file to compile with token variables 
-      template:
+      ansible.builtin.template:
         src: "{{ SCRIPTDIRECTORY }}/{{ item }}"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ item }}"
         mode: 0600
@@ -47,7 +47,7 @@
     - name: Make compiled shc scripts available to student
       become: true
       become_user: root
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         owner: student{{ STDID }}
         group: student{{ STDID }}
@@ -69,12 +69,12 @@
       when: COMPILE | length > 0
 
     - name: Remove shc scripts in place
-      command: "rm -f {{ STUDDIR }}/student{{ STDID }}/*.c.x {{ STUDDIR }}/student{{ STDID }}/*.x {{ STUDDIR }}/student{{ STDID }}/*.shc"
+      ansible.builtin.command: "rm -f {{ STUDDIR }}/student{{ STDID }}/*.c.x {{ STUDDIR }}/student{{ STDID }}/*.x {{ STUDDIR }}/student{{ STDID }}/*.shc"
       when: COMPILE | length > 0
 
     - name: Remove .x.c scripts in place
       become: true
       become_user: root
-      command: "rm -f {{ item }}"
+      ansible.builtin.command: "rm -f {{ item }}"
       with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x.c"
       when: COMPILE | length > 0
