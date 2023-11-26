@@ -124,7 +124,7 @@
     - name: Setup crontab for daily delivery of ansible instantiated files
       become: true
       become_user: root
-      cron:
+      ansible.builtin.cron:
         name: wod-deliver
         minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "04"
@@ -136,7 +136,7 @@
     - name: Setup crontab for daily check of template in dev user home dir
       become: true
       become_user: root
-      cron:
+      ansible.builtin.cron:
         name: wod-check-template
         minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "05"
