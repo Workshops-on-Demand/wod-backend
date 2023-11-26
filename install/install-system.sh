@@ -112,6 +112,7 @@ ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNO
 # For future wod.sh usage by other scripts
 cat >> $SCRIPTDIR/wod.sh << EOF
 export ANSPLAYOPT="$ANSPLAYOPT"
+export PBKDIR=$PBKDIR
 EOF
 export ANSPLAYOPT
 
