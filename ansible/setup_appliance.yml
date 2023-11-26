@@ -1,6 +1,5 @@
 ---
-- hosts: '{{ RTARGET | default([]) }}'
+- hosts: "{{ RTARGET | default([]) }}"
   tasks:
-
     - name: Base setup for a JupyterHub environment server or appliance
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_base_appliance.yml"

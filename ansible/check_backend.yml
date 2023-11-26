@@ -1,3 +1,4 @@
+---
 - hosts: all
   gather_facts: true
 
@@ -42,7 +43,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
+        mode: "0751"
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       ansible.builtin.file:
@@ -50,67 +51,67 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
+        mode: "0751"
 
     - name: Ensure listening port in postfix master.cf is configured correctly
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/postfix/master.cf
-        regex: '^smtp\s*inet'
-        line: '{{ WODPOSTPORT }}      inet  n       -       y       -       -       smtpd'
+        regex: ^smtp\s*inet
+        line: "{{ WODPOSTPORT }}      inet  n       -       y       -       -       smtpd"
         state: present
 
     - name: Ensure myhostname in postfix main.cf is configured correctly
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
-        regex: '^myhostname ='
-        line: "myhostname = {{ WODBEFQDN }}"
+        regex: ^myhostname =
+        line: myhostname = {{ WODBEFQDN }}
         state: present
 
     - name: Ensure listening addresses in postfix main.cf is configured correctly
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
-        regex: '^inet_interfaces ='
-        line: "inet_interfaces =  {{ WODBEFQDN }},localhost"
+        regex: ^inet_interfaces =
+        line: inet_interfaces =  {{ WODBEFQDN }},localhost
         state: present
 
     - name: Ensure the mailbox command is correct
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
-        regex: '^[#]*mailbox_command ='
-        line: "mailbox_command = /usr/bin/procmail -a \"$EXTENSION\""
+        regex: ^[#]*mailbox_command =
+        line: mailbox_command = /usr/bin/procmail -a "$EXTENSION"
         state: present
 
     - name: Ensure mydestination in postfix main.cf is configured correctly
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
-        regex: '^mydestination ='
-        line: "mydestination = $myhostname, {{ WODBEFQDN.split('.')[0] }}, {{ WODBEEXTFQDN }}, {{ WODBEEXTFQDN.split('.')[0] }}, localhost, localhost.localdomain"
+        regex: ^mydestination =
+        line: mydestination = $myhostname, {{ WODBEFQDN.split('.')[0] }}, {{ WODBEEXTFQDN }}, {{ WODBEEXTFQDN.split('.')[0] }}, localhost, localhost.localdomain
         state: present
 
     - name: Ensure hostname is not modified (useful for vagrant setup e.g.)
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
-        regex: '^append_dot_mydomain ='
-        line: "append_dot_mydomain = no"
+        regex: ^append_dot_mydomain =
+        line: append_dot_mydomain = no
         state: present
 
     - name: Deploy an instanciated procmailrc conf file
       ansible.builtin.template:
         src: "{{ SYSDIR }}/procmailrc.j2"
         dest: "{{ ansible_env.HOME }}/.procmailrc"
-        mode: 0600
+        mode: "0600"
 
     - name: Enable postfix service
       become: true
@@ -129,7 +130,7 @@
         minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "04"
         user: "{{ WODUSER }}"
-        job: "/usr/local/bin/wod-deliver"
+        job: /usr/local/bin/wod-deliver
         cron_file: wod-deliver
         state: present
 
@@ -141,7 +142,7 @@
         minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "05"
         user: root
-        job: "/usr/local/bin/wod-check-template"
+        job: /usr/local/bin/wod-check-template
         cron_file: wod-check-template
         state: present
 
@@ -166,17 +167,17 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0711'
+        mode: "0711"
 
     - name: Lockdown /home
       become: true
       become_user: root
       ansible.builtin.file:
-        path: "/home"
+        path: /home
         state: directory
         owner: root
         group: root
-        mode: '0711'
+        mode: "0711"
 
     - name: Ensure that directory {{ ansible_env.HOME }}/.mail exists
       ansible.builtin.file:
@@ -184,18 +185,18 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0750
+        mode: "0750"
 
     - name: Ensure that file vault_secret in {{ ANSIBLEPRIVDIR }}/ exists
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
-        regexp: '^.*$'
-        line: '{{ VAULTPWD }}'
+        regexp: ^.*$
+        line: "{{ VAULTPWD }}"
 
     - name: Fix modes for {{ ANSIBLEPRIVDIR }}/vault_secret
       ansible.builtin.file:
         path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
-        mode: 0600
+        mode: "0600"
 
     - name: Ensure that required nbconvert directories exists
       become: true
@@ -205,7 +206,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0755'
+        mode: "0755"
       with_items:
         - /usr/local/share/jupyter/nbconvert/
         - /usr/local/share/jupyter/nbconvert/templates/
@@ -239,7 +240,7 @@
         - acj_path.rc == 0
 
     - name: Copy WoD service file as ansible template for variable expansion
-      become: yes
+      become: true
       become_user: root
       ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
       with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
@@ -267,7 +268,7 @@
     - name: Remove Linux users and their home directory
       become: true
       become_user: root
-      user:
+      ansible.builtin.user:
         name: "{{ 'student%s' | format(item) }}"
         state: absent
         remove: true
@@ -278,7 +279,7 @@
     - name: Ensure dedicated students groups exist
       become: true
       become_user: root
-      group:
+      ansible.builtin.group:
         name: "{{ 'student%s' | format(item) }}"
         state: present
         gid: "{{ item + GIDBASE }}"
@@ -287,7 +288,7 @@
     - name: Ensure Linux students users exists with their home dir
       become: true
       become_user: root
-      user:
+      ansible.builtin.user:
         name: "{{ 'student%s' | format(item) }}"
         state: present
         create_home: true
