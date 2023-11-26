@@ -17,20 +17,20 @@
       become_user: root
       ansible.builtin.package:
         name:
-        - ansible
-        - git
-        - rsync
-        - wget
-        - bzip2
-        - jq
-        - moreutils
-        - net-tools
-        - nodejs
-        - npm
-        - telnet
-        - man
-        - unzip
-        - netcat
+          - ansible
+          - git
+          - rsync
+          - wget
+          - bzip2
+          - jq
+          - moreutils
+          - net-tools
+          - nodejs
+          - npm
+          - telnet
+          - man
+          - unzip
+          - netcat
         update_cache: true
         state: present
 
@@ -39,13 +39,13 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - apt-file
-        - ldap-utils
-        - fail2ban
-        - libproc-processtable-perl
-        - acct
-        - libjson-perl
-        - libyaml-tiny-perl
+          - apt-file
+          - ldap-utils
+          - fail2ban
+          - libproc-processtable-perl
+          - acct
+          - libjson-perl
+          - libyaml-tiny-perl
       when:
         - ansible_os_family == "Debian"
 
@@ -54,14 +54,14 @@
       become_user: root
       ansible.builtin.package:
         pkg:
-        - openldap-clients
-        - perl-Crypt-PasswdMD5
-        - fail2ban-all
-        - perl-Proc-ProcessTable
-        - perl-Data-Dumper
-        - psacct
-        - perl-JSON
-        - perl-YAML-Tiny
+          - openldap-clients
+          - perl-Crypt-PasswdMD5
+          - fail2ban-all
+          - perl-Proc-ProcessTable
+          - perl-Data-Dumper
+          - psacct
+          - perl-JSON
+          - perl-YAML-Tiny
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
@@ -94,7 +94,7 @@
       become: true
       become_user: root
       ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-      with_fileglob: [ '{{ WODBEDIR }}/sys/wod-*.service.j2' ]
+      with_fileglob: ['{{ WODBEDIR }}/sys/wod-*.service.j2']
 
     - name: Enable WoD service
       become: true
