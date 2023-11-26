@@ -1,7 +1,7 @@
 ---
 
 - name: Setup Playbook for WKSHP-ML101 appliance
-  hosts: '{{ RTARGET }}'
+  hosts: '{{ RTARGET | default([]) }}'
   tasks:
     - name: Setup docker based appliance
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_docker_based_appliance.yml"
