@@ -1,5 +1,5 @@
 ---
-- hosts: '{{ RTARGET }}'
+- hosts: '{{ RTARGET | default([]) }}'
   tasks:
 
     - name: Base setup for a JupyterHub environment server or appliance

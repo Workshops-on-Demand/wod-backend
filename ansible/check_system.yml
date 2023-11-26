@@ -247,7 +247,7 @@
 - name: Setup crontab for daily pkg security update
   become: true
   become_user: root
-  cron:
+  ansible.builtin.cron:
     name: wod-upd
     minute: "{{ 59 | random(seed=inventory_hostname) }} "
     hour: "03"
@@ -259,7 +259,7 @@
 - name: Setup weekly process cleanup
   become: true
   become_user: root
-  cron:
+  ansible.builtin.cron:
     name: wod-cleanup-processes
     minute: "{{ 59 | random(seed=inventory_hostname) }} "
     hour: "04"
