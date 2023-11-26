@@ -1,3 +1,4 @@
+---
 - hosts: all
   gather_facts: true
 
@@ -31,16 +32,16 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-          #- name: Enable frontend WoD services
-          #become: true
-          #become_user: root
-          #ansible.builtin.systemd:
-          #state: restarted
-          #daemon_reload: true
-          #enabled: true
-          #name: "{{ item }}"
-          #with_items:
-          #- httpd
+    #- name: Enable frontend WoD services
+    #become: true
+    #become_user: root
+    #ansible.builtin.systemd:
+    #state: restarted
+    #daemon_reload: true
+    #enabled: true
+    #name: "{{ item }}"
+    #with_items:
+    #- httpd
 
     - name: Test private tasks YAML file
       ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_frontend.yml"
