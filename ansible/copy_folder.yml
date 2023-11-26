@@ -32,7 +32,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
     - name: check variables file exists
       stat:
@@ -144,7 +144,7 @@
         state: directory
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: 0751
+        mode: '0751'
         recurse: true
 
     - name: Deliver workspace setup to point to README
@@ -155,7 +155,7 @@
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: 0644
+        mode: '0644'
 
     - name: Verif whether we have a Workshop content
       ansible.builtin.command: ls "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
@@ -235,7 +235,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
     - name: Copy the wod-generate-pdf script in the workshop dir
       become: true
@@ -245,7 +245,7 @@
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/wod-generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: 0755
+        mode: '0755'
 
     - name: Create a checkpoint file for the user
       ansible.builtin.copy:
@@ -253,7 +253,7 @@
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0644
+        mode: '0644'
 
     - name: Adapt owner/group/modes for target workshop
       become: true

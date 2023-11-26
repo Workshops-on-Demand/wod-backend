@@ -51,7 +51,7 @@
         path: "{{ item }}"
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: 0755
+        mode: '0755'
       with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x"
       when: COMPILE | length > 0
 

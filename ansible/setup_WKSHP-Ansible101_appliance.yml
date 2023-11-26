@@ -47,7 +47,7 @@
         state: directory
         owner: apache
         group: apache
-        mode: 0711
+        mode: '0711'
 
     - name: Configure httpd for passwd usage
       become: true
@@ -57,7 +57,7 @@
         dest: /etc/httpd/conf.d/ansible.conf
         owner: apache
         group: apache
-        mode: 0644
+        mode: '0644'
 
     - name: Configure htpasswd
       become: true
