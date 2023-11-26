@@ -42,7 +42,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       ansible.builtin.file:
@@ -50,7 +50,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
     - name: Ensure listening port in postfix master.cf is configured correctly
       become: true
@@ -150,7 +150,7 @@
     # Works for both private and public parts
     - name: Deliver create/reset/setup scripts as ansible template for variable expansion
       ansible.builtin.template:
-        src={{ item }} dest={{ item | dirname }}/{{ item | basename | regex_replace('\.j2$') }} mode=0755
+        src={{ item }} dest={{ item | dirname }}/{{ item | basename | regex_replace('\.j2$') }} mode='0755'
       with_fileglob: [ '{{ SCRIPTDIR }}/*.sh*.j2', '{{ SCRIPTPRIVDIR }}/*.sh*.j2' ]
 
     - name: Deliver variables files as ansible template for variable expansion
@@ -166,7 +166,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0711
+        mode: '0711'
 
     - name: Lockdown /home
       become: true
@@ -176,7 +176,7 @@
         state: directory
         owner: root
         group: root
-        mode: 0711
+        mode: '0711'
 
     - name: Ensure that directory {{ ansible_env.HOME }}/.mail exists
       ansible.builtin.file:
@@ -205,7 +205,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
       with_items:
         - /usr/local/share/jupyter/nbconvert/
         - /usr/local/share/jupyter/nbconvert/templates/
@@ -241,7 +241,7 @@
     - name: Copy WoD service file as ansible template for variable expansion
       become: yes
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
       with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
 
     # Done after private part, which may affect branding

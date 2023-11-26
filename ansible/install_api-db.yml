@@ -73,7 +73,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
       with_items:
         - /usr/local/bin
         - /usr/local/share
@@ -81,7 +81,7 @@
     - name: Deliver build-seeders scripts under /usr/local/bin
       become: true
       become_user: root
-      ansible.builtin.copy: src={{ item }} dest=/usr/local/bin/{{ item | basename }} mode=0755
+      ansible.builtin.copy: src={{ item }} dest=/usr/local/bin/{{ item | basename }} mode='0755'
       with_fileglob: ['{{ SCRIPTDIR }}/install/build-seeders.*']
 
     - name: Disable WoD services
@@ -99,7 +99,7 @@
     - name: Copy WoD service file as ansible template for variable expansion
       become: true
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
       with_fileglob: ['{{ WODBEDIR }}/sys/wod-*.service.j2']
 
     - name: Enable WoD service
@@ -119,7 +119,7 @@
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0644
+        mode: '0644'
 
     - name: Configure fail2ban filter
       become: true
@@ -129,7 +129,7 @@
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
-        mode: 0644
+        mode: '0644'
 
     - name: Configure fail2ban jail
       become: true
@@ -139,7 +139,7 @@
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
-        mode: 0644
+        mode: '0644'
 
     - name: Configure fail2ban action
       become: true
@@ -149,7 +149,7 @@
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root
-        mode: 0755
+        mode: '0755'
 
     - name: Enable fail2ban
       become: true

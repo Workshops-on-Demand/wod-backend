@@ -421,7 +421,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
     - name: Ensure all additional pip packages are installed
       pip:
@@ -488,7 +488,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
       with_items:
         - /usr/local/bin
         - /usr/local/share
@@ -501,7 +501,7 @@
         dest: /usr/local/bin/gophernotes
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
 
     - name: Cleanup intermediate go directory
       become: true
@@ -523,7 +523,7 @@
         dest: /usr/local/bin/kernel_python
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
 
     - name: Fix python kernel path to include virtualenv setup
       lineinfile:
@@ -540,12 +540,12 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
     - name: Deliver build scripts under /usr/local/bin
       become: true
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} mode=0755
+      ansible.builtin.template: src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} mode='0755'
       with_fileglob: [ '{{ SCRIPTDIR }}//build*.sh.j2' ]
 
     - name: Ensure Rust kernel is installed
@@ -555,7 +555,7 @@
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ JPHUB }}//share/jupyter/kernels/rust/{{ item | basename }}"
-        mode: 0644
+        mode: '0644'
       with_fileglob: [ '{{ ansible_env.HOME }}/.local/share/jupyter/kernels/rust/*' ]
 
     - name: Ensure Rust kernel is deployed
@@ -566,7 +566,7 @@
         dest: "/usr/local/bin/evcxr_jupyter"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
 
     - name: Extract iJava kernel
       unarchive:
@@ -659,7 +659,7 @@
         state: link
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0755
+        mode: '0755'
         force: true
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
@@ -703,7 +703,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0751
+        mode: '0751'
 
 
     - name: Disable WoD services
@@ -808,7 +808,7 @@
     - name: Copy WoD service file as ansible template for variable expansion
       become: yes
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
       with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
 
     - name: Enable WoD service
@@ -849,7 +849,7 @@
       ansible.builtin.copy:
         src: "{{ WODBEDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
-        mode: 0644
+        mode: '0644'
 
     - name: Enable postfix service
       become: true
@@ -868,7 +868,7 @@
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
-        mode: 0644
+        mode: '0644'
 
     - name: Configure fail2ban jail
       become: true
@@ -878,7 +878,7 @@
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
-        mode: 0644
+        mode: '0644'
 
     - name: Configure fail2ban action
       become: true
@@ -888,7 +888,7 @@
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root
-        mode: 0755
+        mode: '0755'
 
     - name: Enable fail2ban
       become: true

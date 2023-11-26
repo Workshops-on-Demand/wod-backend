@@ -87,7 +87,7 @@
       dest: /etc/ldap.conf
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
     when: LDAPSETUP == "1"
 
   - name: Configure LDAP client 2/3
