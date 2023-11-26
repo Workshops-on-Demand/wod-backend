@@ -213,7 +213,7 @@
   ansible.builtin.template:
     src: "{{ SYSDIR }}/hosts.j2"
     dest: "/etc/hosts"
-    mode: 0644
+    mode: '0644'
     owner: root
   when:
     - hosts_path.rc != 0
@@ -224,7 +224,7 @@
   ansible.builtin.template:
     src: "{{ SYSPRIVDIR }}/hosts.j2"
     dest: "/etc/hosts"
-    mode: 0644
+    mode: '0644'
     owner: root
   when:
     - hosts_path.rc == 0
@@ -233,7 +233,7 @@
   become: true
   become_user: root
   ansible.builtin.template:
-    src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} owner=root group=root mode=0755
+    src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} owner=root group=root mode='0755'
   with_fileglob: [ '{{ SYSDIR }}/wod*.j2', '{{ SYSPRIVDIR }}/wod*.j2', '{{ SYSDIR }}/wod-upd*' ]
 
 - name: Install the pkg update script
@@ -272,7 +272,7 @@
 - name: Copy WoD service file as ansible template for variable expansion
   become: true
   become_user: root
-  ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+  ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
   with_fileglob: [ '{{ SYSDIR }}//wod-*.service.j2', '{{ SYSPRIVDIR }}//wod-*.service.j2' ]
 
 - name: Enable WoD services

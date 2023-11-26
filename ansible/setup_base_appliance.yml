@@ -9,7 +9,7 @@
     state: directory
     owner: "{{ WODUSER }}"
     group: "{{ WODUSER }}"
-    mode: 0711
+    mode: '0711'
 
 - name: Use USERMIN for APPMIN if installing
   set_fact:
