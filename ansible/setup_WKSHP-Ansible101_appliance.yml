@@ -42,7 +42,7 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        path: /var/www/student
+        path: "/var/www/student"
         state: directory
         owner: apache
         group: apache
@@ -72,7 +72,7 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        path: /var/www/student/{{ 'student%s' | format(item) }}
+        path: "/var/www/student/{{ 'student%s' | format(item) }}"
         owner: apache
         group: apache
         mode: "0700"
