@@ -1,3 +1,4 @@
+---
 - name: Playbook for WoD api-db server check
   hosts: all
   gather_facts: true

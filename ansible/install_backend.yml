@@ -1,9 +1,10 @@
+---
 - name: Playbook for WoD backend server installation
   hosts: all
   gather_facts: true
   vars:
-    IJAVAVER: "1.3.0"
-    KUBECTLVER: "1.21.6"
+    IJAVAVER: 1.3.0
+    KUBECTLVER: 1.21.6
 
   tasks:
     - name: Include variables for the underlying distribution
@@ -15,19 +16,19 @@
     - name: Add CentOS SC repository into repo list
       become: true
       become_user: root
-      yum:
+      ansible.builtin.yum:
         name: centos-release-scl-rh
         state: present
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
-    - name: Enable Powertools repo for Rocky 
+    - name: Enable Powertools repo for Rocky
       become: true
       become_user: root
-      lineinfile:
-        path: "/etc/yum.repos.d/Rocky-PowerTools.repo"
-        line: 'enabled=1'
+      ansible.builtin.lineinfile:
+        path: /etc/yum.repos.d/Rocky-PowerTools.repo
+        line: enabled=1
         state: present
       when:
         - ansible_distribution == "Rocky"
@@ -36,18 +37,18 @@
     - name: Add conda GPG Key to APT
       become: true
       become_user: root
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
         state: present
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
 
-      # TODO: Do it for EPEL if really needed
+    # TODO: Do it for EPEL if really needed
     - name: Add conda APT repository
       become: true
       become_user: root
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main
         state: present
       when:
@@ -57,7 +58,7 @@
     - name: Add Hashicorp GPG Key to APT
       become: true
       become_user: root
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://apt.releases.hashicorp.com/gpg
         state: present
       when:
@@ -67,7 +68,7 @@
     - name: Add Hashicorp APT repository
       become: true
       become_user: root
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://apt.releases.hashicorp.com focal main
         state: present
       when:
@@ -77,7 +78,7 @@
     - name: Add Hashicorp GPG Key to RPM DB
       become: true
       become_user: root
-      rpm_key:
+      ansible.builtin.rpm_key:
         key: https://rpm.releases.hashicorp.com/gpg
         state: present
       when:
@@ -86,10 +87,10 @@
     - name: Add Hashicorp YUM repository
       become: true
       become_user: root
-      yum_repository:
+      ansible.builtin.yum_repository:
         name: hashicorp
-        baseurl: "https://rpm.releases.hashicorp.com/RHEL/{{ ansible_distribution_major_version }}/x86_64/stable"
-        description: "Upstream Hashicorp Yum repository"
+        baseurl: https://rpm.releases.hashicorp.com/RHEL/{{ ansible_distribution_major_version }}/x86_64/stable
+        description: Upstream Hashicorp Yum repository
         enabled: true
         state: present
       when:
@@ -98,16 +99,16 @@
     - name: Add K8s GPG Key to APT
       become: true
       become_user: root
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://packages.cloud.google.com/apt/doc//apt-key.gpg
         state: present
       when:
-       - ansible_os_family == "Debian"
+        - ansible_os_family == "Debian"
 
     - name: Add K8s GPG Key to RPM DB
       become: true
       become_user: root
-      rpm_key:
+      ansible.builtin.rpm_key:
         key: "{{ item }}"
         state: present
       with_items:
@@ -119,7 +120,7 @@
     - name: Add K8s APT repository
       become: true
       become_user: root
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
         state: present
       when:
@@ -129,7 +130,7 @@
     - name: Add Golang APT repository
       become: true
       become_user: root
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: ppa:longsleep/golang-backports
         state: present
       when:
@@ -139,10 +140,10 @@
     - name: Add K8s YUM repository
       become: true
       become_user: root
-      yum_repository:
+      ansible.builtin.yum_repository:
         name: k8s
-        baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch"
-        description: "Upstream K8s Yum repository"
+        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+        description: Upstream K8s Yum repository
         enabled: true
         state: present
       when:
@@ -155,21 +156,21 @@
         path: /etc/apt/sources.list.d/microsoft-prod.list
         state: absent
       when:
-       - ansible_os_family == "Debian"
+        - ansible_os_family == "Debian"
 
     - name: Remove MicroSoft repo package
       become: true
       become_user: root
       ansible.builtin.package:
         name:
-        - packages-microsoft-prod
+          - packages-microsoft-prod
         state: absent
 
     - name: Add Microsoft GPG Key to RPM DB
       become: true
       become_user: root
-      rpm_key:
-        key: "https://packages.microsoft.com/keys/microsoft.asc"
+      ansible.builtin.rpm_key:
+        key: https://packages.microsoft.com/keys/microsoft.asc
         state: present
       when:
         - ansible_distribution == "Rocky"
@@ -186,8 +187,8 @@
     - name: Setup MicroSoft repo for YUM
       become: true
       become_user: root
-      yum:
-        name: "https://packages.microsoft.com/config/rhel/{{ ansible_distribution_major_version }}/packages-microsoft-prod.rpm"
+      ansible.builtin.yum:
+        name: https://packages.microsoft.com/config/rhel/{{ ansible_distribution_major_version }}/packages-microsoft-prod.rpm
         state: present
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
@@ -206,18 +207,18 @@
       become_user: root
       ansible.builtin.package:
         name:
-        - kubectl
-        - aspnetcore-runtime-3.1
-        - aspnetcore-runtime-5.0
-        - dotnet-runtime-3.1
-        - dotnet-runtime-5.0
-        - dotnet-sdk-3.1
-        - dotnet-sdk-5.0
-        # Incompatible with dotnet 8
-        - aspnetcore-runtime-7.0
-        - dotnet-runtime-7.0
-        - dotnet-sdk-7.0
-        - powershell
+          - kubectl
+          - aspnetcore-runtime-3.1
+          - aspnetcore-runtime-5.0
+          - dotnet-runtime-3.1
+          - dotnet-runtime-5.0
+          - dotnet-sdk-3.1
+          - dotnet-sdk-5.0
+          # Incompatible with dotnet 8
+          - aspnetcore-runtime-7.0
+          - dotnet-runtime-7.0
+          - dotnet-sdk-7.0
+          - powershell
         state: absent
 
     - name: Clean potential remaining dotnet rubbish in v7
@@ -225,7 +226,7 @@
       become_user: root
       ansible.builtin.package:
         name:
-        - dotnet-host-7.0
+          - dotnet-host-7.0
         state: absent
         purge: true
 
@@ -234,62 +235,62 @@
       become_user: root
       ansible.builtin.package:
         name:
-        - golang
+          - golang
       when:
-       - ansible_distribution == "Ubuntu"
-       - ansible_distribution_major_version <= "20"
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version <= "20"
 
     - name: Ensure all required packages are installed
       become: true
       become_user: root
       ansible.builtin.package:
         name:
-        - ansible
-        - python3
-        - python3-pip
-        - python3-jmespath
-        - python3-virtualenv
-        - python3-wheel
-        - git
-        - rsync
-        - acl
-        - wget
-        - bzip2
-        - firefox
-        - jq
-        - httpie
-        - moreutils
-        - net-tools
-        - nodejs
-        - npm
-        - telnet
-        - pandoc
-        - clang
-        - cmake
-        - texlive-xetex
-        - aspnetcore-runtime-6.0
-        - dotnet-runtime-6.0
-        - dotnet-sdk-6.0
+          - ansible
+          - python3
+          - python3-pip
+          - python3-jmespath
+          - python3-virtualenv
+          - python3-wheel
+          - git
+          - rsync
+          - acl
+          - wget
+          - bzip2
+          - firefox
+          - jq
+          - httpie
+          - moreutils
+          - net-tools
+          - nodejs
+          - npm
+          - telnet
+          - pandoc
+          - clang
+          - cmake
+          - texlive-xetex
+          - aspnetcore-runtime-6.0
+          - dotnet-runtime-6.0
+          - dotnet-sdk-6.0
           #- aspnetcore-runtime-7.0
           #- dotnet-runtime-7.0
           #- dotnet-sdk-7.0
-        - aspnetcore-runtime-8.0
-        - dotnet-runtime-8.0
-        - dotnet-sdk-8.0
-        - dotnet-host
-        - postfix
-        - procmail
-        - conda
-        - libgdiplus
-        - cargo
-        - rustc
-        - man
-        - unzip
-        - shc
-        - patch
-        - expect
-        - netcat
-        - terraform
+          - aspnetcore-runtime-8.0
+          - dotnet-runtime-8.0
+          - dotnet-sdk-8.0
+          - dotnet-host
+          - postfix
+          - procmail
+          - conda
+          - libgdiplus
+          - cargo
+          - rustc
+          - man
+          - unzip
+          - shc
+          - patch
+          - expect
+          - netcat
+          - terraform
         state: present
         update_cache: true
 
@@ -298,25 +299,25 @@
       become_user: root
       ansible.builtin.apt:
         pkg:
-        - python3-dev
-        - python3-venv
-        - python3-ipywidgets
-        - apt-file
-        - ldap-utils
-        - default-jre
-        - default-jdk
-        - texlive-fonts-recommended
-        - texlive-latex-recommended
-        - software-properties-common
-        - lld
-        - libzmq3-dev
-        - libc6-dev
-        - nfs-common
-        - libcrypt-passwdmd5-perl
-        - libopenmpi-dev
-        - fail2ban
-        - libproc-processtable-perl
-        - acct
+          - python3-dev
+          - python3-venv
+          - python3-ipywidgets
+          - apt-file
+          - ldap-utils
+          - default-jre
+          - default-jdk
+          - texlive-fonts-recommended
+          - texlive-latex-recommended
+          - software-properties-common
+          - lld
+          - libzmq3-dev
+          - libc6-dev
+          - nfs-common
+          - libcrypt-passwdmd5-perl
+          - libopenmpi-dev
+          - fail2ban
+          - libproc-processtable-perl
+          - acct
       when:
         - ansible_os_family == "Debian"
 
@@ -325,7 +326,7 @@
       become_user: root
       ansible.builtin.package:
         name:
-        - golang
+          - golang
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version > "20"
@@ -335,7 +336,7 @@
       become_user: root
       ansible.builtin.package:
         name:
-        - golang-go
+          - golang-go
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
@@ -345,19 +346,19 @@
       become_user: root
       ansible.builtin.package:
         pkg:
-        - python3-devel
-        - openldap-clients
-        - glibc-devel
-        - java
-        - nfs-utils
-        - zeromq-devel
-        - perl-Crypt-PasswdMD5
-        - openmpi-devel
-        - fail2ban-all
-        - perl-Proc-ProcessTable
-        - perl-Data-Dumper
-        - psacct
-        - golang
+          - python3-devel
+          - openldap-clients
+          - glibc-devel
+          - java
+          - nfs-utils
+          - zeromq-devel
+          - perl-Crypt-PasswdMD5
+          - openmpi-devel
+          - fail2ban-all
+          - perl-Proc-ProcessTable
+          - perl-Data-Dumper
+          - psacct
+          - golang
         state: present
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
@@ -365,7 +366,7 @@
     - name: Ensure all required CentOS RPM packages are installed
       become: true
       become_user: root
-      yum:
+      ansible.builtin.yum:
         name: llvm-toolset-7.0-lld
         state: present
       when:
@@ -380,24 +381,24 @@
         - configurable-http-proxy
 
     - name: Remove a set of existing pip packages
-      pip:
+      ansible.builtin.pip:
         name:
-        - jupyterhub
-        - jupyterlab
-        - jupyterhub-idle-culler
-        - ansible-kernel
-        - bash_kernel
-        - sshkernel
-        - powershell_kernel
-        - kotlin-jupyter-kernel
-        - redfish
-        - jupyter-docx-bundler
-        - requests
-        - PyYAML
-        - findspark
-        - jwt
-        - jinja2-cli
-        - determined
+          - jupyterhub
+          - jupyterlab
+          - jupyterhub-idle-culler
+          - ansible-kernel
+          - bash_kernel
+          - sshkernel
+          - powershell_kernel
+          - kotlin-jupyter-kernel
+          - redfish
+          - jupyter-docx-bundler
+          - requests
+          - PyYAML
+          - findspark
+          - jwt
+          - jinja2-cli
+          - determined
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -421,12 +422,12 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
+        mode: "0751"
 
     - name: Ensure all additional pip packages are installed
-      pip:
+      ansible.builtin.pip:
         name:
-        - ipywidgets
+          - ipywidgets
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -435,9 +436,9 @@
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Ensure jupyterhub pip packages is installed on CentOS
-      pip:
+      ansible.builtin.pip:
         name:
-        - jupyterhub
+          - jupyterhub
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -446,9 +447,9 @@
         - ansible_distribution == "CentOS"
 
     - name: Ensure jupyterhub pip packages is installed
-      pip:
+      ansible.builtin.pip:
         name:
-        - jupyterhub==3.1.1
+          - jupyterhub==3.1.1
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -457,21 +458,21 @@
         - ansible_distribution != "CentOS"
 
     - name: Ensure all required pip packages are installed
-      pip:
+      ansible.builtin.pip:
         name:
-        - jupyterlab
-        - jupyterhub-idle-culler
-        - ansible-kernel>=0.9.0
-        - bash_kernel>=0.7.2
-        - sshkernel>=0.11.1
-        - redfish
-        - jupyter-docx-bundler
-        - requests
-        - PyYAML
-        - findspark
-        - jwt
-        - jinja2-cli
-        - determined
+          - jupyterlab
+          - jupyterhub-idle-culler
+          - ansible-kernel>=0.9.0
+          - bash_kernel>=0.7.2
+          - sshkernel>=0.11.1
+          - redfish
+          - jupyter-docx-bundler
+          - requests
+          - PyYAML
+          - findspark
+          - jwt
+          - jinja2-cli
+          - determined
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -488,7 +489,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0755'
+        mode: "0755"
       with_items:
         - /usr/local/bin
         - /usr/local/share
@@ -501,13 +502,13 @@
         dest: /usr/local/bin/gophernotes
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Cleanup intermediate go directory
       become: true
       become_user: root
       ansible.builtin.file:
-        path: '{{ ansible_env.HOME }}/go'
+        path: "{{ ansible_env.HOME }}/go"
         state: absent
 
     - name: Ensure that this a compliant WoD system
@@ -523,12 +524,12 @@
         dest: /usr/local/bin/kernel_python
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Fix python kernel path to include virtualenv setup
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "{{ JPHUB }}/share/jupyter/kernels/python3/kernel.json"
-        regexp: '^\s*"python",$'
+        regexp: ^\s*"python",$
         line: '   "/usr/local/bin/kernel_python",'
         state: present
 
@@ -540,82 +541,80 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
+        mode: "0751"
 
     - name: Deliver build scripts under /usr/local/bin
       become: true
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} mode='0755'
-      with_fileglob: [ '{{ SCRIPTDIR }}//build*.sh.j2' ]
+      ansible.builtin.template:
+        src: "{{"
+        dest: /usr/local/bin/{{
+        mode: "'0755'"
+        cmd: item }} item | basename | regex_replace('\.j2$') }}
+      with_fileglob: ["{{ SCRIPTDIR }}//build*.sh.j2"]
 
     - name: Ensure Rust kernel is installed
-      shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
-
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
     - name: Ensure Rust kernel files are installed
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ JPHUB }}//share/jupyter/kernels/rust/{{ item | basename }}"
-        mode: '0644'
-      with_fileglob: [ '{{ ansible_env.HOME }}/.local/share/jupyter/kernels/rust/*' ]
+        mode: "0644"
+      with_fileglob: ["{{ ansible_env.HOME }}/.local/share/jupyter/kernels/rust/*"]
 
     - name: Ensure Rust kernel is deployed
       become: true
       become_user: root
       ansible.builtin.copy:
         src: "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
-        dest: "/usr/local/bin/evcxr_jupyter"
+        dest: /usr/local/bin/evcxr_jupyter
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Extract iJava kernel
-      unarchive:
+      ansible.builtin.unarchive:
         src: https://github.com/SpencerPark/IJava/releases/download/v{{ IJAVAVER }}/ijava-{{ IJAVAVER }}.zip
         dest: "{{ ansible_env.HOME }}"
         remote_src: true
 
     - name: Ensure jupyterhub IJava kernel is installed
-      shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
-
-    #- name: Ensure jupyterhub docx bundle is installed
-    #  shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && jupyter bundlerextension enable --py jupyter_docx_bundler --sys-prefix
-
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
     - name: Ensure jupyterhub ssh kernel is installed
-      shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
-
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
     - name: Ensure jupyterhub kernels are installed
-      shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
         - bash_kernel
         - ansible_kernel
       changed_when: false
 
     - name: Fix ansible kernel path to include virtualenv setup
-      replace:
+      ansible.builtin.replace:
         path: "{{ JPHUB }}/share/jupyter/kernels/{{ item }}/kernel.json"
-        regexp: '(.+)"{{ JPHUB }}/bin/python3",(.+)$'
-        replace: '\1"/usr/local/bin/kernel_python",\2'
+        regexp: (.+)"{{ JPHUB }}/bin/python3",(.+)$
+        replace: \1"/usr/local/bin/kernel_python",\2
       with_items:
         - ansible
         - ssh
 
     - name: Check whether to patch ansible kernel
-      ansible.builtin.command: "grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py"
+      ansible.builtin.command: grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py
       register: patch_done
       failed_when: false
       changed_when: false
 
     #- name: Patch ansible kernel with fixes coming from master
-     # ansible.posix.patch:
-      #  src: "{{ SYSDIR }}/master-vs-0.9.0.patch"
-       # basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
-        #strip: 2
-        #backup: true
-      #when: patch_done.rc != 0
+    # ansible.posix.patch:
+    #  src: "{{ SYSDIR }}/master-vs-0.9.0.patch"
+    # basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
+    #strip: 2
+    #backup: true
+    #when: patch_done.rc != 0
 
     - name: Remove former kernel files installed locally
       ansible.builtin.file:
-        path: '{{ ansible_env.HOME }}/.local/share/jupyter/kernels'
+        path: "{{ ansible_env.HOME }}/.local/share/jupyter/kernels"
         state: absent
 
     - name: Ensure powershell is removed through dotnet before installing
@@ -640,8 +639,8 @@
         - pwsh
         - powershell
         - dotnet
-        - dotnet-interactive      
-        
+        - dotnet-interactive
+
     - name: Remove pwsh components to be sure a good one will be available
       become: true
       become_user: root
@@ -659,7 +658,7 @@
         state: link
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0755'
+        mode: "0755"
         force: true
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
@@ -668,8 +667,8 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        src: "/usr/share/dotnet/{{ item }}"
-        dest: "/usr/lib/dotnet/{{ item }}"
+        src: /usr/share/dotnet/{{ item }}
+        dest: /usr/lib/dotnet/{{ item }}
         state: link
         force: true
       with_items:
@@ -694,7 +693,7 @@
       become: true
       become_user: root
       ansible.builtin.command: /usr/local/bin/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
-        # Only working with dotnet 7.0 which is incompqtible with needed 8.0
+      # Only working with dotnet 7.0 which is incompqtible with needed 8.0
       ignore_errors: true
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
@@ -703,8 +702,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
-
+        mode: "0751"
 
     - name: Disable WoD services
       become: true
@@ -739,74 +737,74 @@
         chdir: "{{ JPHUB }}/etc/jupyterhub/"
 
     - name: Existing token
-      debug:
+      ansible.builtin.debug:
         msg: "Existing token: {{ WODBETOKEN }}"
 
     - name: Adapt jupyterhub configuration file
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
         block: |
-         #######################################################################################
-         c.Spawner.default_url = '/lab'
-         c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
-         c.JupyterHub.shutdown_on_logout = True
-         c.JupyterHub.redirect_to_server = True
-         c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
-         c.JupyterHub.pid_file = 'jupyterhub.pid'
-         c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
-         c.JupyterHub.port = {{ WODBEPORT }}
-         c.JupyterHub.services = [
-                {
-                "name": "admintk",
-                "api_token": "{{ WODBETOKEN }}"
-                }
-                ]
-         c.JupyterHub.load_roles = [
-                  {
-            "name": "jupyteradm",
-            "description": "Elevated privileges (can do anything)",
-            "scopes": [
-                "admin:users",
-                "admin:groups",
-                "admin:servers",
-                "read:roles",
-                "tokens",
-                "list:users",
-                "list:services",
-                "read:services",
-                "read:hub",
-                "access:services",
-                "access:servers",
-                "proxy",
-                "shutdown"
-            ],
-            "users": ["{{ WODUSER }}"]
-                 },
-                {
-            "name": "jupyteradmin",
-            "scopes": [
-                "admin:users",
-                "admin:groups",
-                "admin:servers",
-                "read:roles",
-                "tokens",
-                "list:services",
-                "read:services",
-                "read:hub",
-                "access:services",
-                "access:servers",
-                "proxy",
-                "shutdown"
-                ],
-            "services": [
-                "admintk"
-                ]
-                }
-            ]
-          #####################################################################################
-   
+          #######################################################################################
+          c.Spawner.default_url = '/lab'
+          c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
+          c.JupyterHub.shutdown_on_logout = True
+          c.JupyterHub.redirect_to_server = True
+          c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+          c.JupyterHub.pid_file = 'jupyterhub.pid'
+          c.JupyterHub.cookie_secret_file = 'jupyterhub_cookie_secret'
+          c.JupyterHub.port = {{ WODBEPORT }}
+          c.JupyterHub.services = [
+                 {
+                 "name": "admintk",
+                 "api_token": "{{ WODBETOKEN }}"
+                 }
+                 ]
+          c.JupyterHub.load_roles = [
+                   {
+             "name": "jupyteradm",
+             "description": "Elevated privileges (can do anything)",
+             "scopes": [
+                 "admin:users",
+                 "admin:groups",
+                 "admin:servers",
+                 "read:roles",
+                 "tokens",
+                 "list:users",
+                 "list:services",
+                 "read:services",
+                 "read:hub",
+                 "access:services",
+                 "access:servers",
+                 "proxy",
+                 "shutdown"
+             ],
+             "users": ["{{ WODUSER }}"]
+                  },
+                 {
+             "name": "jupyteradmin",
+             "scopes": [
+                 "admin:users",
+                 "admin:groups",
+                 "admin:servers",
+                 "read:roles",
+                 "tokens",
+                 "list:services",
+                 "read:services",
+                 "read:hub",
+                 "access:services",
+                 "access:servers",
+                 "proxy",
+                 "shutdown"
+                 ],
+             "services": [
+                 "admintk"
+                 ]
+                 }
+             ]
+           #####################################################################################
+
     - name: Copy WoD service file as ansible template for variable expansion
-      become: yes
+      become: true
       become_user: root
       ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
       with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
@@ -836,10 +834,10 @@
       #status_code: 201
 
     - name: Setup group admin in jupyterhub
-      uri:
+      ansible.builtin.uri:
         url: "{{ WODBEAPIURL }}/hub/api/groups/admingroup"
         headers:
-          Authorization: "token {{ WODBETOKEN }}"
+          Authorization: token {{ WODBETOKEN }}
         method: POST
         body_format: json
         body: '{ "users": [ "{{ WODUSER }}" ], "roles": [ "jupyteradm" ], "name": "admingroup"}'
@@ -849,7 +847,7 @@
       ansible.builtin.copy:
         src: "{{ WODBEDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
-        mode: '0644'
+        mode: "0644"
 
     - name: Enable postfix service
       become: true
@@ -865,30 +863,30 @@
       become_user: root
       ansible.builtin.copy:
         src: "{{ SYSDIR }}/fail2ban.conf"
-        dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
+        dest: /etc/fail2ban/filter.d/jupyterhub.conf
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Configure fail2ban jail
       become: true
       become_user: root
       ansible.builtin.copy:
         src: "{{ SYSDIR }}/fail2ban.jail"
-        dest: "/etc/fail2ban/jail.local"
+        dest: /etc/fail2ban/jail.local
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Configure fail2ban action
       become: true
       become_user: root
       ansible.builtin.copy:
         src: "{{ SYSDIR }}/fail2ban.action"
-        dest: "/etc/fail2ban/action.d/jupyterhub.conf"
+        dest: /etc/fail2ban/action.d/jupyterhub.conf
         owner: root
         group: root
-        mode: '0755'
+        mode: "0755"
 
     - name: Enable fail2ban
       become: true
@@ -903,14 +901,14 @@
     - name: Fix sshd conf on CentOS/Rocky
       become: true
       become_user: root
-      lineinfile:
-        path: "/etc/ssh/sshd_config"
-        line: 'StrictModes no'
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: StrictModes no
         state: present
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: restart sshd service
+    - name: Restart sshd service
       become: true
       become_user: root
       ansible.builtin.systemd:
@@ -929,7 +927,7 @@
 
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the wod-notebooks git repo
-      git:
+      ansible.builtin.git:
         repo: https://github.com/Workshops-on-Demand/wod-notebooks.git
         dest: "{{ WODNOBO }}"
       when:

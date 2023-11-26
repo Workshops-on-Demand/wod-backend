@@ -1,7 +1,6 @@
 ---
-
 - name: Setup Playbook for WKSHP-Spark101 appliance
-  hosts: '{{ RTARGET | default([]) }}'
+  hosts: "{{ RTARGET | default([]) }}"
   tasks:
     - name: Setup docker based appliance
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_docker_based_appliance.yml"

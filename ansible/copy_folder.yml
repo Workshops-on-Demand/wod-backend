@@ -1,3 +1,4 @@
+---
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
 # # All variables in upper case come from the procmail-action.sh script
 - hosts: all
@@ -7,35 +8,35 @@
     VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}"
 
   tasks:
-    - fail:
+    - ansible.builtin.fail:
         msg: STDID variable is empty ! Fat fingers ?!?
       when: STDID is not defined
 
-    - fail:
+    - ansible.builtin.fail:
         msg: WORKSHOP variable is empty ! Fat fingers ?!?
       when: WORKSHOP is not defined
 
-    - fail:
+    - ansible.builtin.fail:
         msg: CHALLENGE variable is empty ! Fat fingers ?!?
       when: CHALLENGE is not defined
 
-    - fail:
+    - ansible.builtin.fail:
         msg: PBKDIR variable is empty ! Fat fingers ?!?
       when: PBKDIR is not defined
 
     - name: Load variables generated at install time
       ansible.builtin.include_vars: /etc/wod.yml
 
-    - name: "check {{ VARPRIVDIR }}/pass exists"
+    - name: Check {{ VARPRIVDIR }}/pass exists
       ansible.builtin.file:
         path: "{{ VARPRIVDIR }}/pass"
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
+        mode: "0751"
 
-    - name: check variables file exists
-      stat:
+    - name: Check variables file exists
+      ansible.builtin.stat:
         path: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
       ignore_errors: true
       register: variables_file
@@ -44,8 +45,8 @@
         file: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
       when: variables_file.stat.exists
 
-    - name: check private variables file exists
-      stat:
+    - name: Check private variables file exists
+      ansible.builtin.stat:
         path: "{{ VARPRIVDIR }}/variables_{{ CHALLENGE }}.yml"
       ignore_errors: true
       register: privvariables_file
@@ -54,8 +55,8 @@
         file: "{{ VARPRIVDIR }}/variables_{{ CHALLENGE }}.yml"
       when: privvariables_file.stat.exists
 
-    - name: check password file exists
-      stat:
+    - name: Check password file exists
+      ansible.builtin.stat:
         path: "{{ VARPRIVDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       ignore_errors: true
       register: pass_file
@@ -65,8 +66,8 @@
       when: pass_file.stat.exists
 
     # find all notebooks
-    - name: find jupyter notebooks
-      find:
+    - name: Find jupyter notebooks
+      ansible.builtin.find:
         paths: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: true
         # Add other file types to process them as ansible templates
@@ -83,8 +84,8 @@
       register: notebooks
 
     # find all private notebooks
-    - name: find jupyter private notebooks
-      find:
+    - name: Find jupyter private notebooks
+      ansible.builtin.find:
         paths: "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: true
         # Add other file types to process them as ansible templates
@@ -94,40 +95,39 @@
           - "*.py"
           - "*.sh"
           - "*.src"
-          - "Variables.ps1"
-        excludes: '*-checkpoint.ipynb'
+          - Variables.ps1
+        excludes: "*-checkpoint.ipynb"
       register: notebookspriv
 
-    - name: debug
-      debug:
+    - name: Debug
+      ansible.builtin.debug:
         msg: "{{ notebooks.files }}"
 
-    - name: debug
-      debug:
+    - name: Debug
+      ansible.builtin.debug:
         msg: "{{ notebookspriv.files }}"
 
-        #- name: debug
-        #debug:
-        #msg: "{{ ansible_facts }}"
+    #- name: debug
+    #debug:
+    #msg: "{{ ansible_facts }}"
 
+    #- name: debug
+    #debug:
+    #msg: "{{ OVIP }}"
 
-        #- name: debug
-        #debug:
-        #msg: "{{ OVIP }}"
+    #- name: debug-OVIP
+    #debug:
+    #msg: "{{ item.key }} => {{ item.value }}"
+    #with_dict: "{{ OVIP }}"
+    #when: "{{ STDID }} == {{ item.key }}"
 
-        #- name: debug-OVIP
-        #debug:
-        #msg: "{{ item.key }} => {{ item.value }}"
-        #with_dict: "{{ OVIP }}"
-        #when: "{{ STDID }} == {{ item.key }}"
-
-        #   - name: Cleanup Outputs, metadata and execution_count
-        #shell: |
-        #jq '(.cells[] | select(has("outputs")) | .outputs) = []
-        #| (.cells[] | select(has("execution_count")) | .execution_count) = null
-        #| .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
-        #with_items: "{{ notebooks.files }}"
-        #when: item.path is not search("Variables.ps1")
+    #   - name: Cleanup Outputs, metadata and execution_count
+    #shell: |
+    #jq '(.cells[] | select(has("outputs")) | .outputs) = []
+    #| (.cells[] | select(has("execution_count")) | .execution_count) = null
+    #| .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
+    #with_items: "{{ notebooks.files }}"
+    #when: item.path is not search("Variables.ps1")
 
     - name: Purge potential remaining workshop (no CLEANUP done)
       become: true
@@ -144,7 +144,7 @@
         state: directory
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: '0751'
+        mode: "0751"
         recurse: true
 
     - name: Deliver workspace setup to point to README
@@ -155,7 +155,7 @@
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: '0644'
+        mode: "0644"
 
     - name: Verif whether we have a Workshop content
       ansible.builtin.command: ls "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
@@ -169,7 +169,7 @@
         src: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts:
-          - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
+          - --exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1
       when:
         - nobo_path.rc == 0
 
@@ -184,24 +184,24 @@
         src: "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts:
-          - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
+          - --exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1
       when:
         - nobopriv_path.rc == 0
         - nobo_path.rc != 0
 
-    - name: check a private pre_templating.yml file exists
-      stat:
+    - name: Check a private pre_templating.yml file exists
+      ansible.builtin.stat:
         path: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
       ignore_errors: true
       register: pretemp
 
     - ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
       when: pretemp.stat.exists
- 
-      #- name: debug
-      #debug:
-      #msg: "PASSSTU:{{ PASSSTU }}"
- 
+
+    #- name: debug
+    #debug:
+    #msg: "PASSSTU:{{ PASSSTU }}"
+
     # Second copy all data to be templated with variables
     - name: Deliver notebooks as ansible template for variable expansion
       ansible.builtin.template:
@@ -220,8 +220,8 @@
         - nobopriv_path.rc == 0
         - nobo_path.rc != 0
 
-    - name: check a private post_templating.yml file exists
-      stat:
+    - name: Check a private post_templating.yml file exists
+      ansible.builtin.stat:
         path: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
       ignore_errors: true
       register: posttemp
@@ -235,7 +235,7 @@
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0751'
+        mode: "0751"
 
     - name: Copy the wod-generate-pdf script in the workshop dir
       become: true
@@ -245,7 +245,7 @@
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/wod-generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}
-        mode: '0755'
+        mode: "0755"
 
     - name: Create a checkpoint file for the user
       ansible.builtin.copy:
@@ -253,19 +253,19 @@
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: '0644'
+        mode: "0644"
 
     - name: Adapt owner/group/modes for target workshop
       become: true
       become_user: root
       ansible.builtin.file:
-        path: '{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
+        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         recurse: true
         mode: u+rwx
 
-    - name: setup ACL for the Workshop
+    - name: Setup ACL for the Workshop
       become: true
       become_user: root
       ansible.posix.acl:
@@ -276,7 +276,7 @@
         permissions: rwx
         state: present
 
-    - name: setup default ACL for the Workshop
+    - name: Setup default ACL for the Workshop
       become: true
       become_user: root
       ansible.posix.acl:
