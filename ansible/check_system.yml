@@ -1,5 +1,5 @@
 - name: Load variables generated at install time
-  include_vars: /etc/wod.yml
+  ansible.builtin.include_vars: /etc/wod.yml
 
 - name: Ensure correct nproc soft limits
   become: true
@@ -109,7 +109,7 @@
 - name: Enable firewalld service
   become: true
   become_user: root
-  systemd:
+  ansible.builtin.systemd:
     state: restarted
     daemon_reload: true
     enabled: true
@@ -120,7 +120,7 @@
 - name: Enable NTP service
   become: true
   become_user: root
-  systemd:
+  ansible.builtin.systemd:
     state: started
     daemon_reload: true
     enabled: true
@@ -132,7 +132,7 @@
 - name: Enable NTP service
   become: true
   become_user: root
-  systemd:
+  ansible.builtin.systemd:
     state: started
     daemon_reload: true
     enabled: true
@@ -143,7 +143,7 @@
 - name: Enable chrony service
   become: true
   become_user: root
-  systemd:
+  ansible.builtin.systemd:
     state: started
     daemon_reload: true
     enabled: true
@@ -167,13 +167,13 @@
     src: '{{ WODBEDIR }}/skel/'
 
 - name: Test .profile file
-  command: ls "{{ ansible_env.HOME }}/.profile"
+  ansible.builtin.command: ls "{{ ansible_env.HOME }}/.profile"
   register: profile_path
   failed_when: false
   changed_when: false
 
 - name: Ensure we have a .profile file for DEB systems
-  copy:
+  ansible.builtin.copy:
     src: /etc/skel/.profile
     dest: "{{ ansible_env.HOME }}/.profile"
   when:
@@ -181,7 +181,7 @@
     - ansible_os_family == "Debian"
 
 - name: Ensure we have a .profile file for RPM systems
-  copy:
+  ansible.builtin.copy:
     src: /etc/skel/.bash_profile
     dest: "{{ ansible_env.HOME }}/.profile"
   when:
@@ -202,7 +202,7 @@
     state: present
 
 - name: Test private hosts.j2 template
-  command: ls "{{ SYSPRIVDIR }}/hosts.j2"
+  ansible.builtin.command: ls "{{ SYSPRIVDIR }}/hosts.j2"
   register: hosts_path
   failed_when: false
   changed_when: false
@@ -210,7 +210,7 @@
 - name: Expand public template for /etc/hosts
   become: true
   become_user: root
-  template:
+  ansible.builtin.template:
     src: "{{ SYSDIR }}/hosts.j2"
     dest: "/etc/hosts"
     mode: 0644
@@ -221,7 +221,7 @@
 - name: Expand private template for /etc/hosts
   become: true
   become_user: root
-  template:
+  ansible.builtin.template:
     src: "{{ SYSPRIVDIR }}/hosts.j2"
     dest: "/etc/hosts"
     mode: 0644
@@ -232,14 +232,14 @@
 - name: Install Wod utility scripts
   become: true
   become_user: root
-  template:
+  ansible.builtin.template:
     src={{ item }} dest=/usr/local/bin/{{ item | basename | regex_replace('\.j2$') }} owner=root group=root mode=0755
   with_fileglob: [ '{{ SYSDIR }}/wod*.j2', '{{ SYSPRIVDIR }}/wod*.j2', '{{ SYSDIR }}/wod-upd*' ]
 
 - name: Install the pkg update script
   become: true
   become_user: root
-  file:
+  ansible.builtin.file:
     src: "/usr/local/bin/wod-upd.{{ ansible_pkg_mgr }}"
     dest: /usr/local/bin/wod-upd
     state: link
@@ -272,13 +272,13 @@
 - name: Copy WoD service file as ansible template for variable expansion
   become: true
   become_user: root
-  template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
+  ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
   with_fileglob: [ '{{ SYSDIR }}//wod-*.service.j2', '{{ SYSPRIVDIR }}//wod-*.service.j2' ]
 
 - name: Enable WoD services
   become: true
   become_user: root
-  systemd:
+  ansible.builtin.systemd:
     state: restarted
     daemon_reload: true
     enabled: true
@@ -287,12 +287,12 @@
     - wod-kill-processes
 
 - name: Test private tasks YAML file
-  command: ls "{{ ANSIBLEPRIVDIR }}/check_system.yml"
+  ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_system.yml"
   register: acj_path
   failed_when: false
   changed_when: false
 
 - name: Now call private tasks if available
-  include_tasks: "{{ ANSIBLEPRIVDIR }}/check_system.yml"
+  ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/check_system.yml"
   when:
     - acj_path.rc == 0
