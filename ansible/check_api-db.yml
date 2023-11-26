@@ -1,9 +1,10 @@
-- hosts: all
+- name: Playbook for WoD api-db server check
+  hosts: all
   gather_facts: true
 
   tasks:
     - name: Ensure that this a compliant WoD system
-      include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
+      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
     - name: Setup ufw firewall TCP rules
       become: true
@@ -30,7 +31,7 @@
     - name: Enable WoD services
       become: true
       become_user: root
-      systemd:
+      ansible.builtin.systemd:
         state: restarted
         daemon_reload: true
         enabled: true
@@ -39,12 +40,12 @@
         - docker
 
     - name: Test private tasks YAML file
-      command: ls "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
+      ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
       register: acj_path
       failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available
-      include_tasks: "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
+      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
       when:
         - acj_path.rc == 0
