@@ -78,6 +78,12 @@
         - /usr/local/bin
         - /usr/local/share
 
+    - name: Deliver build-seeders scripts under /usr/local/bin
+      become: true
+      become_user: root
+      ansible.builtin.copy: src={{ item }} dest=/usr/local/bin/{{ item | basename }} mode=0755
+      with_fileglob: ['{{ SCRIPTDIR }}/install/build-seeders.*']
+
     - name: Disable WoD services
       become: true
       become_user: root
