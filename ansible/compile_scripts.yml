@@ -76,7 +76,7 @@
       when: COMPILE | length > 0
 
     - name: Remove shc scripts in place
-      ansible.builtin.command: rm -f {{ STUDDIR }}/student{{ STDID }}/*.c.x {{ STUDDIR }}/student{{ STDID }}/*.x {{ STUDDIR }}/student{{ STDID }}/*.shc
+      ansible.builtin.command: "rm -f {{ STUDDIR }}/student{{ STDID }}/*.c.x {{ STUDDIR }}/student{{ STDID }}/*.x {{ STUDDIR }}/student{{ STDID }}/*.shc"
       when: COMPILE | length > 0
       register: result
       changed_when: result.rc != 0
@@ -84,7 +84,7 @@
     - name: Remove .x.c scripts in place
       become: true
       become_user: root
-      ansible.builtin.command: rm -f {{ item }}
+      ansible.builtin.command: "rm -f {{ item }}"
       with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x.c"
       when: COMPILE | length > 0
       register: result

@@ -46,7 +46,7 @@
         group: "{{ WODUSER }}"
         mode: "0751"
 
-    - name: Ensure existence of directory etc/jupyterhub under "{{ JPHUB }}"
+    - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       ansible.builtin.file:
         path: "{{ JPHUB }}/etc/jupyterhub"
         state: directory
@@ -178,13 +178,13 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        path: /home
+        path: "/home"
         state: directory
         owner: root
         group: root
         mode: "0711"
 
-    - name: "Ensure existence of directory .mail under {{ ansible_env.HOME }}"
+    - name: Ensure that directory {{ ansible_env.HOME }}/.mail exists
       ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/.mail"
         state: directory
@@ -198,7 +198,7 @@
         regexp: ^.*$
         line: "{{ VAULTPWD }}"
 
-    - name: Fix modes for vault_secret under "{{ ANSIBLEPRIVDIR }}"
+    - name: Fix modes for {{ ANSIBLEPRIVDIR }}/vault_secret
       ansible.builtin.file:
         path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
         mode: "0600"
