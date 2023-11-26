@@ -28,7 +28,7 @@
     failed_when:
       - '"Could not find the requested service" not in service_stop.stdout'
       - service_stop.rc != 0
-    systemd:
+    ansible.builtin.systemd:
       state: stopped
       enabled: false
       name: podman
@@ -37,7 +37,7 @@
   - name: Ensure all required packages are installed
     become: true
     become_user: root
-    package:
+    ansible.builtin.package:
       name:
       - podman
       - podman-compose
@@ -46,7 +46,7 @@
   - name: Enable Podman service
     become: true
     become_user: root
-    systemd:
+    ansible.builtin.systemd:
       state: started
       daemon_reload: true
       enabled: true

@@ -1,6 +1,6 @@
 ---
   - name: Setup first the podman context (packages, deps, ...)
-    include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
+    ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
 
   - name: Ensure Linux students users belong to the docker group
     become: true
