@@ -178,7 +178,7 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        path: "/home"
+        path: /home
         state: directory
         owner: root
         group: root
@@ -192,7 +192,7 @@
         group: "{{ WODUSER }}"
         mode: "0750"
 
-    - name: "Ensure existence of file vault_secret in {{ ANSIBLEPRIVDIR }}"
+    - name: Ensure that file vault_secret in {{ ANSIBLEPRIVDIR }} exists
       ansible.builtin.lineinfile:
         path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
         regexp: ^.*$

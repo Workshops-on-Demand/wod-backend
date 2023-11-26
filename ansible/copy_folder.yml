@@ -32,7 +32,7 @@
     - name: Load variables generated at install time
       ansible.builtin.include_vars: /etc/wod.yml
 
-    - name: "check {{ VARPRIVDIR }}/pass exists"
+    - name: Check {{ VARPRIVDIR }}/pass exists
       ansible.builtin.file:
         path: "{{ VARPRIVDIR }}/pass"
         state: directory

@@ -70,6 +70,7 @@
           - moreutils
           - net-tools
           - nodejs
+          - npm
           - telnet
           - man
           - unzip
