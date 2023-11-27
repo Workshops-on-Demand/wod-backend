@@ -1,5 +1,5 @@
 ---
-  - name: Add Docker GPG Key to RPM DB
+  - name: Add Docker GPG Key to RPM DB # noqa: yaml[indentation]
     become: true
     become_user: root
     rpm_key:
@@ -29,8 +29,8 @@
       url: https://download.docker.com/linux/ubuntu/gpg
       state: present
     when:
-     - ansible_distribution == "Ubuntu"
-     - ansible_distribution_major_version >= "20"
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version >= "20"
 
   - name: Setup Docker repo for APT
     become: true
@@ -39,19 +39,19 @@
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
       state: present
     when:
-     - ansible_distribution == "Ubuntu"
-     - ansible_distribution_major_version >= "20"
+      - ansible_distribution == "Ubuntu"
+      - ansible_distribution_major_version >= "20"
 
   - name: Ensure no existing incorrect docker pkg is installed
     become: true
     become_user: root
     ansible.builtin.package:
       name:
-      - docker-client
-      - docker-common
-      - docker
-      - docker-engine
-      - docker-compose
+        - docker-client
+        - docker-common
+        - docker
+        - docker-engine
+        - docker-compose
       state: absent
 
   - name: Disable Docker service
@@ -92,8 +92,8 @@
     become_user: root
     ansible.builtin.package:
       name:
-      - docker-ce
-      - docker-compose-plugin
+        - docker-ce
+        - docker-compose-plugin
       state: present
 
   - name: Enable Docker service
