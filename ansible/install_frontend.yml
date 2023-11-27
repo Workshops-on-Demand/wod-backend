@@ -120,14 +120,18 @@
         enabled: false
         name: "{{ item }}"
       ignore_errors: true
+      register: ignore_errors_register
       with_items:
         - wod-kill-processes
 
     - name: Copy WoD service file as ansible template for variable expansion
       become: true
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
-      with_fileglob: [ '{{ WODBEDIR }}/sys/wod-*.service.j2' ]
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
+        mode: "0644"
+      with_fileglob: ['{{ WODBEDIR }}/sys/wod-*.service.j2']
 
     - name: Enable WoD service
       become: true
