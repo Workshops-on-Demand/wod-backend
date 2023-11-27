@@ -1,5 +1,5 @@
 ---
-- name: Playbook for WoD api-db server check
+- name: Playbook to check periodically WoD api-db
   hosts: all
   gather_facts: true
 
