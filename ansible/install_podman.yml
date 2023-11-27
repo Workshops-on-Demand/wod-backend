@@ -1,14 +1,12 @@
 ---
-
-
-  - name: Add EPEL repository into repo list
+  - name: Add EPEL repository into repo list # noqa: yaml[indentation]
     become: true
     become_user: root
     yum:
       name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
       state: present
     when:
-      - ansible_distribution == "CentOS" 
+      - ansible_distribution == "CentOS"
 
   - name: Add EPEL repository into repo list
     become: true
@@ -39,8 +37,8 @@
     become_user: root
     ansible.builtin.package:
       name:
-      - podman
-      - podman-compose
+        - podman
+        - podman-compose
       state: present
 
   - name: Enable Podman service
