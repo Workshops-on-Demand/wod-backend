@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Playbook to check periodically WoD backend
+  hosts: all
   gather_facts: true
 
   tasks:

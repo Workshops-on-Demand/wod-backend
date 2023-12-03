@@ -405,6 +405,7 @@
         virtualenv_python: "{{ virtualenv_python }}"
       when: CLEAN|bool
       ignore_errors: true
+      register: ignore_errors_register
 
     - name: Remove directory "{{ JPHUB }}"
       become: true
@@ -479,7 +480,7 @@
         virtualenv_python: "{{ virtualenv_python }}"
 
     - name: Ensure Go kernel is installed
-      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+      ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
 
     - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: true
@@ -580,8 +581,10 @@
 
     - name: Ensure jupyterhub IJava kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
+
     - name: Ensure jupyterhub ssh kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
+
     - name: Ensure jupyterhub kernels are installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
@@ -604,13 +607,13 @@
       failed_when: false
       changed_when: false
 
-    #- name: Patch ansible kernel with fixes coming from master
+    # - name: Patch ansible kernel with fixes coming from master
     # ansible.posix.patch:
     #  src: "{{ SYSDIR }}/master-vs-0.9.0.patch"
     # basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
-    #strip: 2
-    #backup: true
-    #when: patch_done.rc != 0
+    # strip: 2
+    # backup: true
+    # when: patch_done.rc != 0
 
     - name: Remove former kernel files installed locally
       ansible.builtin.file:
@@ -622,12 +625,14 @@
       become_user: root
       ansible.builtin.command: "{{ dotnetpath }}/dotnet tool uninstall --global powershell"
       ignore_errors: true
+      register: ignore_errors_register
 
     - name: Ensure dotnet interactive is removed through dotnet before installing
       become: true
       become_user: root
       ansible.builtin.command: "{{ dotnetpath }}/dotnet tool uninstall --global Microsoft.dotnet-interactive"
       ignore_errors: true
+      register: ignore_errors_register
 
     - name: Remove old MS tools to be sure a good one will be available
       become: true
@@ -695,6 +700,7 @@
       ansible.builtin.command: /usr/local/bin/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
       # Only working with dotnet 7.0 which is incompqtible with needed 8.0
       ignore_errors: true
+      register: ignore_errors_register
 
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       ansible.builtin.file:
@@ -713,6 +719,7 @@
         enabled: false
         name: "{{ item }}"
       ignore_errors: true
+      register: ignore_errors_register
       with_items:
         - jupyterhub
         - wod-kill-processes
@@ -821,17 +828,17 @@
         - jupyterhub
 
     - name: Wait 5 seconds to let WoD services start
-      shell: sleep 5
+      ansible.builtin.shell: sleep 5
 
-      #- name: Setup {{ WODUSER }} account in jupyterhub
-      #uri:
-      #url: "{{ WODBEAPIURL }}/hub/api/users"
-      #headers:
-      #Authorization: "token {{ WODBETOKEN }}"
-      #method: POST
-      #body_format: json
-      #body: '{ "usernames": [ "{{ WODUSER }}" ], "admin": true }'
-      #status_code: 201
+      # - name: Setup {{ WODUSER }} account in jupyterhub
+      # uri:
+      # url: "{{ WODBEAPIURL }}/hub/api/users"
+      # headers:
+      # Authorization: "token {{ WODBETOKEN }}"
+      # method: POST
+      # body_format: json
+      # body: '{ "usernames": [ "{{ WODUSER }}" ], "admin": true }'
+      # status_code: 201
 
     - name: Setup group admin in jupyterhub
       ansible.builtin.uri:
