@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Playbook to compile scripts
+  hosts: all
   tasks:
     - name: Script Compilation Issue
       ansible.builtin.fail:
@@ -26,7 +27,8 @@
       ignore_errors: true
       register: token_file
 
-    - ansible.builtin.include_vars:
+    - name: Include additional variables if they exist
+      ansible.builtin.include_vars:
         ansible.builtin.file: "{{ VARDIRECTORY }}/variables_{{ CHALLENGE }}.yml"
       when: token_file.stat.exists
 
@@ -44,6 +46,8 @@
       ansible.builtin.shell: cd "{{ STUDDIR }}/student{{ STDID }}" && shc -f "{{ item }}"
       with_items: "{{ cmpfiles }}"
       when: COMPILE | length > 0
+      register: result
+      changed_when: result.rc != 0
 
     - name: Make compiled shc scripts available to student
       become: true
@@ -55,6 +59,8 @@
         mode: "0755"
       with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x"
       when: COMPILE | length > 0
+      register: result
+      changed_when: result.rc != 0
 
     - name: Setup ACL for the scripts
       become: true
@@ -72,6 +78,8 @@
     - name: Remove shc scripts in place
       ansible.builtin.command: rm -f {{ STUDDIR }}/student{{ STDID }}/*.c.x {{ STUDDIR }}/student{{ STDID }}/*.x {{ STUDDIR }}/student{{ STDID }}/*.shc
       when: COMPILE | length > 0
+      register: result
+      changed_when: result.rc != 0
 
     - name: Remove .x.c scripts in place
       become: true
@@ -79,3 +87,5 @@
       ansible.builtin.command: rm -f {{ item }}
       with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x.c"
       when: COMPILE | length > 0
+      register: result
+      changed_when: result.rc != 0
