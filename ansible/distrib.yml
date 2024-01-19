@@ -6,3 +6,5 @@
   tasks:
     - name: System details
       ansible.builtin.shell: echo '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}' > '{{ ansible_env.HOME }}/.mail/distrib'
+      register: result
+      changed_when: result.rc != 0

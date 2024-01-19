@@ -310,9 +310,12 @@
       loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
     - name: Ensure jupyterhub students users exist
-      ansible.builtin.command: "curl -X POST --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
-      register: my_output
-      changed_when: my_output.rc != 0
+      ansible.builtin.uri:
+        url: "{{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        headers:
+          Authorization: token {{ WODBETOKEN }}
+        method: POST
+        status_code: 201
       loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
     - name: Setup ACL for students with the account {{ WODUSER }}
