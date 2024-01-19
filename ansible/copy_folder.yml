@@ -1,26 +1,31 @@
 ---
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
 # # All variables in upper case come from the procmail-action.sh script
-- hosts: all
+- name: Copy expanded content into the student directory
+  hosts: all
   gather_facts: true
   vars:
     VARDIR: "{{ ANSIBLEDIR }}/{{ PBKDIR }}"
     VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}"
 
   tasks:
-    - ansible.builtin.fail:
+    - name: Check var STDID
+      ansible.builtin.fail:
         msg: STDID variable is empty ! Fat fingers ?!?
       when: STDID is not defined
 
-    - ansible.builtin.fail:
+    - name: Check var WORKSHOP
+      ansible.builtin.fail:
         msg: WORKSHOP variable is empty ! Fat fingers ?!?
       when: WORKSHOP is not defined
 
-    - ansible.builtin.fail:
+    - name: Check var CHALLENGE
+      ansible.builtin.fail:
         msg: CHALLENGE variable is empty ! Fat fingers ?!?
       when: CHALLENGE is not defined
 
-    - ansible.builtin.fail:
+    - name: Check var PBKDIR
+      ansible.builtin.fail:
         msg: PBKDIR variable is empty ! Fat fingers ?!?
       when: PBKDIR is not defined
 
@@ -41,7 +46,8 @@
       ignore_errors: true
       register: variables_file
 
-    - ansible.builtin.include_vars:
+    - name: Include variables
+      ansible.builtin.include_vars:
         file: "{{ VARDIR }}/variables_{{ CHALLENGE }}.yml"
       when: variables_file.stat.exists
 
@@ -51,7 +57,8 @@
       ignore_errors: true
       register: privvariables_file
 
-    - ansible.builtin.include_vars:
+    - name: Include private variables
+      ansible.builtin.include_vars:
         file: "{{ VARPRIVDIR }}/variables_{{ CHALLENGE }}.yml"
       when: privvariables_file.stat.exists
 
@@ -61,7 +68,8 @@
       ignore_errors: true
       register: pass_file
 
-    - ansible.builtin.include_vars:
+    - name: Include private student variables
+      ansible.builtin.include_vars:
         file: "{{ VARPRIVDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       when: pass_file.stat.exists
 
@@ -107,27 +115,27 @@
       ansible.builtin.debug:
         msg: "{{ notebookspriv.files }}"
 
-    #- name: debug
-    #debug:
-    #msg: "{{ ansible_facts }}"
+    # - name: debug
+    # debug:
+    # msg: "{{ ansible_facts }}"
 
-    #- name: debug
-    #debug:
-    #msg: "{{ OVIP }}"
+    # - name: debug
+    # debug:
+    # msg: "{{ OVIP }}"
 
-    #- name: debug-OVIP
-    #debug:
-    #msg: "{{ item.key }} => {{ item.value }}"
-    #with_dict: "{{ OVIP }}"
-    #when: "{{ STDID }} == {{ item.key }}"
+    # - name: debug-OVIP
+    # debug:
+    # msg: "{{ item.key }} => {{ item.value }}"
+    # with_dict: "{{ OVIP }}"
+    # when: "{{ STDID }} == {{ item.key }}"
 
     #   - name: Cleanup Outputs, metadata and execution_count
-    #shell: |
-    #jq '(.cells[] | select(has("outputs")) | .outputs) = []
-    #| (.cells[] | select(has("execution_count")) | .execution_count) = null
-    #| .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
-    #with_items: "{{ notebooks.files }}"
-    #when: item.path is not search("Variables.ps1")
+    # shell: |
+    # jq '(.cells[] | select(has("outputs")) | .outputs) = []
+    # | (.cells[] | select(has("execution_count")) | .execution_count) = null
+    # | .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
+    # with_items: "{{ notebooks.files }}"
+    # when: item.path is not search("Variables.ps1")
 
     - name: Purge potential remaining workshop (no CLEANUP done)
       become: true
@@ -195,18 +203,20 @@
       ignore_errors: true
       register: pretemp
 
-    - ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+    - name: Include pre-templatnig tasks
+      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
       when: pretemp.stat.exists
 
-    #- name: debug
-    #debug:
-    #msg: "PASSSTU:{{ PASSSTU }}"
+    # - name: debug
+    # debug:
+    # msg: "PASSSTU:{{ PASSSTU }}"
 
     # Second copy all data to be templated with variables
     - name: Deliver notebooks as ansible template for variable expansion
       ansible.builtin.template:
         src: "{{ item.path }}"
         dest: "{{ item.path | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }}"
+        mode: "0644"
       with_items: "[{{ notebooks.files }}]"
       when:
         - nobo_path.rc == 0
@@ -215,6 +225,7 @@
       ansible.builtin.template:
         src: "{{ item.path }}"
         dest: "{{ item.path | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}"
+        mode: "0644"
       with_items: "[{{ notebookspriv.files }}] "
       when:
         - nobopriv_path.rc == 0
@@ -226,7 +237,8 @@
       ignore_errors: true
       register: posttemp
 
-    - ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+    - name: Include post-templating tasks
+      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
       when: posttemp.stat.exists
 
     - name: Create a checkpoint directory

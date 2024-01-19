@@ -271,9 +271,9 @@
           - aspnetcore-runtime-6.0
           - dotnet-runtime-6.0
           - dotnet-sdk-6.0
-          #- aspnetcore-runtime-7.0
-          #- dotnet-runtime-7.0
-          #- dotnet-sdk-7.0
+          # - aspnetcore-runtime-7.0
+          # - dotnet-runtime-7.0
+          # - dotnet-sdk-7.0
           - aspnetcore-runtime-8.0
           - dotnet-runtime-8.0
           - dotnet-sdk-8.0
@@ -379,6 +379,8 @@
       with_items:
         - json
         - configurable-http-proxy
+      register: result
+      changed_when: result.rc != 0
 
     - name: Remove a set of existing pip packages
       ansible.builtin.pip:
@@ -403,7 +405,7 @@
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
         virtualenv_python: "{{ virtualenv_python }}"
-      when: CLEAN|bool
+      when: CLEAN | bool
       ignore_errors: true
       register: ignore_errors_register
 
@@ -413,9 +415,9 @@
       ansible.builtin.file:
         path: "{{ JPHUB }}"
         state: absent
-      when: CLEAN|bool
+      when: CLEAN | bool
 
-    - name: Create directory "{{ JPHUB }}" if needed
+    - name: If needed, create directory "{{ JPHUB }}"
       become: true
       become_user: root
       ansible.builtin.file:
@@ -481,6 +483,8 @@
 
     - name: Ensure Go kernel is installed
       ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+      register: result
+      changed_when: result.rc != 0
 
     - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: true
@@ -549,13 +553,15 @@
       become_user: root
       ansible.builtin.template:
         src: "{{"
-        dest: /usr/local/bin/{{
-        mode: "'0755'"
-        cmd: item }} item | basename | regex_replace('\.j2$') }}
+        dest: /usr/local/bin/{{ item | basename | regex_replace('\.j2$') }}
+        mode: "0755"
       with_fileglob: ["{{ SCRIPTDIR }}//build*.sh.j2"]
 
     - name: Ensure Rust kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
+      register: result
+      changed_when: result.rc != 0
+
     - name: Ensure Rust kernel files are installed
       ansible.builtin.copy:
         src: "{{ item }}"
@@ -581,16 +587,21 @@
 
     - name: Ensure jupyterhub IJava kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
+      register: result
+      changed_when: result.rc != 0
 
     - name: Ensure jupyterhub ssh kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
+      register: result
+      changed_when: result.rc != 0
 
     - name: Ensure jupyterhub kernels are installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
         - bash_kernel
         - ansible_kernel
-      changed_when: false
+      register: result
+      changed_when: result.rc != 0
 
     - name: Fix ansible kernel path to include virtualenv setup
       ansible.builtin.replace:
@@ -626,6 +637,7 @@
       ansible.builtin.command: "{{ dotnetpath }}/dotnet tool uninstall --global powershell"
       ignore_errors: true
       register: ignore_errors_register
+      changed_when: ignore_errors_register.rc != 0
 
     - name: Ensure dotnet interactive is removed through dotnet before installing
       become: true
@@ -633,6 +645,7 @@
       ansible.builtin.command: "{{ dotnetpath }}/dotnet tool uninstall --global Microsoft.dotnet-interactive"
       ignore_errors: true
       register: ignore_errors_register
+      changed_when: ignore_errors_register.rc != 0
 
     - name: Remove old MS tools to be sure a good one will be available
       become: true
@@ -688,21 +701,26 @@
       become: true
       become_user: root
       ansible.builtin.command: "{{ dotnetpath }}/dotnet tool install --tool-path /usr/local/bin powershell"
+      register: result
+      changed_when: result.rc != 0
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: true
       become_user: root
       ansible.builtin.command: "{{ dotnetpath }}/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive"
+      register: result
+      changed_when: result.rc != 0
 
     - name: Ensure dotnet kernel is installed
       become: true
       become_user: root
       ansible.builtin.command: /usr/local/bin/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
-      # Only working with dotnet 7.0 which is incompqtible with needed 8.0
+      # Only working with dotnet 7.0 which is incompatible with needed 8.0
       ignore_errors: true
-      register: ignore_errors_register
+      register: result
+      changed_when: result.rc != 0
 
-    - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
+    - name: Ensure existence of directory etc/jupyterhub under "{{ JPHUB }}"
       ansible.builtin.file:
         path: "{{ JPHUB }}/etc/jupyterhub"
         state: directory
@@ -742,6 +760,8 @@
       ansible.builtin.command: "{{ JPHUB }}/bin/jupyterhub --generate-config"
       args:
         chdir: "{{ JPHUB }}/etc/jupyterhub/"
+      register: result
+      changed_when: result.rc != 0
 
     - name: Existing token
       ansible.builtin.debug:
@@ -813,8 +833,11 @@
     - name: Copy WoD service file as ansible template for variable expansion
       become: true
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
-      with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
+        mode: "0644"
+      with_fileglob: ['{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2']
 
     - name: Enable WoD service
       become: true
@@ -828,7 +851,9 @@
         - jupyterhub
 
     - name: Wait 5 seconds to let WoD services start
-      ansible.builtin.shell: sleep 5
+      ansible.builtin.command: sleep 5
+      register: result
+      changed_when: result.rc != 0
 
       # - name: Setup {{ WODUSER }} account in jupyterhub
       # uri:
