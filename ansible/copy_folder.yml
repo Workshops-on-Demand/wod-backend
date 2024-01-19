@@ -217,7 +217,7 @@
         src: "{{ item.path }}"
         dest: "{{ item.path | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }}"
         mode: "0644"
-      with_items: "[{{ notebooks.files }}]"
+      with_items: "{{ notebooks.files | json_query('files[*].filename') }}"
       when:
         - nobo_path.rc == 0
 
@@ -226,7 +226,7 @@
         src: "{{ item.path }}"
         dest: "{{ item.path | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}"
         mode: "0644"
-      with_items: "[{{ notebookspriv.files }}] "
+      with_items: "{{ notebookspriv.files | json_query('files[*].filename') }}"
       when:
         - nobopriv_path.rc == 0
         - nobo_path.rc != 0

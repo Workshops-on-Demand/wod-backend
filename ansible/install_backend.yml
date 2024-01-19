@@ -552,10 +552,10 @@
       become: true
       become_user: root
       ansible.builtin.template:
-        src: "{{"
+        src: "{{ item }}"
         dest: /usr/local/bin/{{ item | basename | regex_replace('\.j2$') }}
         mode: "0755"
-      with_fileglob: ["{{ SCRIPTDIR }}//build*.sh.j2"]
+      with_fileglob: ["{{ SCRIPTDIR }}/build*.sh.j2"]
 
     - name: Ensure Rust kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
