@@ -36,7 +36,7 @@
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
-    - name: Create directory "{{ JPHUB }}" if needed
+    - name: If needed create directory "{{ JPHUB }}"
       become: true
       become_user: root
       ansible.builtin.file:
@@ -152,15 +152,19 @@
     # Works for both private and public parts
     - name: Deliver create/reset/setup scripts as ansible template for variable expansion
       ansible.builtin.template:
-        src={{ item }} dest={{ item | dirname }}/{{ item | basename | regex_replace('\.j2$') }} mode='0755'
-      with_fileglob: [ '{{ SCRIPTDIR }}/*.sh*.j2', '{{ SCRIPTPRIVDIR }}/*.sh*.j2' ]
+        src: "{{ item }}"
+        dest: "{{ item | dirname }}/{{ item | basename | regex_replace('.j2$') }}"
+        mode: "0755"
+      with_fileglob: ['{{ SCRIPTDIR }}/*.sh*.j2', '{{ SCRIPTPRIVDIR }}/*.sh*.j2']
 
     - name: Deliver variables files as ansible template for variable expansion
       ansible.builtin.template:
-        src={{ item }} dest={{ item | dirname }}/{{ item | basename | regex_replace('\.j2$') }} mode=644
-      with_fileglob: [ '{{ ANSIBLEDIR }}/{{ PBKDIR }}/*.yml.j2', '{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/*.yml.j2' ]
+        src: "{{ item }}"
+        dest: "{{ item | dirname }}/{{ item | basename | regex_replace('.j2$') }}"
+        mode: "0644"
+      with_fileglob: ['{{ ANSIBLEDIR }}/{{ PBKDIR }}/*.yml.j2', '{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/*.yml.j2']
 
-    - name: Ensure that directory {{ STUDDIR }} exists
+    - name: "Ensure existence of directory {{ STUDDIR }}"
       become: true
       become_user: root
       ansible.builtin.file:
@@ -243,8 +247,11 @@
     - name: Copy WoD service file as ansible template for variable expansion
       become: true
       become_user: root
-      ansible.builtin.template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode='0644'
-      with_fileglob: [ '{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2' ]
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/{{ item | basename | regex_replace('.j2$') }}"
+        mode: "0644"
+      with_fileglob: ['{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2']
 
     # Done after private part, which may affect branding
     - name: Enable backend WoD services
@@ -263,8 +270,10 @@
       ansible.builtin.command:
         cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
-      when: CLEAN|bool
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
+      when: CLEAN | bool
+      register: result
+      changed_when: result.rc != 0
 
     - name: Remove Linux users and their home directory
       become: true
@@ -274,8 +283,8 @@
         state: absent
         remove: true
         force: true
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
-      when: CLEAN|bool
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
+      when: CLEAN | bool
 
     - name: Ensure dedicated students groups exist
       become: true
@@ -284,7 +293,7 @@
         name: "{{ 'student%s' | format(item) }}"
         state: present
         gid: "{{ item + GIDBASE }}"
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
     - name: Ensure Linux students users exists with their home dir
       become: true
@@ -298,15 +307,15 @@
         shell: /bin/bash
         uid: "{{ item + UIDBASE }}"
         group: "{{ 'student%s' | format(item) }}"
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
     - name: Ensure jupyterhub students users exist
       ansible.builtin.command: "curl -X POST --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
       register: my_output
       changed_when: my_output.rc != 0
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
-    - name: Setup ACL for students with {{ WODUSER }} account
+    - name: Setup ACL for students with the account {{ WODUSER }}
       become: true
       become_user: root
       ansible.posix.acl:
@@ -317,9 +326,9 @@
         permissions: rwx
         state: present
         recalculate_mask: mask
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
-    - name: Setup default ACL for students with {{ WODUSER }} account
+    - name: Setup default ACL for students with account "{{ WODUSER }}"
       become: true
       become_user: root
       ansible.posix.acl:
@@ -331,4 +340,4 @@
         default: true
         state: present
         recalculate_mask: mask
-      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
+      loop: "{{ range(USERMIN, USERMAX + 1) | list }}"

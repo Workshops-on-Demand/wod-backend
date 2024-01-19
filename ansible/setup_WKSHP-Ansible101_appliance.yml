@@ -77,7 +77,7 @@
         group: apache
         mode: "0700"
         state: directory
-      loop: "{{ range( APPMIN|int, APPMAX|int + 1)|list }}"
+      loop: "{{ range(APPMIN | int, APPMAX | int + 1) | list }}"
 
     - name: Ensure students index.html file exist
       become: true
@@ -88,7 +88,7 @@
         owner: apache
         group: apache
         mode: "0600"
-      loop: "{{ range( APPMIN|int, APPMAX|int + 1)|list }}"
+      loop: "{{ range(APPMIN | int, APPMAX | int + 1) | list }}"
 
     - name: Enable httpd service
       become: true
