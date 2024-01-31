@@ -7,6 +7,7 @@
 use strict;
 use YAML::Tiny;
 use Data::Dumper;
+use open ":std", ":encoding(UTF-8)"; # to avoid wide char in print msgs
 
 my $h = {};
 
