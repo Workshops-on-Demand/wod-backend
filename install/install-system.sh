@@ -214,8 +214,13 @@ EOF
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
+	echo "Install pm2"
+	npm install pm2@latest
+	export PATH=$PATH:"$WODAPIDBDIR/node_modules/pm2/bin"
+	echo "Stop a previous server"
+	pm2 del workshops-on-demand
 	echo "Start the API server"
-	npm start &
+	pm2 start
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
 	cat > .env << EOF
