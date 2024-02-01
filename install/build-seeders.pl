@@ -41,7 +41,7 @@ if (-d $ENV{'WODPRIVNOBO'}) {
 }
 
 print "Data gathered from YAML files wod.yml under $ENV{'WODNOBO'}\n";
-print Dumper($h);
+#print Dumper($h);
 
 # Generating workshop seeder file
 my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js";
@@ -52,9 +52,9 @@ print(WKSHP "'use strict';\n\n") if ($seederfile =~ /01-/);
 print(WKSHP "module.exports = {\n");
 print(WKSHP "  up: (queryInterface, Sequelize) => {\n");
 print(WKSHP "    return queryInterface.bulkInsert('workshops', [\n");
-foreach my $w (keys %$h) {
+foreach my $w (sort keys %$h) {
 	print(WKSHP "      {\n");
-	foreach my $f (keys %{$h->{$w}}) {
+	foreach my $f (sort keys %{$h->{$w}}) {
 		#print "Looking at $f: ***$h->{$w}->{$f}***\n";
 		## If boolean or integer or array no quoting needed
 		if (($h->{$w}->{$f} =~ /true/) || ($h->{$w}->{$f} =~ /false/) || ($h->{$w}->{$f} =~ /^[0-9]+$/) ||  ($h->{$w}->{$f} =~ /\[/)) {
@@ -104,13 +104,13 @@ my $wodbeextfqdn = "";
 my $pbkdir = "";
 $wodbeextfqdn = $ENV{'WODBEEXTFQDN'} if (defined $ENV{'WODBEEXTFQDN'});
 $pbkdir = $ENV{'PBKDIR'} if (defined $ENV{'PBKDIR'});
-print(WKSHP "url: \`$wodbeextfqdn/user/student");
+print(WKSHP "      url: \`$wodbeextfqdn/user/student");
 print WKSHP <<'EOF';
 ${key}/lab?`,
       username: `student${key}`,
       password: 'MyNewPassword',
 EOF
-print(WKSHP "location: '$pbkdir',\n");
+print(WKSHP "      location: '$pbkdir',\n");
 print WKSHP <<'EOF';
     }));
 
