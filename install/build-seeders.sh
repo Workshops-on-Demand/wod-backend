@@ -12,5 +12,6 @@ if [ -f "$WODPRIVINV" ]; then
 else
 	PRIVINV=""
 fi
-export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host `hostname -f` --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
+HOSTNAME=`hostname -f`
+export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $HOSTNAME --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 $INSTALLDIR/build-seeders.pl
