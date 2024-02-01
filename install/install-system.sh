@@ -229,7 +229,7 @@ EOF
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
-	launch_with_pm2($WODAPIDBDIR)
+	launch_with_pm2 $WODAPIDBDIR 
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
 	cat > .env << EOF
@@ -257,7 +257,7 @@ EOF
 	echo "Patching package.json to allow listening on the right host:port"
 	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p $WODFEPORT|" package.json
 	echo "Start the Frontend server"
-	launch_with_pm2($WODFEDIR)
+	launch_with_pm2 $WODFEDIR 
 fi
 
 if [ $WODTYPE != "appliance" ]; then
