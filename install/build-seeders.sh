@@ -7,10 +7,10 @@ SCRIPT=`realpath $0`
 INSTALLDIR=`dirname $SCRIPT`
 
 source $INSTALLDIR/../scripts/wod.sh
-if [ -f "$ANSIBLEPRIVDIR/inventory" ]; then
-	PRIVINV="-i $ANSIBLEPRIVDIR/inventory"
+if [ -f "$WODPRIVINV" ]; then
+	PRIVINV="-i $WODPRIVINV"
 else
 	PRIVINV=""
 fi
-export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --list | jq "._meta.hostvars.\"$WODAPIDBFQDN\".USERMAX"`
+export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host `hostname -f` --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 $INSTALLDIR/build-seeders.pl
