@@ -4,7 +4,7 @@ date
 
 export WODTYPE=$1
 if [ -z "$WODTYPE" ]; then
-	echo "Syntax: install_system api-db|backend|frontend|appliance"
+	echo "Syntax: install-system.sh api-db|backend|frontend|appliance"
 	exit -1
 fi
 
@@ -18,10 +18,10 @@ launch_with_pm2() {
 	export PATH=$PATH:"$DIR/node_modules/pm2/bin"
 	pm2 show $APP 2>&1 > /dev/null
 	if [ $? -eq 0 ]; then
-		echo "Stop a previous server"
+		echo "Stop a previous server for $APP"
 		pm2 del $APP
 	fi
-	echo "Start the API server"
+	echo "Start the $APP server"
 	pm2 start --name=$APP npm -- start
 }
 
@@ -262,7 +262,7 @@ EOF
 	echo "Patching package.json to allow listening on the right host:port"
 	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p $WODFEPORT|" package.json
 	echo "Start the Frontend server"
-	launch_with_pm2 $WODFEDIR  wod-$WODTYPE
+	launch_with_pm2 $WODFEDIR wod-$WODTYPE
 fi
 
 if [ $WODTYPE != "appliance" ]; then
