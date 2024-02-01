@@ -28,12 +28,21 @@
       when:
         - ansible_os_family == "Debian"
 
-    - name: Npm 16.x repo needs to be used
+    - name: Nodejs repo needs to be pinned
       become: true
       become_user: root
-      ansible.builtin.apt_repository:
-        repo: deb https://deb.nodesource.com/npm_16.x jammy main
+      ansible.builtin.blockinfile:
+        path: /etc/apt/preferences.d/nodejs
+        owner: root
+        group: root
+        mode: "0644"
+        backup: true
+        create: true
         state: present
+        block: |
+          Package: nodejs
+          Pin: origin deb.nodesource.com
+          Pin-Priority: 600
       when:
         - ansible_os_family == "Debian"
 
