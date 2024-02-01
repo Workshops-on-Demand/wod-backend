@@ -12,5 +12,5 @@ if [ -f "$ANSIBLEPRIVDIR/inventory" ]; then
 else
 	PRIVINV=""
 fi
-export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --list | jq "._meta.hostvars.\"127.0.0.1\".USERMAX"`
+export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --list | jq "._meta.hostvars.\"$WODAPIDBFQDN\".USERMAX"`
 $INSTALLDIR/build-seeders.pl
