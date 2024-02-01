@@ -11,7 +11,7 @@ fi
 launch_with_pm2() {
 	DIR=$1
 	shift
-	APP=$2
+	APP=$1
 	shift
 	echo "Install pm2"
 	npm install pm2@latest
