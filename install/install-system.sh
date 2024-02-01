@@ -8,6 +8,18 @@ if [ -z "$WODTYPE" ]; then
 	exit -1
 fi
 
+launch_with_pm2() {
+	DIR=$1
+	shift
+	echo "Install pm2"
+	npm install pm2@latest
+	export PATH=$PATH:"$DIR/node_modules/pm2/bin"
+	echo "Stop a previous server"
+	pm2 del workshops-on-demand
+	echo "Start the API server"
+	pm2 start
+}
+
 if [ ! -f $HOME/.gitconfig ]; then
 	cat > $HOME/.gitconfig << EOF
 # This is Git's per-user configuration file.
@@ -217,13 +229,7 @@ EOF
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
-	echo "Install pm2"
-	npm install pm2@latest
-	export PATH=$PATH:"$WODAPIDBDIR/node_modules/pm2/bin"
-	echo "Stop a previous server"
-	pm2 del workshops-on-demand
-	echo "Start the API server"
-	pm2 start
+	launch_with_pm2($WODAPIDBDIR)
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
 	cat > .env << EOF
@@ -251,7 +257,7 @@ EOF
 	echo "Patching package.json to allow listening on the right host:port"
 	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p $WODFEPORT|" package.json
 	echo "Start the Frontend server"
-	#npm start &
+	launch_with_pm2($WODFEDIR)
 fi
 
 if [ $WODTYPE != "appliance" ]; then
