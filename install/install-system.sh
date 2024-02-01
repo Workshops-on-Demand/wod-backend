@@ -175,6 +175,9 @@ if [ $WODTYPE = "api-db" ]; then
 	$INSTALLDIR/build-seeders.sh
 
 	cd $WODAPIDBDIR
+	echo "Launching npm install..."
+	npm install
+
 	cat > .env << EOF
 FROM_EMAIL_ADDRESS="$WODSENDER"
 SENDGRID_API_KEY="None"
