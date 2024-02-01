@@ -11,13 +11,18 @@ fi
 launch_with_pm2() {
 	DIR=$1
 	shift
+	APP=$2
+	shift
 	echo "Install pm2"
 	npm install pm2@latest
 	export PATH=$PATH:"$DIR/node_modules/pm2/bin"
-	echo "Stop a previous server"
-	pm2 del workshops-on-demand
+	pm2 show $APP 2>&1 > /dev/null
+	if [ $? -eq 0 ]; then
+		echo "Stop a previous server"
+		pm2 del $APP
+	fi
 	echo "Start the API server"
-	pm2 start
+	pm2 start --name=$APP npm -- start
 }
 
 if [ ! -f $HOME/.gitconfig ]; then
@@ -229,7 +234,7 @@ EOF
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
-	launch_with_pm2 $WODAPIDBDIR 
+	launch_with_pm2 $WODAPIDBDIR wod-$WODTYPE
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
 	cat > .env << EOF
@@ -257,7 +262,7 @@ EOF
 	echo "Patching package.json to allow listening on the right host:port"
 	perl -pi -e "s|gatsby develop|gatsby develop -H $WODFEFQDN -p $WODFEPORT|" package.json
 	echo "Start the Frontend server"
-	launch_with_pm2 $WODFEDIR 
+	launch_with_pm2 $WODFEDIR  wod-$WODTYPE
 fi
 
 if [ $WODTYPE != "appliance" ]; then
