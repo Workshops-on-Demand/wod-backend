@@ -59,6 +59,8 @@ cat >> $SCRIPTDIR/wod.sh << 'EOF'
 #
 export ANSIBLEDIR=$WODBEDIR/ansible
 export SYSDIR=$WODBEDIR/sys
+# Name of the backend server seen from outside
+export WODBEEXTFQDN=$WODBEEXTFQDN
 
 # PRIVATE PART
 # These 3 dirs have fixed names by default that you can change in this file
