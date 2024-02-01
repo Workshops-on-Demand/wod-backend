@@ -56,7 +56,8 @@ foreach my $w (keys %$h) {
 	print(WKSHP "      {\n");
 	foreach my $f (keys %{$h->{$w}}) {
 		#print "Looking at $f: ***$h->{$w}->{$f}***\n";
-		if (($h->{$w}->{$f} =~ /true/) || ($h->{$w}->{$f} =~ /false/) || ($h->{$w}->{$f} =~ /^[0-9]+$/)) {
+		## If boolean or integer or array no quoting needed
+		if (($h->{$w}->{$f} =~ /true/) || ($h->{$w}->{$f} =~ /false/) || ($h->{$w}->{$f} =~ /^[0-9]+$/) ||  ($h->{$w}->{$f} =~ /\[/)) {
 			print(WKSHP "        $f: $h->{$w}->{$f},\n");
 		} else {
 			if ($h->{$w}->{$f} =~ /'/) {
@@ -96,7 +97,6 @@ module.exports = {
     const entries3 = arr3.map((key) => ({
       createdAt: new Date(),
       updatedAt: new Date(),
-      url: `
 EOF
 # This variable exists when that script is called at install
 # TODO: Also get it at run time for upgrade
@@ -104,16 +104,14 @@ my $wodbeextfqdn = "";
 my $pbkdir = "";
 $wodbeextfqdn = $ENV{'WODBEEXTFQDN'} if (defined $ENV{'WODBEEXTFQDN'});
 $pbkdir = $ENV{'PBKDIR'} if (defined $ENV{'PBKDIR'});
-print(WKSHP "$wodbeextfqdn/user/student");
+print(WKSHP "url: \`$wodbeextfqdn/user/student");
 print WKSHP <<'EOF';
 ${key}/lab?`,
       username: `student${key}`,
       password: 'MyNewPassword',
-      location: '
 EOF
-print(WKSHP "$pbkdir");
+print(WKSHP "location: '$pbkdir',\n");
 print WKSHP <<'EOF';
-',
     }));
 
     let entries = [...entries3];
