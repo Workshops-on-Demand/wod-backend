@@ -131,12 +131,6 @@ $WODFEFQDN ansible_connection=local
 EOF
 fi
 
-if [ $WODTYPE = "api-db" ]; then
-	cd $HOME/wod-$WODTYPE
-	echo "Launching npm install..."
-	npm install
-fi
-
 # Change default passwd for vagrant and root
 
 # Install WoD - install scripts managed in backend whatever system we install

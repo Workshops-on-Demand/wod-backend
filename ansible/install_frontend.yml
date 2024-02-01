@@ -71,6 +71,7 @@
           - net-tools
           - nodejs
           - npm
+          - yarn
           - telnet
           - man
           - unzip
