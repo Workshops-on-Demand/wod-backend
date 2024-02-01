@@ -86,6 +86,7 @@ fi
 
 # AIP-DB PART
 export WODAPIDBDIR=$PWODBEDIR/wod-api-db
+export WODAPIDBFQDN="$WODAPIDBFQDN"
 
 # FRONTEND PART
 export WODFEDIR=$PWODBEDIR/wod-frontend
