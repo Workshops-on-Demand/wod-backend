@@ -2,8 +2,7 @@
 
 set -x
 
-export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-DataVisu101'] }}
-/home/jupyter/jupyter-procmail/scripts/reset-appliance.sh
+{{ SCRIPTDIR }}/reset-appliance.sh
 
 NAME=datavisulab
 TMPDIR=/tmp/$NAME.$stdid

@@ -79,6 +79,24 @@ fi
 export w
 export ws
 export wid=`get_workshop_id $w`
+#
+# Is it a multi-appliance setup ?
+multiappliance=`get_multiappliance_status $wid`
+monoappliance=`get_monoappliance_status $wid`
+if [ _"`get_multiappliance_status $wid`" != _"false" ]; then
+	APPMINVALUE=`get_range_min $wid`
+	delta=$(($stdid-$APPMINVALUE))
+	baseip=`get_appliance_baseip $w`
+	basedigit=`echo $baseip | cut -d'.' -f4`
+	netip=`echo $baseip | cut -d'.' -f1-3`
+	ip=$(($basedigit+$delta))
+	export RTARGET="$netip.$ip"
+else
+	if [ _"`get_monoappliance_status $wid`" != _"false" ]; then
+		export RTARGET=`get_appliance_baseip $w`
+	fi
+	# If no appliance, we do not define RTARGET on purpose
+fi
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
@@ -110,6 +128,7 @@ if [ $action != "RESET" ]; then
 
 		if [ "$action" = "CREATE" ]; then
 			erase_student
+			# compile flag is a STRING not a boolean
 			compile=`get_compile_status $wid`
 			if [ _"$compile" = _"null" ]; then
 				compile=""
@@ -135,11 +154,12 @@ if [ $action != "RESET" ]; then
 				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
-				echo "Setup workshop $w Backend"
+				echo "Setup workshop $w appliance"
+
 				{{ SCRIPTDIR }}/create-$ws.sh
 			fi
 			if [ -x "{{ SCRIPTPRIVDIR }}/create-$ws.sh" ]; then
-				echo "Setup private workshop $w Backend"
+				echo "Setup private workshop $w appliance"
 				{{ SCRIPTPRIVDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
@@ -161,7 +181,7 @@ if [ $action != "RESET" ]; then
 		dbstdid=$((stdid+{{ BASESTDID }}))
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
-		##Update Password
+		# Update Password
 		curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 			 --request PUT \
 			 --data '{"password":"'$randompw'"}' \

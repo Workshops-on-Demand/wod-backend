@@ -2,7 +2,6 @@
 
 set -x
 
-export RTARGET={{ hostvars[inventory_hostname]['IP-WKSHP-Docker101'] }}
 {{ SCRIPTDIR }}/reset-appliance.sh
 
 NAME=dockerlab

@@ -29,15 +29,16 @@ get_session_token() {
 get_workshop_id() {
 
 	id=0
-	for i in `curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops" | jq -r '.[].id'`; do
-		name=`curl -s --header "x-access-token:$accessToken"  --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$i" | jq .notebook | sed 's/"//g'`
-		if [ _"$name" = _"$1" ]; then
-			id=$i
-			break
+	id=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops" | jq -r '.[] | .notebook,.id' | grep -A 1 -E "^$1$" | tail -1`
+	#for i in `curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops" | jq -r '.[].id'`; do
+		#name=`curl -s --header "x-access-token:$accessToken"  --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$i" | jq .notebook | sed 's/"//g'`
+		#if [ _"$name" = _"$1" ]; then
+			#id=$i
+			#break
 
-		fi
-	done
-	if [ $id = 0 ]; then
+		#fi
+	#done
+	if [ _"$id" = _"" ]; then
 		echo "Workshop ID not found remotely for $1"
 		exit -1
 	fi
@@ -68,6 +69,20 @@ get_reset_status() {
 get_beta_status() {
 
         ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$1" | jq -r '.beta'`
+        echo "$ret"
+}
+
+# This function returns the status of the mono-appliance boolean for the workshop id given as parameter
+get_monoappliance_status() {
+
+        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$1" | jq -r '.monoappliance'`
+        echo "$ret"
+}
+
+# This function returns the status of the multi-appliance boolean for the workshop id given as parameter
+get_multiappliance_status() {
+
+        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$1" | jq -r '.multiappliance'`
         echo "$ret"
 }
 
@@ -106,6 +121,19 @@ get_range_max() {
 
 	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$1" | jq -r '.range[1]'`
 	echo "$ret"
+}
+
+# This function returns the base IP address of the appliance related to the workshop given as parameter
+get_appliance_baseip() {
+	baseip=`grep IP-$1 {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	if [ _"$baseip" = _"" ]; then
+		baseip=`grep IP-$1 {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+		if [ _"$baseip" = _"" ]; then
+			echo "Unable to find the the appliance base IP for $1"
+			exit -1
+		fi
+	fi
+	echo "$baseip"
 }
 
 # This function updates the LDAP passwd with $randompw for the student under management (using $stdid)

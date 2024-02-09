@@ -2,7 +2,6 @@
 
 set -x
 
-export RTARGET={{ hostvars[inventory_hostname]["IP-WKSHP-StackStorm101"] }}
 {{ SCRIPTDIR }}/reset-appliance.sh
 
 # That Workshop also needs another passwd reset
