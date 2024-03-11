@@ -96,7 +96,7 @@ export wid=`get_workshop_id $w`
 # Is it a no- or mono- or multi-appliance setup ?
 multiappliance=`get_multiappliance_status $wid`
 monoappliance=`get_monoappliance_status $wid`
-if [ _"`get_multiappliance_status $wid`" != _"false" ]; then
+if [ _"`get_multiappliance_status $wid`" = _"true" ]; then
 	APPMINVALUE=`get_range_min $wid`
 	delta=$(($stdid-$APPMINVALUE))
 	baseip=`get_appliance_baseip $w`
@@ -105,7 +105,7 @@ if [ _"`get_multiappliance_status $wid`" != _"false" ]; then
 	ip=$(($basedigit+$delta))
 	export RTARGET="$netip.$ip"
 else
-	if [ _"`get_monoappliance_status $wid`" != _"false" ]; then
+	if [ _"`get_monoappliance_status $wid`" = _"true" ]; then
 		export RTARGET=`get_appliance_baseip $w`
 	fi
 	# If no appliance, we do not define RTARGET on purpose
@@ -130,12 +130,12 @@ if [ $action != "RESET" ]; then
 		generate_randompwd
 
 		# Some Notebooks need an LDAP passwd update as well
-		if [ _"`get_ldap_status $wid`" != _"false" ]; then
+		if [ _"`get_ldap_status $wid`" = _"true" ]; then
 			update_ldap_passwd
 			create_var_passwd
 		fi
 		# Some Notebooks need to get the passwd for the user
-		if [ _"`get_varpass_status $wid`" != _"false" ]; then
+		if [ _"`get_varpass_status $wid`" = _"true" ]; then
 			create_var_passwd
 		fi
 
@@ -236,17 +236,9 @@ if [ $action != "RESET" ]; then
 			--request DELETE \
                          "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 
-			# Get Workshop reset status to determine if users should be updated to inactive or not
-			if [ _"`get_reset_status $wid`" = _"false" ]; then
-				# Update student status to inactive
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-					 --request PUT \
-					 --data '{"assigned":"false"}' \
-					 "$WODAPIDBURL/student/$dbstdid"
-				# Possible to clean dirs because no RESET so no file needed in that dir
-	 			erase_student
-				cleanup_processes_student
-			else
+			# Get Worshop reset status to determine if users should be updated to inactive or not
+			if [ _"`get_reset_status $wid`" = _"true" ]; then
+				# Update student status to active
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
@@ -256,6 +248,15 @@ if [ $action != "RESET" ]; then
 					     --request PUT \
 					     --data '{"active": "false"}' \
 					     "$WODAPIDBURL/customer/$userid"
+			else
+				# Update student status to inactive
+				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+					 --request PUT \
+					 --data '{"assigned":"false"}' \
+					 "$WODAPIDBURL/student/$dbstdid"
+				# Possible to clean dirs because no RESET so no file needed in that dir
+	 			erase_student
+				cleanup_processes_student
 			fi
 		else
 			echo "Unknown action $action"
@@ -300,7 +301,7 @@ elif [ "$action" = "RESET" ]; then
 			generate_randompwd
 	
 			# Some Notebooks need an LDAP passwd update as well
-			if [ _"`get_ldap_status $wid`" != _"false" ]; then
+			if [ _"`get_ldap_status $wid`" = _"true" ]; then
 				update_ldap_passwd
 			fi
 			((i=i-1))
