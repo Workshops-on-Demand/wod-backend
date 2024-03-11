@@ -93,7 +93,7 @@ export w
 export ws
 export wid=`get_workshop_id $w`
 #
-# Is it a multi-appliance setup ?
+# Is it a no- or mono- or multi-appliance setup ?
 multiappliance=`get_multiappliance_status $wid`
 monoappliance=`get_monoappliance_status $wid`
 if [ _"`get_multiappliance_status $wid`" != _"false" ]; then

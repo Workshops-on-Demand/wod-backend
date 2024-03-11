@@ -401,6 +401,7 @@
           - jwt
           - jinja2-cli
           - determined
+          - yq
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -476,6 +477,7 @@
           - jwt
           - jinja2-cli
           - determined
+          - yq
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
