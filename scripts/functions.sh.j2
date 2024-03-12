@@ -74,14 +74,14 @@ get_beta_status() {
 # This function returns the status of the mono-appliance boolean for the workshop id given as parameter
 get_monoappliance_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$1" | jq -r '.monoappliance'`
+        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.monoappliance'`
         echo "$ret"
 }
 
 # This function returns the status of the multi-appliance boolean for the workshop id given as parameter
 get_multiappliance_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODFEAPIURL/workshops/$1" | jq -r '.multiappliance'`
+        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.multiappliance'`
         echo "$ret"
 }
 
