@@ -184,6 +184,27 @@ if [ $WODTYPE != "appliance" ]; then
 		echo "Install had errors exiting before launching startup"
 		exit -1
 	fi
+	if [ $WODTYPE = "api-db" ]; then
+		if [ -f "$ANSIBLEDIR/group_vars/$PBKDIR" ]; then
+			WODAPIDBUSER=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
+			WODAPIDBPWD=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
+		fi
+		if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
+			WODAPIDBUSER=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
+			WODAPIDBPWD=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
+		fi
+		if [ _"$WODAPIDBUSER" = _"" ]; then
+			echo "You need to configure WODAPIDBUSER in your $PBKDIR ansible variable file"
+			WODAPIDBUSER="moderator"
+			echo "Using default $WODAPIDBUSER instead"
+		fi
+		if [ _"$WODAPIDBPWD" = _"" ]; then
+			echo "You need to configure WODAPIDBPWD in your $PBKDIR ansible variable file"
+			WODAPIDBPWD="UnMotDePassCompliqué"
+			echo "Using default $WODAPIDBPWD instead"
+		fi
+		PGPASSWORD="TrèsCompliqué!!##123"
+	fi
 fi
 
 if [ $WODTYPE = "api-db" ]; then
@@ -199,7 +220,7 @@ if [ $WODTYPE = "api-db" ]; then
 FROM_EMAIL_ADDRESS="$WODSENDER"
 SENDGRID_API_KEY="None"
 API_PORT=$WODAPIDBPORT
-DB_PW=TrèsCompliqué!!##123
+DB_PW=$PGPASSWORD
 DURATION=4
 JUPYTER_MOUGINS_LOCATION=
 JUPYTER_GRENOBLE_LOCATION=GNB
@@ -234,6 +255,10 @@ EOF
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
 	echo "Reset DB data"
 	npm run reset-data
+	echo "Setup $WODAPIDBUSER"
+	psql --dbname=postgres --username=postgres --host=localhost -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
+	psql --dbname=postgres --username=postgres --host=localhost -c "UPDATE users set password=crypt('"$WODAPIDBPWD"',gen_salt('bf')) where username='"$WODAPIDBUSER"'";
+	echo "Starting API"
 	launch_with_pm2 $WODAPIDBDIR wod-$WODTYPE
 elif [ $WODTYPE = "frontend" ]; then
 	cd $WODFEDIR
