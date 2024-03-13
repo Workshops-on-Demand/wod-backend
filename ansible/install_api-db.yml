@@ -47,6 +47,7 @@
           - acct
           - libjson-perl
           - libyaml-tiny-perl
+          - postgresql-client
       when:
         - ansible_os_family == "Debian"
 
@@ -63,8 +64,15 @@
           - psacct
           - perl-JSON
           - perl-YAML-Tiny
+          - postgresql
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+
+    - name: Ensure all required pip packages are installed
+      ansible.builtin.pip:
+        name:
+          - yq
+        state: present
 
     - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: true
