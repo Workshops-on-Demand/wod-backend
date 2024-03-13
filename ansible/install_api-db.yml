@@ -19,6 +19,8 @@
       ansible.builtin.package:
         name:
           - ansible
+          - python3
+          - python3-pip
           - git
           - rsync
           - wget
