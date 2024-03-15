@@ -122,3 +122,40 @@ print WKSHP <<'EOF';
 };
 EOF
 close(WKSHP);
+
+# Now deal with users
+$seederfile = "$ENV{'WODAPIDBDIR'}/seeders/06-users.js";
+
+print "Generate the seeder file from collected data under $seederfile\n";
+open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
+print WKSHP <<"EOF";
+const getDates = () => {
+  const startDate = new Date();
+  const endDate = new Date();
+  //start.setDate(start.getDate() - 9 + key);
+  endDate.setHours(endDate.getHours() + 4);
+  return { startDate, endDate };
+};
+module.exports = {
+  up: (queryInterface) =>
+    queryInterface.bulkInsert(
+      'users',
+      [
+        {
+          username: $WODAPIDBUSER,
+          email: 'dummy',
+          password:
+            '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      {
+        returning: true,
+      }
+    ),
+
+  down: (queryInterface) => queryInterface.bulkDelete('users', null, {}),
+};
+EOF
+close(WKSHP);
