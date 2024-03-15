@@ -253,7 +253,7 @@ EOF
 	# and we need to stop it before to be idempotent
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose down"
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
-	POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.POSTGRES_DB'`
+	POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.services.db.environment.POSTGRES_DB'`
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Setup $WODAPIDBUSER"
