@@ -71,6 +71,8 @@
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Ensure all required pip packages are installed
+      become: true
+      become_user: root
       ansible.builtin.pip:
         name:
           - yq
