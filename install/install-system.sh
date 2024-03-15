@@ -39,6 +39,8 @@ SCRIPT=`realpath $0`
 # This is the installation directory where install scripts are located.
 INSTALLDIR=`dirname $SCRIPT`
 
+source $INSTALLDIR/functions.sh
+
 # This main dir is computed and is the backend main dir
 export WODBEDIR=`dirname $INSTALLDIR`
 
@@ -185,24 +187,7 @@ if [ $WODTYPE != "appliance" ]; then
 		exit -1
 	fi
 	if [ $WODTYPE = "api-db" ]; then
-		if [ -f "$ANSIBLEDIR/group_vars/$PBKDIR" ]; then
-			WODAPIDBUSER=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
-			WODAPIDBPWD=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
-		fi
-		if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
-			WODAPIDBUSER=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
-			WODAPIDBPWD=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
-		fi
-		if [ _"$WODAPIDBUSER" = _"" ]; then
-			echo "You need to configure WODAPIDBUSER in your $PBKDIR ansible variable file"
-			WODAPIDBUSER="moderator"
-			echo "Using default $WODAPIDBUSER instead"
-		fi
-		if [ _"$WODAPIDBPWD" = _"" ]; then
-			echo "You need to configure WODAPIDBPWD in your $PBKDIR ansible variable file"
-			WODAPIDBPWD="UnMotDePassCompliqué"
-			echo "Using default $WODAPIDBPWD instead"
-		fi
+		get_wodapidb_userpwd
 		export PGPASSWORD="TrèsCompliqué!!##123"
 	fi
 fi
@@ -215,6 +200,8 @@ if [ $WODTYPE = "api-db" ]; then
 	cd $WODAPIDBDIR
 	echo "Launching npm install..."
 	npm install
+
+	export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $HOSTNAME --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 
 	cat > .env << EOF
 FROM_EMAIL_ADDRESS="$WODSENDER"
@@ -237,7 +224,7 @@ POSTFIX_PORT_GREENLAKE=
 FEEDBACK_WORKSHOP_URL="None"
 FEEDBACK_CHALLENGE_URL="None"
 PRODUCTION_API_SERVER=$WODFEFQDN
-NO_OF_STUDENT_ACCOUNTS=1000
+NO_OF_STUDENT_ACCOUNTS=$USERMAX
 SLACK_CHANNEL_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_WORKSHOPS_ON_DEMAND="None"
 SESSION_TYPE_CODING_CHALLENGE="None"
