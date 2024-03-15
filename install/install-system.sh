@@ -203,7 +203,7 @@ if [ $WODTYPE != "appliance" ]; then
 			WODAPIDBPWD="UnMotDePassCompliqué"
 			echo "Using default $WODAPIDBPWD instead"
 		fi
-		PGPASSWORD="TrèsCompliqué!!##123"
+		export PGPASSWORD="TrèsCompliqué!!##123"
 	fi
 fi
 
