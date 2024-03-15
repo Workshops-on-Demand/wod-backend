@@ -484,7 +484,8 @@
         virtualenv_python: "{{ virtualenv_python }}"
 
     - name: Ensure Go kernel is installed
-      ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes@0.7.5 && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+      ansible.builtin.shell: env GO111MODULE=off go install github.com/gopherdata/gophernotes@0.7.5 && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp "{{ ansible_env.HOME }}"/go/src/github.com/gopherdata/gophernotes/kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+        #ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes@0.7.5 && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
       register: result
       changed_when: result.rc != 0
 
