@@ -253,11 +253,12 @@ EOF
 	# and we need to stop it before to be idempotent
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose down"
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker-compose config ; docker-compose up -d"
+	POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.POSTGRES_DB'`
 	echo "Reset DB data"
 	npm run reset-data
 	echo "Setup $WODAPIDBUSER"
 	psql --dbname=postgres --username=postgres --host=localhost -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
-	psql --dbname=postgres --username=postgres --host=localhost -c "UPDATE users set password=crypt('"$WODAPIDBPWD"',gen_salt('bf')) where username='"$WODAPIDBUSER"'";
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "UPDATE users set password=crypt('"$WODAPIDBPWD"',gen_salt('bf')) where username='"$WODAPIDBUSER"'";
 	echo "Starting API"
 	launch_with_pm2 $WODAPIDBDIR wod-$WODTYPE
 elif [ $WODTYPE = "frontend" ]; then
