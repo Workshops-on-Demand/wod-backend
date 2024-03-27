@@ -142,7 +142,7 @@ module.exports = {
       'users',
       [
         {
-          username: $WODAPIDBUSER,
+          username: $ENV{'WODAPIDBUSER'},
           email: 'dummy',
           password:
             '',
