@@ -1,5 +1,7 @@
 #!/bin/bash
 
+bash -x 
+
 date
 
 export WODTYPE=$1
@@ -124,7 +126,6 @@ chmod 755 $SCRIPTDIR/wod.sh
 source $SCRIPTDIR/wod.sh
 
 cd $SCRIPTDIR/../ansible
-SHORTNAME="`hostname -s`"
 PBKDIR=$WODGROUP
 
 # Declares shell variables as ansible variables as well
