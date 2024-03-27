@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bash -x 
+set -x 
 
 date
 
