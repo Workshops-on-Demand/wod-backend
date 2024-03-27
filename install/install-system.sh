@@ -202,7 +202,7 @@ if [ $WODTYPE = "api-db" ]; then
 	echo "Launching npm install..."
 	npm install
 
-	export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $HOSTNAME --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
+	export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 
 	cat > .env << EOF
 FROM_EMAIL_ADDRESS="$WODSENDER"
