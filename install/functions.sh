@@ -21,15 +21,23 @@ if [ -f "$ANSIBLEDIR/group_vars/$PBKDIR" ]; then
 	fi
 fi
 if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
-	WODAPIDBUSER=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
-	if [ _"$WODAPIDBUSER" = _"null" ]; then
-		WODAPIDBUSER=""
+	WODAPIDBUSER2=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
+	if [ _"$WODAPIDBUSER2" = _"null" ]; then
+		WODAPIDBUSER2=""
 	fi
-	WODAPIDBPWD=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
-	if [ _"$WODAPIDBPWD" = _"null" ]; then
-		WODAPIDBPWD=""
+	WODAPIDBPWD2=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
+	if [ _"$WODAPIDBPWD2" = _"null" ]; then
+		WODAPIDBPWD2=""
 	fi
 fi
+# Overload standard with private if anything declared there
+if [ _"$WODAPIDBUSER2" != _"" ]; then
+	WODAPIDBUSER=$WODAPIDBUSER2
+fi
+if [ _"$WODAPIDBPWD2" != _"" ]; then
+	WODAPIDBPWD=$WODAPIDBPWD2
+fi
+
 if [ _"$WODAPIDBUSER" = _"" ]; then
 	echo "You need to configure WODAPIDBUSER in your $PBKDIR ansible variable file"
 	WODAPIDBUSER="moderator"
