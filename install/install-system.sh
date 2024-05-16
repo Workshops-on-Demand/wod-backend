@@ -18,11 +18,14 @@ launch_with_pm2() {
 	echo "Install pm2"
 	npm install pm2@latest
 	export PATH=$PATH:"$DIR/node_modules/pm2/bin"
+	# Allow error to occur
+	set +e
 	pm2 show $APP 2>&1 > /dev/null
 	if [ $? -eq 0 ]; then
 		echo "Stop a previous server for $APP"
 		pm2 del $APP
 	fi
+	set -e
 	echo "Start the $APP server"
 	pm2 start --name=$APP npm -- start
 }
