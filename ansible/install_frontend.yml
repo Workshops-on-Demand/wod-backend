@@ -10,7 +10,7 @@
     - name: Base setup for a base system
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
 
-    - name: Add ubuntuupdates GPG Key to APT
+    - name: Add ubuntu updates GPG Key to APT
       become: true
       become_user: root
       ansible.builtin.apt_key:
@@ -19,11 +19,11 @@
       when:
         - ansible_os_family == "Debian"
 
-    - name: Nodejs 18.x repo needs to be used
+    - name: Nodejs 16.x repo needs to be used
       become: true
       become_user: root
       ansible.builtin.apt_repository:
-        repo: deb https://deb.nodesource.com/node_18.x jammy main
+        repo: deb https://deb.nodesource.com/node_16.x jammy main
         state: present
       when:
         - ansible_os_family == "Debian"
