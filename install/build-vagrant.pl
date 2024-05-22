@@ -34,13 +34,15 @@ my %machines = (
 	'frontend' => "wodfeu2204",
 	'backend' => "wodbec7",
 );
-my %port = (
+my %ports = (
 	'api-db' => "8021",
 	'frontend' => "8000",
 	'backend' => "8000",
 	'postfix' => "10025",
 );
 my $machines = \%machines;
+my $ports = \%ports;
+
 GetOptions("type|t=s" => \$wodtype,
 	   "workshop|w" => \$wkshp,
 	   "machines|m=s%" => $machines,
