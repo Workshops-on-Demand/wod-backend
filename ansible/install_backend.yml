@@ -443,7 +443,7 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Ensure jupyterhub pip packages is installed on CentOS
+    - name: Ensure jupyterhub pip packages are installed on CentOS
       ansible.builtin.pip:
         name:
           - jupyterhub
@@ -454,7 +454,7 @@
       when:
         - ansible_distribution == "CentOS"
 
-    - name: Ensure jupyterhub pip packages is installed
+    - name: Ensure jupyterhub pip packages are installed
       ansible.builtin.pip:
         name:
           - jupyterhub==3.1.1
