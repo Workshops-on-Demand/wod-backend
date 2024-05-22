@@ -19,11 +19,11 @@
       when:
         - ansible_os_family == "Debian"
 
-    - name: Nodejs 16.x repo needs to be used
+    - name: Nodejs 20.x repo needs to be used
       become: true
       become_user: root
       ansible.builtin.apt_repository:
-        repo: deb https://deb.nodesource.com/node_16.x jammy main
+        repo: deb https://deb.nodesource.com/node_20.x jammy main
         state: present
       when:
         - ansible_os_family == "Debian"
