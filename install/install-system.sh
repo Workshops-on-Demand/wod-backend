@@ -18,6 +18,9 @@ launch_with_pm2() {
 	echo "Install pm2"
 	npm install pm2@latest
 	export PATH=$PATH:"$DIR/node_modules/pm2/bin"
+	echo >> $HOME/.bash_profile << EOF
+export PATH=$PATH:"$DIR/node_modules/pm2/bin"
+EOF
 	# Allow error to occur
 	set +e
 	pm2 show $APP 2>&1 > /dev/null
