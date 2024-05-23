@@ -66,13 +66,13 @@ Vagrant.configure("2") do |config|
       EOS
   end
   config.vm.define :"wodfeu2204" do |wodfeubuntu2204|
-    wodfeubuntu2204.vm.box = "generic/ubuntu2004"
+    wodfeubuntu2204.vm.box = "generic/ubuntu2204"
     wodfeubuntu2204.vm.hostname = "wodfeu2204.wodnet.local"
     wodfeubuntu2204.vm.network :public_network, :mac => "525400010102", :libvirt__domain_name => "wodfeubuntu2204.wodnet.local"
     wodfeubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8020
   end
   config.vm.define :"wodapiu2204" do |wodapiubuntu2204|
-    wodapiubuntu2204.vm.box = "generic/ubuntu2004"
+    wodapiubuntu2204.vm.box = "generic/ubuntu2204"
     wodapiubuntu2204.vm.hostname = "wodapiu2204.wodnet.local"
     wodapiubuntu2204.vm.network :public_network, :mac => "525400010103", :libvirt__domain_name => "wodapiubuntu2204.wodnet.local"
     wodapiubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8021
