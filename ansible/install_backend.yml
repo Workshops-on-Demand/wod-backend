@@ -858,7 +858,7 @@
         - jupyterhub
 
     - name: Wait 5 seconds to let WoD services start
-      ansible.builtin.command: sleep 5
+      ansible.builtin.command: "sleep 5"
       register: result
       changed_when: result.rc != 0
 
