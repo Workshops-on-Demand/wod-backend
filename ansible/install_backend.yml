@@ -487,11 +487,11 @@
         virtualenv_command: "{{ virtualenv_command }}"
         virtualenv_python: "{{ virtualenv_python }}"
 
-          #- name: Ensure Go kernel is installed
-          #does not work ansible.builtin.shell: go install github.com/gopherdata/gophernotes@v0.7.5 && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp "{{ ansible_env.HOME }}"/go/src/github.com/gopherdata/gophernotes/kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
-        #does not work any more ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes@0.7.5 && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
-        #register: result
-        #changed_when: result.rc != 0
+          # - name: Ensure Go kernel is installed
+          # does not work ansible.builtin.shell: go install github.com/gopherdata/gophernotes@v0.7.5 && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp "{{ ansible_env.HOME }}"/go/src/github.com/gopherdata/gophernotes/kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+        # does not work any more ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes@0.7.5 && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+        # register: result
+        # changed_when: result.rc != 0
 
     - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: true
@@ -506,15 +506,15 @@
         - /usr/local/bin
         - /usr/local/share
 
-          #- name: Make gophernotes available under /usr/local/bin
-          #become: true
-          #become_user: root
-          #ansible.builtin.copy:
-          #src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
-          #dest: /usr/local/bin/gophernotes
-          #owner: "{{ WODUSER }}"
-          #group: "{{ WODUSER }}"
-          #mode: "0755"
+          # - name: Make gophernotes available under /usr/local/bin
+          # become: true
+          # become_user: root
+          # ansible.builtin.copy:
+          # src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
+          # dest: /usr/local/bin/gophernotes
+          # owner: "{{ WODUSER }}"
+          # group: "{{ WODUSER }}"
+          # mode: "0755"
 
     - name: Cleanup intermediate go directory
       become: true
