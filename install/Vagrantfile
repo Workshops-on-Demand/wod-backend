@@ -45,6 +45,20 @@ Vagrant.configure("2") do |config|
     wodbeubuntu2004.vm.hostname = "wodbeu2004.wodnet.local"
     wodbeubuntu2004.vm.network :public_network, :mac => "525400010105", :libvirt__domain_name => "wodbeu2004.wodnet.local"
     wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8011
+    wodbeubuntu2004.vm.provision "shell",
+      # This has to be so until your host system uses an openssh >= 8.8
+      # and your private key is not RSA1 anymore deprecated with it.
+      # located under $HOME/.vagrant.d/insecure_private_key
+      # or replace manually this private key with an ssh-ed25519 one
+      inline: <<-EOS
+      echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' > /etc/ssh/sshd_config.d/wod.conf
+      echo 'PubkeyAcceptedAlgorithms=+ssh-rsa' >> /etc/ssh/sshd_config.d/wod.conf
+      # I also have to modify DNS resolution despite systemd believing it does it correctly
+      rm -f /etc/resolv.conf
+      echo 'nameserver 192.168.8.2' > /etc/resolv.conf
+      echo 'search wodnet.local' >> /etc/resolv.conf
+      ip r del 192.168.8.2
+      EOS
   end
   config.vm.define :wodbeu2204 do |wodbeubuntu2204|
     wodbeubuntu2204.vm.box = "generic/ubuntu2204"
@@ -57,12 +71,10 @@ Vagrant.configure("2") do |config|
       # located under $HOME/.vagrant.d/insecure_private_key
       # or replace manually this private key with an ssh-ed25519 one
       inline: <<-EOS
-      echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' > /etc/ssh/sshd_config.d/wod.conf
-      echo 'PubkeyAcceptedAlgorithms=+ssh-rsa' >> /etc/ssh/sshd_config.d/wod.conf
-      # I also have to modify DNS resolution despite systemd believing it does it correctly
       rm -f /etc/resolv.conf
       echo 'nameserver 192.168.8.2' > /etc/resolv.conf
       echo 'search wodnet.local' >> /etc/resolv.conf
+      ip r del 192.168.8.2
       EOS
   end
   config.vm.define :"wodfeu2204" do |wodfeubuntu2204|
@@ -76,6 +88,7 @@ Vagrant.configure("2") do |config|
       rm -f /etc/resolv.conf
       echo 'nameserver 192.168.8.2' > /etc/resolv.conf
       echo 'search wodnet.local' >> /etc/resolv.conf
+      ip r del 192.168.8.2
       EOS
   end
   config.vm.define :"wodapiu2204" do |wodapiubuntu2204|
@@ -89,6 +102,7 @@ Vagrant.configure("2") do |config|
       rm -f /etc/resolv.conf
       echo 'nameserver 192.168.8.2' > /etc/resolv.conf
       echo 'search wodnet.local' >> /etc/resolv.conf
+      ip r del 192.168.8.2
       EOS
   end
   config.vm.define :wodappDocker101 do |wodappDocker101|
