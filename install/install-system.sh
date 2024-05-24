@@ -252,8 +252,7 @@ EOF
 	npm run reset-data
 	echo "Setup $WODAPIDBUSER"
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
-	pgid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "SELECT * from users;" | grep "$WODAPIDBUSER" | cut -d'|' -f1`
-	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "UPDATE users set password=crypt('$WODAPIDBPWD',gen_salt('bf')) where id=$pgid;"
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "UPDATE users set password=crypt('$WODAPIDBPWD',gen_salt('bf')) where username='$WODAPIDBUSER';"
 	echo "Starting API"
 	launch_with_pm2 $WODAPIDBDIR wod-$WODTYPE
 elif [ $WODTYPE = "frontend" ]; then

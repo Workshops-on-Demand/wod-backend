@@ -11,21 +11,21 @@ set -e
 # This function fetches the DB user/passwd
 get_wodapidb_userpwd() {
 if [ -f "$ANSIBLEDIR/group_vars/$PBKDIR" ]; then
-	WODAPIDBUSER=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
+	WODAPIDBUSER=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER' | sed 's/"//g'`
 	if [ _"$WODAPIDBUSER" = _"null" ]; then
 		WODAPIDBUSER=""
 	fi
-	WODAPIDBPWD=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
+	WODAPIDBPWD=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD' | sed 's/"//g'`
 	if [ _"$WODAPIDBPWD" = _"null" ]; then
 		WODAPIDBPWD=""
 	fi
 fi
 if [ -f "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" ]; then
-	WODAPIDBUSER2=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER'`
+	WODAPIDBUSER2=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBUSER' | sed 's/"//g'`
 	if [ _"$WODAPIDBUSER2" = _"null" ]; then
 		WODAPIDBUSER2=""
 	fi
-	WODAPIDBPWD2=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD'`
+	WODAPIDBPWD2=`cat "$ANSIBLEPRIVDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPWD' | sed 's/"//g'`
 	if [ _"$WODAPIDBPWD2" = _"null" ]; then
 		WODAPIDBPWD2=""
 	fi
