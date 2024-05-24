@@ -142,10 +142,9 @@ module.exports = {
       'users',
       [
         {
-          username: $ENV{'WODAPIDBUSER'},
+          username: '$ENV{'WODAPIDBUSER'}',
           email: 'dummy',
-          password:
-            '',
+          password: '',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
