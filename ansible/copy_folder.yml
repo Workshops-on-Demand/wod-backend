@@ -214,10 +214,10 @@
     # Second copy all data to be templated with variables
     - name: Deliver notebooks as ansible template for variable expansion
       ansible.builtin.template:
-        src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }}"
+        src: "{{ item }}"
+        dest: "{{ item | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }}"
         mode: "0644"
-      with_items: "{{ notebooks.files | json_query('files[*].filename') }}"
+      with_items: "{{ notebooks | json_query('files[*].path') }}"
       when:
         - nobo_path.rc == 0
 
