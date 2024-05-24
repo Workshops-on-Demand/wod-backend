@@ -59,10 +59,10 @@ Vagrant.configure("2") do |config|
       inline: <<-EOS
       echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' > /etc/ssh/sshd_config.d/wod.conf
       echo 'PubkeyAcceptedAlgorithms=+ssh-rsa' >> /etc/ssh/sshd_config.d/wod.conf
-      # I also have to modify DNS resolution despite systemd believeing it does it correctly
+      # I also have to modify DNS resolution despite systemd believing it does it correctly
       rm -f /etc/resolv.conf
       echo 'nameserver 192.168.8.2' > /etc/resolv.conf
-      echo 'search home.musique-ancienne.org' >> /etc/resolv.conf
+      echo 'search wodnet.local' >> /etc/resolv.conf
       EOS
   end
   config.vm.define :"wodfeu2204" do |wodfeubuntu2204|
@@ -70,12 +70,26 @@ Vagrant.configure("2") do |config|
     wodfeubuntu2204.vm.hostname = "wodfeu2204.wodnet.local"
     wodfeubuntu2204.vm.network :public_network, :mac => "525400010102", :libvirt__domain_name => "wodfeubuntu2204.wodnet.local"
     wodfeubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8020
+    wodfeubuntu2204.vm.provision "shell",
+      inline: <<-EOS
+      # I also have to modify DNS resolution despite systemd believing it does it correctly
+      rm -f /etc/resolv.conf
+      echo 'nameserver 192.168.8.2' > /etc/resolv.conf
+      echo 'search wodnet.local' >> /etc/resolv.conf
+      EOS
   end
   config.vm.define :"wodapiu2204" do |wodapiubuntu2204|
     wodapiubuntu2204.vm.box = "generic/ubuntu2204"
     wodapiubuntu2204.vm.hostname = "wodapiu2204.wodnet.local"
     wodapiubuntu2204.vm.network :public_network, :mac => "525400010103", :libvirt__domain_name => "wodapiubuntu2204.wodnet.local"
     wodapiubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8021
+    wodapiubuntu2204.vm.provision "shell",
+      inline: <<-EOS
+      # I also have to modify DNS resolution despite systemd believing it does it correctly
+      rm -f /etc/resolv.conf
+      echo 'nameserver 192.168.8.2' > /etc/resolv.conf
+      echo 'search wodnet.local' >> /etc/resolv.conf
+      EOS
   end
   config.vm.define :wodappDocker101 do |wodappDocker101|
     wodappDocker101.vm.box = "generic/centos7"
