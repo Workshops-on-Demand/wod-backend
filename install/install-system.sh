@@ -150,7 +150,7 @@ then
     echo "ansible-galaxy could not be found, please install ansible"
     exit -1
 fi
-if [ $WODDISTRIB = "centos-7" ] || [ $WODDISTRIB = "ubuntu-20.04" ]; then
+if [ $WODDISTRIB = "centos-7" ] || [ $WODDISTRIB = "ubuntu-20.04" ] || [ $WODDISTRIB = "ubuntu-22.04" ]; then
 	# Older distributions require an older version of the collection to work.
 	# See https://github.com/ansible-collections/community.general
 	ansible-galaxy collection install --force-with-deps community.general:4.8.5
