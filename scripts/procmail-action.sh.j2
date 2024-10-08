@@ -243,7 +243,7 @@ if [ $action != "RESET" ]; then
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
 					 "$WODAPIDBURL/student/$dbstdid"
-	 			# set customer  to inactive by default for all workshops
+				# set customer to inactive by default for all workshops
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					     --request PUT \
 					     --data '{"active": "false"}' \
