@@ -109,9 +109,5 @@ if [ $? -eq 0 ]; then
 	fi
 else
 	# No Range
-	# As a security, PURGE needs the student before the number
-	if [ $ACTION = "PURGE" ]; then
-		STDRANGE=student"$STDRANGE"
-	fi
 	send_mail $STDRANGE
 fi
