@@ -66,11 +66,14 @@ if [ "$action" = "PURGE" ]; then
             --request DELETE \
             "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 	generate_randompwd
-	# Unassign student
+	# Unassign student and update student
 	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
-					 --request PUT \
-					 --data '{"assigned":"false"}' \
-					 "$WODFEAPIURL/student/$dbstdid"
+					--request PUT \
+					--data '{
+						"assigned":"false",\
+		 				"password":"'$randompw'"\
+						}' \
+					"$WODFEAPIURL/student/$dbstdid"
 	erase_student
 	cleanup_processes_student
     exit 0
