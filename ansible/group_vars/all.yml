@@ -39,10 +39,11 @@ NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 #
 BRANDING: "WoD Developer"
 BRANDINGWOD: "WoD Developer"
-BRANDINGLOGO: "![HPEDEVlogo](Pictures/hpe-dev-logo.png)"
-BRANDINGLOGOURL: "![HPEDEVlogo](Pictures/hpe-dev-logo.png)"
+BRANDINGLOGO: "![WoDlogo](img/logo.png)"
+BRANDINGLOGOURL: "![WoDlogo](img/logo.png)"
 BRANDINGURL: "https://wod.io"
 BRANDINGSLACK: ""
+BRANDINGX: ""
 #
 # Survey management - Use if you want to ask for feedbacks on your Workshops - Look at existing conclusion notebooks
 SURVEYURL: TBD
