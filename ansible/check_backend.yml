@@ -192,13 +192,13 @@
         group: "{{ WODUSER }}"
         mode: "0750"
 
-    - name: "Ensure that file vault_secret in {{ ANSIBLEPRIVDIR }} exists"
+    - name: "Ensure that file vault_secret exists in {{ ANSIBLEPRIVDIR }}"
       ansible.builtin.lineinfile:
         path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
         regexp: ^.*$
         line: "{{ VAULTPWD }}"
 
-    - name: Fix modes for {{ ANSIBLEPRIVDIR }}/vault_secret
+    - name: "Fix modes for vault_secret under {{ ANSIBLEPRIVDIR }}"
       ansible.builtin.file:
         path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
         mode: "0600"
@@ -220,15 +220,15 @@
         - "{{ JPHUB }}/share/jupyter/nbconvert/templates/html/"
 
     - name: Deliver images in the static web server zone
-      become: yes
+      become: true
       become_user: root
       copy:
         src: "{{ item }}"
         dest: "{{ item | regex_replace(WODBEDIR, JPHUB) | regex_replace('/img', '/share/jupyterhub/static') }}"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
-        mode: 0644
-      with_fileglob: [ '{{ WODBEDIR }}/img/*' ]
+        mode: "0644"
+      with_fileglob: ['{{ WODBEDIR }}/img/*']
 
     # Perform private part before users management to allow interruption of the deliver script
     # during normal operations - waiting till end of users management can take hours for 2000 users.
