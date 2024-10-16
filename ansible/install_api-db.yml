@@ -117,7 +117,7 @@
       ansible.builtin.find:
         paths: "{{ WODAPIDBDIR }}"
         file_type: file
-        use_regex: yes
+        use_regex: true
         patterns: ['^.*.j2$']
         recurse: true
       register: apidbtemplates

@@ -1,4 +1,5 @@
 ---
+tasks:
   - name: Setup first the Docker context (packages, deps, ...)
     ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
 
