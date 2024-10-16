@@ -5,10 +5,11 @@
   vars:
     IJAVAVER: 1.3.0
     KUBECTLVER: 1.21.6
+    WODDVER: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
 
   tasks:
     - name: Include variables for the underlying distribution
-      ansible.builtin.include_vars: "{{ ANSIBLEDIR }}/group_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      ansible.builtin.include_vars: "{{ ANSIBLEDIR }}/group_vars/{{ WODDVER }}.yml"
 
     - name: Base setup for a JupyterHub environment server or appliance
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_base_appliance.yml"
@@ -488,8 +489,14 @@
         virtualenv_python: "{{ virtualenv_python }}"
 
           # - name: Ensure Go kernel is installed
-          # does not work ansible.builtin.shell: go install github.com/gopherdata/gophernotes@v0.7.5 && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp "{{ ansible_env.HOME }}"/go/src/github.com/gopherdata/gophernotes/kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
-        # does not work any more ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes@0.7.5 && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=off go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+          # does not work ansible.builtin.shell: go install github.com/gopherdata/gophernotes@v0.7.5
+          # && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes
+          # && cp "{{ ansible_env.HOME }}"/go/src/github.com/gopherdata/gophernotes/kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+        # does not work any more ansible.builtin.shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes@0.7.5
+        # && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes"
+        # && env GO111MODULE=off go install
+        # && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes
+        # && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
         # register: result
         # changed_when: result.rc != 0
 
@@ -565,7 +572,7 @@
       with_fileglob: ["{{ SCRIPTDIR }}/build*.sh.j2"]
 
     - name: Ensure Rust kernel is installed
-      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ WODDVER }}" --install
       register: result
       changed_when: result.rc != 0
 
@@ -580,7 +587,7 @@
       become: true
       become_user: root
       ansible.builtin.copy:
-        src: "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
+        src: "{{ SYSDIR }}/evcxr_jupyter.{{ WODDVER }}"
         dest: /usr/local/bin/evcxr_jupyter
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -727,7 +734,7 @@
       register: result
       changed_when: result.rc != 0
 
-    - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
+    - name: "Ensure that directory /etc/jupyterhub exists under {{ JPHUB }}"
       ansible.builtin.file:
         path: "{{ JPHUB }}/etc/jupyterhub"
         state: directory
@@ -968,7 +975,9 @@
     - name: Checkout notebooks from the wod-notebooks git repo
       ansible.builtin.git:
         repo: https://github.com/Workshops-on-Demand/wod-notebooks.git
+        version: main
         dest: "{{ WODNOBO }}"
+      changed_when: false
       when:
         - nobo_path.rc != 0
 

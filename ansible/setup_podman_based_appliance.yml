@@ -1,4 +1,5 @@
 ---
+tasks:
   - name: Setup first the podman context (packages, deps, ...)
     ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
 
