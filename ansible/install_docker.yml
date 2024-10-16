@@ -1,5 +1,6 @@
 ---
-  - name: Add Docker GPG Key to RPM DB # noqa: yaml[indentation]
+tasks:
+  - name: Add Docker GPG Key to RPM DB
     become: true
     become_user: root
     rpm_key:
