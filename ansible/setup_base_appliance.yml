@@ -29,7 +29,7 @@
     - name: Remove Linux users and their home directory
       become: true
       become_user: root
-      user:
+      ansible.builtin.user:
         name: "{{ 'student%s' | format(item) }}"
         state: absent
         remove: true
@@ -50,7 +50,7 @@
     - name: Ensure Linux students users exists with their home dir
       become: true
       become_user: root
-      user:
+      ansible.builtin.user:
         name: "{{ 'student%s' | format(item) }}"
         state: present
         create_home: true
