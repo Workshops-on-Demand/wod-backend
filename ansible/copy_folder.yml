@@ -7,7 +7,6 @@
   vars:
     VARDIR: "{{ ANSIBLEDIR }}/{{ PBKDIR }}"
     VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}"
-
   tasks:
     - name: Check var STDID
       ansible.builtin.fail:

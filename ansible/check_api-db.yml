@@ -2,7 +2,6 @@
 - name: Playbook to check periodically WoD api-db
   hosts: all
   gather_facts: true
-
   tasks:
     - name: Ensure that this a compliant WoD system
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"

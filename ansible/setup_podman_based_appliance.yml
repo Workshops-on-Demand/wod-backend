@@ -1,7 +1,7 @@
 ---
 - name: Setup a Podman based appliance
+  hosts: all
   gather_facts: true
-
   tasks:
     - name: Setup first the podman context (packages, deps, ...)
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
