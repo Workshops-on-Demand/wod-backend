@@ -1,14 +1,17 @@
 ---
-tasks:
-  - name: Setup first the Docker context (packages, deps, ...)
-    ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
+- name: Setup a Docker enabled WoD appliance
+  gather_facts: true
 
-  - name: Ensure Linux students users belong to the docker group
-    become: true
-    become_user: root
-    user:
-      name: "{{ 'student%s' | format(item) }}"
-      state: present
-      append: true
-      groups: "docker"
-    loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+  tasks:
+    - name: Setup first the Docker context (packages, deps, ...)
+      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
+
+    - name: Ensure Linux students users belong to the docker group
+      become: true
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        append: true
+        groups: "docker"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
