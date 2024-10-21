@@ -28,7 +28,7 @@
     - name: Add universe repository into sources list
       become: true
       become_user: root
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
         state: present
       when:
@@ -38,7 +38,7 @@
     - name: Add EPEL repository into repo list
       become: true
       become_user: root
-      yum:
+      ansible.builtin.yum:
         name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
         state: present
       when:
@@ -97,7 +97,7 @@
     - name: Configure LDAP client 2/3
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/openldap/ldap.conf
         line: 'URI ldap://{{ LDAPSRVNAME }}'
         state: present
@@ -106,7 +106,7 @@
     - name: Configure LDAP client 3/3
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/openldap/ldap.conf
         line: 'BASE {{ LDAPDMN }}'
         state: present
@@ -115,7 +115,7 @@
     - name: Configure nsswitch.conf for LDAP client 1/2
       become: true
       become_user: root
-      replace:
+      ansible.builtin.replace:
         path: /etc/nsswitch.conf
         # find ldap if any and remove it
         regexp: '\bldap\b'
@@ -131,7 +131,7 @@
     - name: Configure nsswitch.conf for LDAP client 2/2
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/nsswitch.conf
         # force ldap on that line
         regexp: '^({{ item }}):(\s+)(.+)$'

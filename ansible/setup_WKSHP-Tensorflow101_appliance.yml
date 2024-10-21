@@ -4,4 +4,4 @@
   gather_facts: true
   tasks:
     - name: Setup docker based appliance
-      include_tasks: "{{ ANSIBLEDIR }}/setup_docker_based_appliance.yml"
+      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_docker_based_appliance.yml"

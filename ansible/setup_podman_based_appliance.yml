@@ -14,4 +14,4 @@
         state: present
         append: true
         groups: "podman"
-      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+      loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
