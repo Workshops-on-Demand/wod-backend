@@ -1,7 +1,7 @@
 ---
 - name: Install a Docker enabled system
+  hosts: all
   gather_facts: true
-
   tasks:
     - name: Add Docker GPG Key to RPM DB
       become: true

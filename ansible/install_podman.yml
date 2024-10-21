@@ -1,7 +1,7 @@
 ---
 - name: Install a Podman enabled system
+  hosts: all
   gather_facts: true
-
   tasks:
     - name: Add EPEL repository into repo list # noqa: yaml[indentation]
       become: true

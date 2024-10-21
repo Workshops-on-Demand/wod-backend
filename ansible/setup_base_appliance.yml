@@ -1,7 +1,7 @@
 ---
 - name: Setup a base WoD appliance
+  hosts: all
   gather_facts: true
-
   tasks:
     - name: Install a base system
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"

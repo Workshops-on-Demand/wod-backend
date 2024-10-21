@@ -1,6 +1,7 @@
 ---
 - name: Playbook to compile scripts
   hosts: all
+  gather_facts: true
   tasks:
     - name: Script Compilation Issue
       ansible.builtin.fail:

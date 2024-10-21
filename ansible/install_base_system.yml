@@ -1,7 +1,7 @@
 ---
 - name: Install a base WoD system
+  hosts: all
   gather_facts: true
-
   tasks:
     - name: Load variables generated at install time
       ansible.builtin.include_vars: /etc/wod.yml
