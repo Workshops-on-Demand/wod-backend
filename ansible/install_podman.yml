@@ -18,7 +18,6 @@
   when:
     - ansible_distribution == "RedHat"
 
-
 - name: Disable Podman service
   register: service_stop
   become: true
