@@ -1,119 +1,115 @@
 ---
-- name: Install a Docker enabled system
-  hosts: all
-  gather_facts: true
-  tasks:
-    - name: Add Docker GPG Key to RPM DB
-      become: true
-      become_user: root
-      ansible.builtin.rpm_key:
-        key: "{{ item }}"
-        state: present
-      with_items:
-        - https://download.docker.com/linux/centos/gpg
-      when:
-        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+- name: Add Docker GPG Key to RPM DB
+  become: true
+  become_user: root
+  ansible.builtin.rpm_key:
+    key: "{{ item }}"
+    state: present
+  with_items:
+    - https://download.docker.com/linux/centos/gpg
+  when:
+    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Setup Docker repo for RPM
-      become: true
-      become_user: root
-      ansible.builtin.yum_repository:
-        name: docker
-        baseurl: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
-        description: "Upstream Docker Yum repository"
-        enabled: true
-        state: present
-      when:
-        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+- name: Setup Docker repo for RPM
+  become: true
+  become_user: root
+  ansible.builtin.yum_repository:
+    name: docker
+    baseurl: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
+    description: "Upstream Docker Yum repository"
+    enabled: true
+    state: present
+  when:
+    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Add Docker GPG Key to APT
-      become: true
-      become_user: root
-      ansible.builtin.apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-      when:
-        - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version >= "20"
+- name: Add Docker GPG Key to APT
+  become: true
+  become_user: root
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "20"
 
-    - name: Setup Docker repo for APT
-      become: true
-      become_user: root
-      ansible.builtin.apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
-        state: present
-      when:
-        - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version >= "20"
+- name: Setup Docker repo for APT
+  become: true
+  become_user: root
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "20"
 
-    - name: Ensure no existing incorrect docker pkg is installed
-      become: true
-      become_user: root
-      ansible.builtin.package:
-        name:
-          - docker-client
-          - docker-common
-          - docker
-          - docker-engine
-          - docker-compose
-        state: absent
+- name: Ensure no existing incorrect docker pkg is installed
+  become: true
+  become_user: root
+  ansible.builtin.package:
+    name:
+      - docker-client
+      - docker-common
+      - docker
+      - docker-engine
+      - docker-compose
+    state: absent
 
-    - name: Disable Docker service
-      register: service_stop
-      become: true
-      become_user: root
-      failed_when:
-        - '"Could not find the requested service" not in service_stop.stdout'
-        - service_stop.rc != 0
-      ansible.builtin.systemd:
-        state: stopped
-        enabled: false
-        name: docker
-      ignore_errors: true
+- name: Disable Docker service
+  register: service_stop
+  become: true
+  become_user: root
+  failed_when:
+    - '"Could not find the requested service" not in service_stop.stdout'
+    - service_stop.rc != 0
+  ansible.builtin.systemd:
+    state: stopped
+    enabled: false
+    name: docker
+  ignore_errors: true
 
-    - name: Disable Docker socket
-      register: service_stop
-      become: true
-      become_user: root
-      failed_when:
-        - '"Could not find the requested service" not in service_stop.stdout'
-        - service_stop.rc != 0
-      ansible.builtin.systemd:
-        state: stopped
-        enabled: false
-        name: docker.socket
-      ignore_errors: true
+- name: Disable Docker socket
+  register: service_stop
+  become: true
+  become_user: root
+  failed_when:
+    - '"Could not find the requested service" not in service_stop.stdout'
+    - service_stop.rc != 0
+  ansible.builtin.systemd:
+    state: stopped
+    enabled: false
+    name: docker.socket
+  ignore_errors: true
 
-    - name: Ensure there is no pre-existing docker.sock socket
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        path: /var/run/docker.sock
-        state: absent
+- name: Ensure there is no pre-existing docker.sock socket
+  become: true
+  become_user: root
+  ansible.builtin.file:
+    path: /var/run/docker.sock
+    state: absent
 
-    - name: Ensure all required packages are installed
-      become: true
-      become_user: root
-      ansible.builtin.package:
-        name:
-          - docker-ce
-          - docker-compose-plugin
-        state: present
+- name: Ensure all required packages are installed
+  become: true
+  become_user: root
+  ansible.builtin.package:
+    name:
+      - docker-ce
+      - docker-compose-plugin
+    state: present
 
-    - name: Enable Docker service
-      become: true
-      become_user: root
-      ansible.builtin.systemd:
-        state: started
-        daemon_reload: true
-        enabled: true
-        name: docker
+- name: Enable Docker service
+  become: true
+  become_user: root
+  ansible.builtin.systemd:
+    state: started
+    daemon_reload: true
+    enabled: true
+    name: docker
 
-    - name: Ensure the docker group contains the user "{{ WODUSER }}"
-      become: true
-      become_user: root
-      ansible.builtin.user:
-        name: "{{ WODUSER }}"
-        state: present
-        append: true
-        groups: "docker"
+- name: Ensure the docker group contains the user "{{ WODUSER }}"
+  become: true
+  become_user: root
+  ansible.builtin.user:
+    name: "{{ WODUSER }}"
+    state: present
+    append: true
+    groups: "docker"
