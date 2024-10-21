@@ -57,7 +57,7 @@
     - name: Ensure "{{ WODUSER }}" user belong to the Podman group
       become: true
       become_user: root
-      user:
+      ansible.builtin.user:
         name: "{{ WODUSER }}"
         state: present
         append: true
