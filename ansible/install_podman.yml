@@ -1,4 +1,6 @@
 ---
+tasks:
+
   - name: Add EPEL repository into repo list # noqa: yaml[indentation]
     become: true
     become_user: root
