@@ -6,7 +6,7 @@
     - name: Add EPEL repository into repo list # noqa: yaml[indentation]
       become: true
       become_user: root
-      yum:
+      ansible.builtin.yum:
         name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
         state: present
       when:
@@ -15,7 +15,7 @@
     - name: Add EPEL repository into repo list
       become: true
       become_user: root
-      yum:
+      ansible.builtin.yum:
         name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
         disable_gpg_check: true
         state: present
@@ -54,7 +54,7 @@
         enabled: true
         name: podman
 
-    - name: Ensure "{{ WODUSER }}" user belong to the Podman group
+    - name: Ensure the Podman group contains the user "{{ WODUSER }}"
       become: true
       become_user: root
       ansible.builtin.user:

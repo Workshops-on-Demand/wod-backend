@@ -156,8 +156,8 @@
       when:
         - ansible_distribution == "Rocky"
 
-    - name: Ensure limits are correct for "{{ WODUSER }}" account
-      lineinfile:
+    - name: Ensure limits are correct for the account "{{ WODUSER }}"
+      ansible.builtin.lineinfile:
         path: "{{ ansible_env.HOME }}/.bashrc"
         line: "{{ item }}"
       with_items:
@@ -181,6 +181,9 @@
       ansible.builtin.copy:
         src: /etc/skel/.profile
         dest: "{{ ansible_env.HOME }}/.profile"
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
+        mode: "0600"
       when:
         - profile_path.rc != 0
         - ansible_os_family == "Debian"
@@ -189,19 +192,22 @@
       ansible.builtin.copy:
         src: /etc/skel/.bash_profile
         dest: "{{ ansible_env.HOME }}/.profile"
+        owner: "{{ WODUSER }}"
+        group: "{{ WODUSER }}"
+        mode: "0600"
       when:
         - profile_path.rc != 0
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Ensure vim is the default EDITOR
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: "{{ ansible_env.HOME }}/.profile"
         line: export EDITOR=vim
 
     - name: Setup logind.conf
       become: true
       become_user: root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/systemd/logind.conf
         line: UserTasksMax=100000
         state: present

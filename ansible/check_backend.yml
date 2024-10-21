@@ -221,7 +221,7 @@
     - name: Deliver images in the static web server zone
       become: true
       become_user: root
-      copy:
+      ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ item | regex_replace(WODBEDIR, JPHUB) | regex_replace('/img', '/share/jupyterhub/static') }}"
         owner: "{{ WODUSER }}"

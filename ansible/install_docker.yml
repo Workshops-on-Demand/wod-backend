@@ -6,7 +6,7 @@
     - name: Add Docker GPG Key to RPM DB
       become: true
       become_user: root
-      rpm_key:
+      ansible.builtin.rpm_key:
         key: "{{ item }}"
         state: present
       with_items:
@@ -17,7 +17,7 @@
     - name: Setup Docker repo for RPM
       become: true
       become_user: root
-      yum_repository:
+      ansible.builtin.yum_repository:
         name: docker
         baseurl: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
         description: "Upstream Docker Yum repository"
@@ -29,7 +29,7 @@
     - name: Add Docker GPG Key to APT
       become: true
       become_user: root
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
       when:
@@ -39,7 +39,7 @@
     - name: Setup Docker repo for APT
       become: true
       become_user: root
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
       when:
@@ -109,7 +109,7 @@
         enabled: true
         name: docker
 
-    - name: Ensure "{{ WODUSER }}" user belong to the docker group
+    - name: Ensure the docker group contains the user "{{ WODUSER }}"
       become: true
       become_user: root
       ansible.builtin.user:
