@@ -1,64 +1,60 @@
 ---
-- name: Install a Podman enabled system
-  hosts: all
-  gather_facts: true
-  tasks:
-    - name: Add EPEL repository into repo list # noqa: yaml[indentation]
-      become: true
-      become_user: root
-      ansible.builtin.yum:
-        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
-        state: present
-      when:
-        - ansible_distribution == "CentOS"
+- name: Add EPEL repository into repo list # noqa: yaml[indentation]
+  become: true
+  become_user: root
+  ansible.builtin.yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    state: present
+  when:
+    - ansible_distribution == "CentOS"
 
-    - name: Add EPEL repository into repo list
-      become: true
-      become_user: root
-      ansible.builtin.yum:
-        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
-        disable_gpg_check: true
-        state: present
-      when:
-        - ansible_distribution == "RedHat"
+- name: Add EPEL repository into repo list
+  become: true
+  become_user: root
+  ansible.builtin.yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    disable_gpg_check: true
+    state: present
+  when:
+    - ansible_distribution == "RedHat"
 
 
-    - name: Disable Podman service
-      register: service_stop
-      become: true
-      become_user: root
-      failed_when:
-        - '"Could not find the requested service" not in service_stop.stdout'
-        - service_stop.rc != 0
-      ansible.builtin.systemd:
-        state: stopped
-        enabled: false
-        name: podman
-      ignore_errors: true
+- name: Disable Podman service
+  register: service_stop
+  become: true
+  become_user: root
+  failed_when:
+    - '"Could not find the requested service" not in service_stop.stdout'
+    - service_stop.rc != 0
+  ansible.builtin.systemd:
+    state: stopped
+    enabled: false
+    name: podman
+  ignore_errors: true
 
-    - name: Ensure all required packages are installed
-      become: true
-      become_user: root
-      ansible.builtin.package:
-        name:
-          - podman
-          - podman-compose
-        state: present
+- name: Ensure all required packages are installed
+  become: true
+  become_user: root
+  ansible.builtin.package:
+    name:
+      - podman
+      - podman-compose
+    state: present
 
-    - name: Enable Podman service
-      become: true
-      become_user: root
-      ansible.builtin.systemd:
-        state: started
-        daemon_reload: true
-        enabled: true
-        name: podman
+- name: Enable Podman service
+  become: true
+  become_user: root
+  ansible.builtin.systemd:
+    state: started
+    daemon_reload: true
+    enabled: true
+    name: podman
 
-    - name: Ensure the Podman group contains the user "{{ WODUSER }}"
-      become: true
-      become_user: root
-      ansible.builtin.user:
-        name: "{{ WODUSER }}"
-        state: present
-        append: true
-        groups: "podman"
+- name: Ensure the Podman group contains the user "{{ WODUSER }}"
+  become: true
+  become_user: root
+  ansible.builtin.user:
+    name: "{{ WODUSER }}"
+    state: present
+    append: true
+    groups: "podman"
