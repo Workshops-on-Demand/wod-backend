@@ -1,14 +1,17 @@
 ---
-tasks:
-  - name: Setup first the podman context (packages, deps, ...)
-    ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
+- name: Setup a Podman based appliance
+  gather_facts: true
 
-  - name: Ensure Linux students users belong to the docker group
-    become: true
-    become_user: root
-    user:
-      name: "{{ 'student%s' | format(item) }}"
-      state: present
-      append: true
-      groups: "podman"
-    loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"
+  tasks:
+    - name: Setup first the podman context (packages, deps, ...)
+      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
+
+    - name: Ensure Linux students users belong to the docker group
+      become: true
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        append: true
+        groups: "podman"
+      loop: "{{ range( APPMIN|int, APPMAX|int )|list }}"

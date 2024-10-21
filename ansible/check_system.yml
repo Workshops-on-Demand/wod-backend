@@ -1,305 +1,310 @@
-- name: Load variables generated at install time
-  ansible.builtin.include_vars: /etc/wod.yml
+---
+- name: Check compliance of a WoD system
+  gather_facts: true
 
-- name: Ensure correct nproc soft limits
-  become: true
-  become_user: root
-  community.general.pam_limits:
-    domain: "{{ WODUSER }}"
-    limit_type: soft
-    limit_item: nproc
-    value: "800000"
-
-- name: Ensure correct nproc hard limits
-  become: true
-  become_user: root
-  community.general.pam_limits:
-    domain: "{{ WODUSER }}"
-    limit_type: hard
-    limit_item: nproc
-    value: "800000"
-
-- name: Ensure correct nofile soft limits
-  become: true
-  become_user: root
-  community.general.pam_limits:
-    domain: "{{ WODUSER }}"
-    limit_type: soft
-    limit_item: nofile
-    value: "65535"
-
-- name: Ensure correct nofile hard limits
-  become: true
-  become_user: root
-  community.general.pam_limits:
-    domain: "{{ WODUSER }}"
-    limit_type: hard
-    limit_item: nofile
-    value: "65535"
-
-- name: Setup sysctl params
-  become: true
-  become_user: root
-  ansible.posix.sysctl:
-    name: "{{ item.key }}"
-    value: "{{ item.value }}"
-    state: present
-    reload: true
-    sysctl_set: true
-  with_items:
-    - { key: "net.ipv4.tcp_keepalive_time", value: "1800" }
-    - { key: "kernel.threads-max", value: "4096000" }
-    - { key: "kernel.pid_max", value: "200000" }
-    - { key: "vm.max_map_count", value: "600000" }
-
-- name: Setup Wod System ufw firewall TCP rules
-  become: true
-  become_user: root
-  community.general.ufw:
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-    state: enabled
-  with_items:
-    - "22"
-    - "123"
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version >= "20"
-
-- name: Setup ufw firewall UDP rules
-  become: true
-  become_user: root
-  community.general.ufw:
-    rule: allow
-    port: "{{ item }}"
-    proto: udp
-    state: enabled
-  with_items:
-    - "123"
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version >= "20"
-
-- name: Setup firewalld TCP rules
-  become: true
-  become_user: root
-  ansible.posix.firewalld:
-    port: "{{ item }}/tcp"
-    permanent: true
-    state: enabled
-  with_items:
-    - "22"
-    - "123"
-  when:
-    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
-
-- name: Setup firewalld UDP rules
-  become: true
-  become_user: root
-  ansible.posix.firewalld:
-    port: "{{ item }}/udp"
-    permanent: true
-    state: enabled
-  with_items:
-    - "123"
-  when:
-    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
-
-- name: Enable firewalld service
-  become: true
-  become_user: root
-  ansible.builtin.systemd:
-    state: restarted
-    daemon_reload: true
-    enabled: true
-    name: firewalld
-  when:
-    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
-
-- name: Enable NTP service
-  become: true
-  become_user: root
-  ansible.builtin.systemd:
-    state: started
-    daemon_reload: true
-    enabled: true
-    name: ntp
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version >= "20"
-
-- name: Enable NTP service
-  become: true
-  become_user: root
-  ansible.builtin.systemd:
-    state: started
-    daemon_reload: true
-    enabled: true
-    name: ntpd
-  when:
-    - ansible_distribution == "CentOS"
-
-- name: Enable chrony service
-  become: true
-  become_user: root
-  ansible.builtin.systemd:
-    state: started
-    daemon_reload: true
-    enabled: true
-    name: chronyd
-  when:
-    - ansible_distribution == "Rocky"
-
-- name: Ensure limits are correct for "{{ WODUSER }}" account
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.bashrc"
-    line: "{{ item }}"
-  with_items:
-    - "ulimit -u 641465"
-    - "ulimit -n 65535"
-
-- name: Copy the skeleton content under /etc/skel
-  become: true
-  become_user: root
-  ansible.posix.synchronize:
-    dest: /etc/skel/
-    src: '{{ WODBEDIR }}/skel/'
-
-- name: Test .profile file
-  ansible.builtin.command: ls "{{ ansible_env.HOME }}/.profile"
-  register: profile_path
-  failed_when: false
-  changed_when: false
-
-- name: Ensure we have a .profile file for DEB systems
-  ansible.builtin.copy:
-    src: /etc/skel/.profile
-    dest: "{{ ansible_env.HOME }}/.profile"
-  when:
-    - profile_path.rc != 0
-    - ansible_os_family == "Debian"
-
-- name: Ensure we have a .profile file for RPM systems
-  ansible.builtin.copy:
-    src: /etc/skel/.bash_profile
-    dest: "{{ ansible_env.HOME }}/.profile"
-  when:
-    - profile_path.rc != 0
-    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
-
-- name: Ensure vim is the default EDITOR
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.profile"
-    line: export EDITOR=vim
-
-- name: Setup logind.conf
-  become: true
-  become_user: root
-  lineinfile:
-    path: /etc/systemd/logind.conf
-    line: UserTasksMax=100000
-    state: present
-
-- name: Test private hosts.j2 template
-  ansible.builtin.command: ls "{{ SYSPRIVDIR }}/hosts.j2"
-  register: hosts_path
-  failed_when: false
-  changed_when: false
-
-- name: Expand public template for /etc/hosts
-  become: true
-  become_user: root
-  ansible.builtin.template:
-    src: "{{ SYSDIR }}/hosts.j2"
-    dest: "/etc/hosts"
-    mode: "0644"
-    owner: root
-  when:
-    - hosts_path.rc != 0
-
-- name: Expand private template for /etc/hosts
-  become: true
-  become_user: root
-  ansible.builtin.template:
-    src: "{{ SYSPRIVDIR }}/hosts.j2"
-    dest: "/etc/hosts"
-    mode: "0644"
-    owner: root
-  when:
-    - hosts_path.rc == 0
-
-- name: Install Wod utility scripts
-  become: true
-  become_user: root
-  ansible.builtin.template:
-    src: "{{ item }}"
-    dest: /usr/local/bin/{{ item | basename | regex_replace('\.j2$') }}
-    owner: root
-    group: root
-    mode: "0755"
-  with_fileglob: ['{{ SYSDIR }}/wod*.j2', '{{ SYSPRIVDIR }}/wod*.j2', '{{ SYSDIR }}/wod-upd*']
-
-- name: Install the pkg update script
-  become: true
-  become_user: root
-  ansible.builtin.file:
-    src: "/usr/local/bin/wod-upd.{{ ansible_pkg_mgr }}"
-    dest: /usr/local/bin/wod-upd
-    state: link
-
-- name: Setup crontab for daily pkg security update
-  become: true
-  become_user: root
-  ansible.builtin.cron:
-    name: wod-upd
-    minute: "{{ 59 | random(seed=inventory_hostname) }} "
-    hour: "03"
-    user: root
-    job: "/usr/local/bin/wod-upd"
-    cron_file: wod-upd
-    state: present
-
-- name: Setup weekly process cleanup
-  become: true
-  become_user: root
-  ansible.builtin.cron:
-    name: wod-cleanup-processes
-    minute: "{{ 59 | random(seed=inventory_hostname) }} "
-    hour: "04"
-    weekday: "0"
-    user: root
-    job: "/usr/local/bin/wod-cleanup-processes.sh"
-    cron_file: wod-cleanup-processes
-    state: present
-
-- name: Copy WoD service file as ansible template for variable expansion
-  become: true
-  become_user: root
-  ansible.builtin.template:
-    src: "{{ item }}"
-    dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
-    mode: "0644"
-  with_fileglob: ['{{ SYSDIR }}//wod-*.service.j2', '{{ SYSPRIVDIR }}//wod-*.service.j2']
-
-- name: Enable WoD services
-  become: true
-  become_user: root
-  ansible.builtin.systemd:
-    state: restarted
-    daemon_reload: true
-    enabled: true
-    name: "{{ item }}"
-  with_items:
-    - wod-kill-processes
-
-- name: Test private tasks YAML file
-  ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_system.yml"
-  register: acj_path
-  failed_when: false
-  changed_when: false
-
-- name: Now call private tasks if available
-  ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/check_system.yml"
-  when:
-    - acj_path.rc == 0
+  tasks:
+    - name: Load variables generated at install time
+      ansible.builtin.include_vars: /etc/wod.yml
+    
+    - name: Ensure correct nproc soft limits
+      become: true
+      become_user: root
+      community.general.pam_limits:
+        domain: "{{ WODUSER }}"
+        limit_type: soft
+        limit_item: nproc
+        value: "800000"
+    
+    - name: Ensure correct nproc hard limits
+      become: true
+      become_user: root
+      community.general.pam_limits:
+        domain: "{{ WODUSER }}"
+        limit_type: hard
+        limit_item: nproc
+        value: "800000"
+    
+    - name: Ensure correct nofile soft limits
+      become: true
+      become_user: root
+      community.general.pam_limits:
+        domain: "{{ WODUSER }}"
+        limit_type: soft
+        limit_item: nofile
+        value: "65535"
+    
+    - name: Ensure correct nofile hard limits
+      become: true
+      become_user: root
+      community.general.pam_limits:
+        domain: "{{ WODUSER }}"
+        limit_type: hard
+        limit_item: nofile
+        value: "65535"
+    
+    - name: Setup sysctl params
+      become: true
+      become_user: root
+      ansible.posix.sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: true
+        sysctl_set: true
+      with_items:
+        - { key: "net.ipv4.tcp_keepalive_time", value: "1800" }
+        - { key: "kernel.threads-max", value: "4096000" }
+        - { key: "kernel.pid_max", value: "200000" }
+        - { key: "vm.max_map_count", value: "600000" }
+    
+    - name: Setup Wod System ufw firewall TCP rules
+      become: true
+      become_user: root
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+        state: enabled
+      with_items:
+        - "22"
+        - "123"
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
+    
+    - name: Setup ufw firewall UDP rules
+      become: true
+      become_user: root
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: udp
+        state: enabled
+      with_items:
+        - "123"
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
+    
+    - name: Setup firewalld TCP rules
+      become: true
+      become_user: root
+      ansible.posix.firewalld:
+        port: "{{ item }}/tcp"
+        permanent: true
+        state: enabled
+      with_items:
+        - "22"
+        - "123"
+      when:
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+    
+    - name: Setup firewalld UDP rules
+      become: true
+      become_user: root
+      ansible.posix.firewalld:
+        port: "{{ item }}/udp"
+        permanent: true
+        state: enabled
+      with_items:
+        - "123"
+      when:
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+    
+    - name: Enable firewalld service
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: true
+        enabled: true
+        name: firewalld
+      when:
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+    
+    - name: Enable NTP service
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        state: started
+        daemon_reload: true
+        enabled: true
+        name: ntp
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
+    
+    - name: Enable NTP service
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        state: started
+        daemon_reload: true
+        enabled: true
+        name: ntpd
+      when:
+        - ansible_distribution == "CentOS"
+    
+    - name: Enable chrony service
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        state: started
+        daemon_reload: true
+        enabled: true
+        name: chronyd
+      when:
+        - ansible_distribution == "Rocky"
+    
+    - name: Ensure limits are correct for "{{ WODUSER }}" account
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: "{{ item }}"
+      with_items:
+        - "ulimit -u 641465"
+        - "ulimit -n 65535"
+    
+    - name: Copy the skeleton content under /etc/skel
+      become: true
+      become_user: root
+      ansible.posix.synchronize:
+        dest: /etc/skel/
+        src: '{{ WODBEDIR }}/skel/'
+    
+    - name: Test .profile file
+      ansible.builtin.command: ls "{{ ansible_env.HOME }}/.profile"
+      register: profile_path
+      failed_when: false
+      changed_when: false
+    
+    - name: Ensure we have a .profile file for DEB systems
+      ansible.builtin.copy:
+        src: /etc/skel/.profile
+        dest: "{{ ansible_env.HOME }}/.profile"
+      when:
+        - profile_path.rc != 0
+        - ansible_os_family == "Debian"
+    
+    - name: Ensure we have a .profile file for RPM systems
+      ansible.builtin.copy:
+        src: /etc/skel/.bash_profile
+        dest: "{{ ansible_env.HOME }}/.profile"
+      when:
+        - profile_path.rc != 0
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+    
+    - name: Ensure vim is the default EDITOR
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.profile"
+        line: export EDITOR=vim
+    
+    - name: Setup logind.conf
+      become: true
+      become_user: root
+      lineinfile:
+        path: /etc/systemd/logind.conf
+        line: UserTasksMax=100000
+        state: present
+    
+    - name: Test private hosts.j2 template
+      ansible.builtin.command: ls "{{ SYSPRIVDIR }}/hosts.j2"
+      register: hosts_path
+      failed_when: false
+      changed_when: false
+    
+    - name: Expand public template for /etc/hosts
+      become: true
+      become_user: root
+      ansible.builtin.template:
+        src: "{{ SYSDIR }}/hosts.j2"
+        dest: "/etc/hosts"
+        mode: "0644"
+        owner: root
+      when:
+        - hosts_path.rc != 0
+    
+    - name: Expand private template for /etc/hosts
+      become: true
+      become_user: root
+      ansible.builtin.template:
+        src: "{{ SYSPRIVDIR }}/hosts.j2"
+        dest: "/etc/hosts"
+        mode: "0644"
+        owner: root
+      when:
+        - hosts_path.rc == 0
+    
+    - name: Install Wod utility scripts
+      become: true
+      become_user: root
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: /usr/local/bin/{{ item | basename | regex_replace('\.j2$') }}
+        owner: root
+        group: root
+        mode: "0755"
+      with_fileglob: ['{{ SYSDIR }}/wod*.j2', '{{ SYSPRIVDIR }}/wod*.j2', '{{ SYSDIR }}/wod-upd*']
+    
+    - name: Install the pkg update script
+      become: true
+      become_user: root
+      ansible.builtin.file:
+        src: "/usr/local/bin/wod-upd.{{ ansible_pkg_mgr }}"
+        dest: /usr/local/bin/wod-upd
+        state: link
+    
+    - name: Setup crontab for daily pkg security update
+      become: true
+      become_user: root
+      ansible.builtin.cron:
+        name: wod-upd
+        minute: "{{ 59 | random(seed=inventory_hostname) }} "
+        hour: "03"
+        user: root
+        job: "/usr/local/bin/wod-upd"
+        cron_file: wod-upd
+        state: present
+    
+    - name: Setup weekly process cleanup
+      become: true
+      become_user: root
+      ansible.builtin.cron:
+        name: wod-cleanup-processes
+        minute: "{{ 59 | random(seed=inventory_hostname) }} "
+        hour: "04"
+        weekday: "0"
+        user: root
+        job: "/usr/local/bin/wod-cleanup-processes.sh"
+        cron_file: wod-cleanup-processes
+        state: present
+    
+    - name: Copy WoD service file as ansible template for variable expansion
+      become: true
+      become_user: root
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
+        mode: "0644"
+      with_fileglob: ['{{ SYSDIR }}//wod-*.service.j2', '{{ SYSPRIVDIR }}//wod-*.service.j2']
+    
+    - name: Enable WoD services
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: true
+        enabled: true
+        name: "{{ item }}"
+      with_items:
+        - wod-kill-processes
+    
+    - name: Test private tasks YAML file
+      ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_system.yml"
+      register: acj_path
+      failed_when: false
+      changed_when: false
+    
+    - name: Now call private tasks if available
+      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/check_system.yml"
+      when:
+        - acj_path.rc == 0
