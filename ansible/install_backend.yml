@@ -615,13 +615,12 @@
       register: result
       changed_when: result.rc != 0
 
-    - name: Fix ansible kernel path to include virtualenv setup
+    - name: Fix kernel path to include virtualenv setup
       ansible.builtin.replace:
         path: "{{ JPHUB }}/share/jupyter/kernels/{{ item }}/kernel.json"
         regexp: (.+)"{{ JPHUB }}/bin/python3",(.+)$
         replace: \1"/usr/local/bin/kernel_python",\2
       with_items:
-        - ansible
         - ssh
 
     # - name: Check whether to patch ansible kernel
