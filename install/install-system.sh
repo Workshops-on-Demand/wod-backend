@@ -230,11 +230,14 @@ WODGID=`id -g`
 EOF
 	echo "Launching docker PostgreSQL stack"
 	# Start the PostgreSQL DB stack
+	PGSQLDIR=`cat $WODAPIDBDIR/docker-compose.yml | yq '.services.db.environment.PGDATA' | sed 's/"//g'`
 	# We need to relog with sudo as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
 	# and we need to stop it before to be idempotent
-	# and we need to remove the data directory 
+	# and we need to remove the data directory not done by the compose down
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker compose down"
+	# That dir is owned by lxd, so needs root to remove
+	sudo su - -c "rm -rf $PGSQLDIR"
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker compose config ; docker compose up -d"
 	POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.services.db.environment.POSTGRES_DB' | sed 's/"//g'`
 	echo "Reset DB data"
