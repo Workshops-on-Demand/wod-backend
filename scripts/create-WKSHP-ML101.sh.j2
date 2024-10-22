@@ -73,7 +73,7 @@ EOF
 cat > $TMPDIR/launch-$NAME << EOF
 #!/bin/bash
 cd $TMPDIR
-docker-compose up --build -d
+docker compose up --build -d
 EOF
 
 # Copy content and start container

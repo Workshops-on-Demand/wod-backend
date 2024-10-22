@@ -11,7 +11,12 @@ TMPDIR=/tmp/$NAME.$stdid
 mkdir -p $TMPDIR
 cat > $TMPDIR/stop-compose << EOF
 cd $TMPDIR
-docker-compose down
+DOOCKERVER=`docker --version | awk '{print $3}' | cut -d. -f1`
+if [ $DOCKERVER -le 20 ]; then
+	docker-compose down
+else
+	docker compose down
+fi
 EOF
 
 chmod 755 $TMPDIR/stop-compose

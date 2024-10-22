@@ -84,7 +84,7 @@ FROM $DCKBASE
 COPY docker.repo /etc/yum.repos.d/docker.repo
 RUN yum install -y perl openssh openssh-server sudo curl epel-release vsftpd net-tools
 # Only available once EPEL is there
-RUN yum install -y docker-compose docker-ce
+RUN yum install -y docker-compose-plugin docker-ce
 COPY ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
 COPY ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 COPY ssh_host_ecdsa_key /etc/ssh/ssh_host_ecdsa_key
