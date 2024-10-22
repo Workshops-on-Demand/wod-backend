@@ -55,11 +55,6 @@ export WODBEDIR=`dirname $INSTALLDIR`
 # This is where wod.sh will be stored
 SCRIPTDIR="$WODBEDIR/scripts"
 
-if [ $WODTYPE = "backend" ]; then
-	# In case of update remove first old jupyterhub version
-	sudo rm -rf /opt/jupyterhub
-fi
-
 cat > $SCRIPTDIR/wod.sh << EOF
 # This is the wod.sh script, generated at install
 #
@@ -133,6 +128,13 @@ source $SCRIPTDIR/wod.sh
 
 cd $SCRIPTDIR/../ansible
 PBKDIR=$WODGROUP
+
+if [ $WODTYPE = "backend" ]; then
+	export JPHUB=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.JPHUB' | sed 's/"//g'`
+	# In case of update remove first old jupyterhub version
+	sudo rm -rf $JPHUB
+fi
+
 
 # Declares shell variables as ansible variables as well
 # then they can be used in playbooks
