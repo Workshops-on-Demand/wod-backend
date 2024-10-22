@@ -613,7 +613,6 @@
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
         - bash_kernel
-        - ansible_kernel
       register: result
       changed_when: result.rc != 0
 
@@ -626,11 +625,11 @@
         - ansible
         - ssh
 
-    - name: Check whether to patch ansible kernel
-      ansible.builtin.command: grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py
-      register: patch_done
-      failed_when: false
-      changed_when: false
+    # - name: Check whether to patch ansible kernel
+    # ansible.builtin.command: grep Loader=yaml.FullLoader {{ JPHUB }}/{{ python_lib }}/ansible_kernel/convert_playbook.py
+    # register: patch_done
+    # failed_when: false
+    # changed_when: false
 
     # - name: Patch ansible kernel with fixes coming from master
     # ansible.posix.patch:
