@@ -66,8 +66,14 @@ export WODTYPE=$WODTYPE
 
 # Location of the backend directory
 export WODBEDIR=$WODBEDIR
+#
+# Name of the backend server seen from outside
+export WODBEEXTFQDN=$WODBEEXTFQDN
 
+# Name of the api-db server
+export WODAPIDBFQDN="$WODAPIDBFQDN"
 EOF
+
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # BACKEND PART
 # The backend dir has some fixed subdirs 
@@ -81,8 +87,6 @@ cat >> $SCRIPTDIR/wod.sh << 'EOF'
 #
 export ANSIBLEDIR=$WODBEDIR/ansible
 export SYSDIR=$WODBEDIR/sys
-# Name of the backend server seen from outside
-export WODBEEXTFQDN=$WODBEEXTFQDN
 
 # PRIVATE PART
 # These 3 dirs have fixed names by default that you can change in this file
@@ -108,7 +112,6 @@ fi
 
 # AIP-DB PART
 export WODAPIDBDIR=$PWODBEDIR/wod-api-db
-export WODAPIDBFQDN="$WODAPIDBFQDN"
 
 # FRONTEND PART
 export WODFEDIR=$PWODBEDIR/wod-frontend
