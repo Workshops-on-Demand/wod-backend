@@ -301,6 +301,13 @@ export WODGENKEYS
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
 $EXEPATH/install-system-$WODDISTRIB.sh
 
+# In order to be able to access install script we need correct rights on our home dir
+WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
+BKPSTAT=`stat --printf '%a' $WODHDIR
+echo "Found $WODUSER home directory $WODHDIR with rights $BKPSTAT"
+echo "Forcing temporarily open rights to access install scripts"
+chmod o+x $WODHDIR
+
 # Now drop priviledges
 # Call the common install script to finish install
 echo "Installing common remaining stuff as $WODUSER"
@@ -341,6 +348,9 @@ EOF
 else
     su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODBEEXTPORT,WODAPIDBPORT,WODPOSTPORT -c "$EXEPATH/install-system-common.sh"
 fi
+
+echo "Setting up original rights for $WODHDIR with $BKPSTAT"
+chmod $BKPSTAT $WODHDIR
 
 # In any case remove the temp dir
 rm -rf $WODTMPDIR
