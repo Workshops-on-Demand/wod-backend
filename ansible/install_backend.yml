@@ -471,7 +471,6 @@
         name:
           - jupyterlab
           - jupyterhub-idle-culler
-          - ansible-kernel>=0.9.0
           - bash_kernel>=0.7.2
           - sshkernel>=0.11.1
           - redfish
