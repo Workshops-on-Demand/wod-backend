@@ -233,6 +233,7 @@ EOF
 	# We need to relog with sudo as $WODUSER so it's really in the docker group
 	# and be able to communicate with docker
 	# and we need to stop it before to be idempotent
+	# and we need to remove the data directory 
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker compose down"
 	sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker compose config ; docker compose up -d"
 	POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.services.db.environment.POSTGRES_DB' | sed 's/"//g'`
