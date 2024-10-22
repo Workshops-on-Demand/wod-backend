@@ -303,7 +303,7 @@ $EXEPATH/install-system-$WODDISTRIB.sh
 
 # In order to be able to access install script we need correct rights on our home dir
 WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
-BKPSTAT=`stat --printf '%a' $WODHDIR
+BKPSTAT=`stat --printf '%a' $WODHDIR`
 echo "Found $WODUSER home directory $WODHDIR with rights $BKPSTAT"
 echo "Forcing temporarily open rights to access install scripts"
 chmod o+x $WODHDIR
