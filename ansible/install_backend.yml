@@ -293,7 +293,6 @@
           - shc
           - patch
           - expect
-          - netcat
           - terraform
         state: present
         update_cache: true
@@ -322,6 +321,7 @@
           - fail2ban
           - libproc-processtable-perl
           - acct
+          - netcat-openbsd
       when:
         - ansible_os_family == "Debian"
 
@@ -363,6 +363,7 @@
           - perl-Data-Dumper
           - psacct
           - golang
+          - netcat
         state: present
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"

@@ -73,7 +73,6 @@
           - telnet
           - man
           - unzip
-          - netcat
         state: present
         update_cache: true
 
@@ -88,6 +87,7 @@
           - libproc-processtable-perl
           - acct
           - yarn
+          - netcat-openbsd
       when:
         - ansible_os_family == "Debian"
 
@@ -102,6 +102,7 @@
           - perl-Proc-ProcessTable
           - perl-Data-Dumper
           - psacct
+          - netcat
       when:
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
