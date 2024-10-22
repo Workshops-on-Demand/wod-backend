@@ -32,7 +32,6 @@
           - telnet
           - man
           - unzip
-          - netcat
         update_cache: true
         state: present
 
@@ -49,6 +48,7 @@
           - libjson-perl
           - libyaml-tiny-perl
           - postgresql-client
+          - netcat-openbsd
       when:
         - ansible_os_family == "Debian"
 
@@ -66,6 +66,7 @@
           - perl-JSON
           - perl-YAML-Tiny
           - postgresql
+          - netcat
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
