@@ -16,11 +16,11 @@ my @blacklistcmd = (
 );
 # Commands that are white listed/kept using cmndline
 my @whitelistcmd = (
-		"/opt/jupyterhub/bin/jupyterhub-singleuser",
+		"{{ JPHUB }}/bin/jupyterhub-singleuser",
 		# Isn't it a security hole as dotnet can launch whatever I guess
 		"dotnet",
 		"dotnet-interactive",
-		"-home=/opt/jupyterhub/lib/python3.*/site-packages/run_kotlin_kernel",
+		"-home={{ JPHUB }}/lib/python3.*/site-packages/run_kotlin_kernel",
 );
 my $logf = "$ENV{'HOME'}/.mail/wod-kill-processes.log";
 
