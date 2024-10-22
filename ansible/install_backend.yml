@@ -537,8 +537,8 @@
     - name: Make kernel_python available under /usr/local/bin
       become: true
       become_user: root
-      ansible.builtin.copy:
-        src: "{{ SYSDIR }}/kernel_python"
+      ansible.builtin.template:
+        src: "{{ SYSDIR }}/kernel_python.j2"
         dest: /usr/local/bin/kernel_python
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
