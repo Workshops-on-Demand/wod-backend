@@ -134,6 +134,12 @@ Last seat for speaker
 [750] Speakers SMES 
 
   
+751-775 Python201 
+
+[751-775] Workshops Location : Mougins  
+
+[775] Speaker SMES
+
 
 
 776-825 RedfishAnsible (Using the iLO Redfish API with Ansible and OneView)
