@@ -5,6 +5,29 @@ ANSIBLEPRIVOPT=""
 
 source {{ SCRIPTDIR }}/wod.sh
 
+CMD="ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml |& tee /tmp/wod-deliver.log.$$"
+send_mail() {
+
+        cat > /tmp/mail.$$ << EOF
+MAIL FROM: {{ WODSENDER }}
+RCPT TO: {{ WODMONITOR }}
+DATA
+Subject: ERROR in wod-deliver
+
+Command $CMD finished with errors:
+----------------------------------
+EOF
+
+	cat /tmp/wod-deliver.log.$$ >> /tmp/mail.$$
+        cat >> /tmp/mail.$$ << EOF
+----------------------------------
+.
+QUIT
+EOF
+        cat /tmp/mail.$$ | netcat {{ WODBEFQDN }} {{ WODPOSTPORT }}
+        rm -f /tmp/mail.$$
+}
+
 # Git doesn't collect file rights and we need to have correct ones here so forcing
 for d in {{ WODBEDIR }}/skel  {{ WODPRIVDIR }}/skel; do
 	if [ -d $d ]; then
@@ -21,5 +44,10 @@ done
 #
 
 cd {{ ANSIBLEDIR }}
+$CMD
 
-ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml
+if [ $? -ne 0 ]; then
+	# We have an error in the delivery warn the admin
+	send_mail
+fi
+rm -f /tmp/wod-deliver.log.$$
