@@ -222,7 +222,7 @@
       become_user: root
       copy:
         src: "{{ item }}"
-        dest: "{{ path | regex_replace(WODBEDIR, JPHUB) | regex_replace('/img', '/share/jupyterhub/static') }}"
+        dest: "{{ item | regex_replace(WODBEDIR, JPHUB) | regex_replace('/img', '/share/jupyterhub/static') }}"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
         mode: 0644
