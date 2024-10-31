@@ -9,7 +9,11 @@ NAME=tensorflowlab
 mkdir -p $HOME/$NAME
 cd $HOME/$NAME
 
+<<<<<<< HEAD
 DCKBASE="tensorflow:latest-jupyter"
+=======
+DCKBASE="jupyter/tensorflow-notebook"
+>>>>>>> update wod tensorflow docker image
 
 cat > Dockerfile << EOF
 FROM $DCKBASE
