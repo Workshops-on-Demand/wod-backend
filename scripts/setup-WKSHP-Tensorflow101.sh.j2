@@ -2,14 +2,14 @@
 
 #set -x
 
-echo "Prepare the Tensorflow101101 container image"
+echo "Prepare the Tensorflow101 container image"
 
 NAME=tensorflowlab
 
 mkdir -p $HOME/$NAME
 cd $HOME/$NAME
 
-DCKBASE="tensorflow/build:2.18-python3.11"
+DCKBASE="tensorflow:latest-jupyter"
 
 cat > Dockerfile << EOF
 FROM $DCKBASE
