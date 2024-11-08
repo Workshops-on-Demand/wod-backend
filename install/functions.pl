@@ -46,3 +46,5 @@ print "Data gathered from YAML files wod.yml under $ENV{'WODNOBO'}\n";
 #print Dumper($h);
 return($h);
 }
+
+1;
