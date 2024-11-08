@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Wrapper for build-workshops.pl
+# Wrapper for build-seeders.pl
 #
 SCRIPT=`realpath $0`
 # This is the installation directory where install scripts are located.
