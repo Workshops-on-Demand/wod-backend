@@ -60,7 +60,7 @@
       - git
     state: present
 
-- name: Ensure all required Ubuntu/CentOS7 packages are installed
+- name: Ensure all required common base packages are installed
   become: true
   become_user: root
   ansible.builtin.package:
@@ -68,6 +68,16 @@
       - ntp
   when:
     - ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu"
+
+- name: Ensure all required Ubuntu packages are installed
+  become: true
+  become_user: root
+  ansible.builtin.package:
+    pkg:
+      - ufw
+      - iputils-ping
+  when:
+    - ansible_distribution == "Ubuntu"
 
 - name: Ensure all required Rocky packages are installed
   become: true
