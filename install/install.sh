@@ -160,6 +160,10 @@ fi
 if [ ! -z "${i}" ]; then
     WODBEIP="${i}"
 else
+    if [ ! -x /usr/bin/ping ] || [ ! -x /bin/ping ]; then
+	    echo "Please install the ping command before re-running this install script"
+	    exit -1
+    fi
     WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
 fi
 export WODBEIP
@@ -301,12 +305,17 @@ export WODGENKEYS
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
 $EXEPATH/install-system-$WODDISTRIB.sh
 
-# In order to be able to access install script we need correct rights on our home dir
+# In order to be able to access install script we need correct rights on the home dir of the uid launching the script
 WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
 BKPSTAT=`stat --printf '%a' $WODHDIR`
 echo "Found $WODUSER home directory $WODHDIR with rights $BKPSTAT"
 echo "Forcing temporarily open rights to access install scripts"
 chmod o+x $WODHDIR
+
+HDIRSTAT=`stat --printf '%a' $HDIR`
+echo "Found $SUDO_USER home directory $HDIR with rights $HDIRSTAT"
+echo "Forcing temporarily open rights to access install scripts"
+chmod o+x $HDIR
 
 # Now drop priviledges
 # Call the common install script to finish install
@@ -351,6 +360,9 @@ fi
 
 echo "Setting up original rights for $WODHDIR with $BKPSTAT"
 chmod $BKPSTAT $WODHDIR
+
+echo "Setting up original rights for $HDIR with $HDIRSTAT"
+chmod $HDIRSTAT $HDIR
 
 # In any case remove the temp dir
 rm -rf $WODTMPDIR
