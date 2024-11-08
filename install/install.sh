@@ -164,7 +164,11 @@ else
 	    echo "Please install the ping command before re-running this install script"
 	    exit -1
     fi
-    WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
+    WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | { grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1 || true; }`
+    if [ _"$WODBEIP" = _"" ]; then
+	    echo "Unable to find IP address for server $WODBEFQDN"
+	    exit -1
+    fi
 fi
 export WODBEIP
 
