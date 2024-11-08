@@ -79,7 +79,7 @@
       - cron
       - iputils-ping
       - python3-venv
-      - python3-yq
+      - yq
   when:
     - ansible_distribution == "Ubuntu"
 
