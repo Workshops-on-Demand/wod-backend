@@ -13,7 +13,7 @@ if [ -f "$WODPRIVINV" ]; then
 else
 	PRIVINV=""
 fi
-HOSTNAME=`hostname -f`
-export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $HOSTNAME --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
+# Only valid for wod-apidb anyway
+export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $WODAPIDBFQDN --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 get_wodapidb_userpwd
 $INSTALLDIR/build-seeders.pl
