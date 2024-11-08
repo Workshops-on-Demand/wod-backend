@@ -75,6 +75,7 @@
   ansible.builtin.package:
     pkg:
       - ufw
+      - cron
       - iputils-ping
   when:
     - ansible_distribution == "Ubuntu"
@@ -85,9 +86,10 @@
   ansible.builtin.package:
     pkg:
       - chrony
+      - cronie
       - epel-release
   when:
-    - ansible_distribution == "Rocky"
+    - ansible_distribution == "Rocky" or ansible_distribution == "CentOS"
 
 - name: Configure LDAP client 1/3
   become: true
