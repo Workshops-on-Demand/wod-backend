@@ -66,6 +66,7 @@
   ansible.builtin.package:
     pkg:
       - ntp
+      - python3-virtualenv
   when:
     - ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu"
 
@@ -89,7 +90,6 @@
       - chrony
       - cronie
       - epel-release
-      - python3-virtualenv
   when:
     - ansible_distribution == "Rocky" or ansible_distribution == "CentOS"
 
