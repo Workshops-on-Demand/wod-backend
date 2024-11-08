@@ -4,7 +4,7 @@
 #
 SCRIPT=`realpath $0`
 # This is the installation directory where install scripts are located.
-INSTALLDIR=`dirname $SCRIPT`
+export INSTALLDIR=`dirname $SCRIPT`
 
 source $INSTALLDIR/functions.sh
 source $INSTALLDIR/../scripts/wod.sh
