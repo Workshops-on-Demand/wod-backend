@@ -303,7 +303,6 @@
       ansible.builtin.apt:
         pkg:
           - python3-dev
-          - python3-venv
           - python3-ipywidgets
           - apt-file
           - ldap-utils
