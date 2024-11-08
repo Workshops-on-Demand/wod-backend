@@ -46,6 +46,8 @@
           - libproc-processtable-perl
           - acct
           - libjson-perl
+          - libdbi-perl
+          - libdbd-pg-perl
           - libyaml-tiny-perl
           - postgresql-client
           - netcat-openbsd
@@ -64,6 +66,8 @@
           - perl-Data-Dumper
           - psacct
           - perl-JSON
+          - perl-DBI
+          - perl-DBD-Pg
           - perl-YAML-Tiny
           - postgresql
           - netcat

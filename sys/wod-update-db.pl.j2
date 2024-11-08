@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+#
+# Update the workshop DB to synchronize the contaent of the DB with the set of wod.yml files from workshops
+# Need to be called after wod.sh and functions.sh have been sourced
+# Done automatically at intall time
+
+use strict;
+use Data::Dumper;
+use open ":std", ":encoding(UTF-8)"; # to avoid wide char in print msgs
+# COmm with the DB
+use DBI;
+use DBD::Pg;
+
+# Use common functions with installer
+require "{{ SCRIPTDIR }}/../install/functions.pl";
+
+my $h = get_wod_metada();
+
+my $dbh = DBI->connect("dbi:Pg:dbname=$ENV{'POSTGRES_DB'},host=localhost",
+                    $ENV{'WODAPIDBUSER'},
+                    $ENV{'WODAPIDBPWD'},
+                    {AutoCommit => 0, RaiseError => 1, PrintError => 0}
+		    );
+# The AutoCommit attribute should always be explicitly set
+print Dumper($h)."\n";
+ 
+# For some advanced uses you may need PostgreSQL type values:
+use DBD::Pg qw(:pg_types);
+ 
+my $hashref = $dbh->selectall_hashref("SELECT * FROM workshops");
+
+for my $i (keys $hashref) {
+	print Dumper($hashref->{$i})."\n";
+}
+
+ 
+#
+#$dbh->do('INSERT INTO mytable(a) VALUES (1)');
+#
+#$sth = $dbh->prepare('INSERT INTO mytable(a) VALUES (?)');
+#
+#$sth->execute();

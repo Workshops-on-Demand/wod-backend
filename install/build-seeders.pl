@@ -2,46 +2,15 @@
 #
 # Build the workshop seeder file to create the correct Workshops during install time
 # Need to be called after wod.sh has been sourced
-# Done automatically at intalls time
+# Done automatically at intall time
 
 use strict;
-use YAML::Tiny;
-use Data::Dumper;
 use open ":std", ":encoding(UTF-8)"; # to avoid wide char in print msgs
 
-my $h = {};
+# Load functions also used by the update process
+require "$ENV{'INSTALLDIR'}./functions.pl";
 
-# Analyses metadata stored within Workshops both public and private
-opendir(DIR,$ENV{'WODNOBO'}) || die "Unable to open directory $ENV{'WODNOBO'}";
-while (my $wkshp = readdir(DIR)) {
-	next if ($wkshp =~ /^\./);
-	my $meta = "$ENV{'WODNOBO'}/$wkshp/wod.yml";
-	if (-f "$meta") {
-		# Open the config
-		my $yaml = YAML::Tiny->read("$meta") || die "Unable to open $meta";
-		# Get a reference to the first document
-		$h->{$wkshp} = $yaml->[0];
-	}
-}
-closedir(DIR);
-
-if (-d $ENV{'WODPRIVNOBO'}) {
-	opendir(PRIVDIR,$ENV{'WODPRIVNOBO'}) || die "Unable to open directory $ENV{'WODPRIVNOBO'}";
-	while (my $wkshp = readdir(PRIVDIR)) {
-		next if ($wkshp =~ /^\./);
-		my $meta = "$ENV{'WODPRIVNOBO'}/$wkshp/wod.yml";
-		if (-f "$meta") {
-			# Open the config
-			my $yaml = YAML::Tiny->read("$meta") || die "Unable to open $meta";
-			# Get a reference to the first document
-			$h->{$wkshp} = $yaml->[0];
-		}
-	}
-	closedir(PRIVDIR);
-}
-
-print "Data gathered from YAML files wod.yml under $ENV{'WODNOBO'}\n";
-#print Dumper($h);
+my $h = get_wod_metada();
 
 # Generating workshop seeder file
 my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js";
