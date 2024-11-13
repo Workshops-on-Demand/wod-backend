@@ -11,7 +11,8 @@ use open ":std", ":encoding(UTF-8)"; # to avoid wide char in print msgs
 use lib "$ENV{'INSTALLDIR'}";
 require "functions.pl";
 
-my $h = get_wod_metada();
+# Calling the subfunction
+my $h = get_wod_metadata();
 
 # Generating workshop seeder file
 my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js";
