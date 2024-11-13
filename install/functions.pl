@@ -8,8 +8,9 @@ use strict;
 use Data::Dumper;
 use YAML::Tiny;
 use open ":std", ":encoding(UTF-8)"; # to avoid wide char in print msgs
+use vars qw(@ISA @EXPORT);
 
-@EXPORT = qw( get_wod_metadata );
+our @EXPORT = qw( get_wod_metadata );
 
 sub get_wod_metadata {
 
