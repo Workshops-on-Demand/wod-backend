@@ -31,6 +31,16 @@
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version >= "20"
 
+- name: Add yq ppa repository into sources list
+  become: true
+  become_user: root
+  ansible.builtin.apt_repository:
+    repo: ppa:rmescandon/yq
+    state: present
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version <= "22"
+
 - name: Add EPEL repository into repo list
   become: true
   become_user: root
