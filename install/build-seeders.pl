@@ -8,7 +8,8 @@ use strict;
 use open ":std", ":encoding(UTF-8)"; # to avoid wide char in print msgs
 
 # Load functions also used by the update process
-use "$ENV{'INSTALLDIR'}/functions.pl";
+use lib "$ENV{'INSTALLDIR'}";
+require "functions.pl";
 
 my $h = get_wod_metada();
 
