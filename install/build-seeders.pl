@@ -75,7 +75,7 @@ my $wodbeextfqdn = "";
 my $pbkdir = "";
 $wodbeextfqdn = $ENV{'WODBEEXTFQDN'} if (defined $ENV{'WODBEEXTFQDN'});
 $pbkdir = $ENV{'PBKDIR'} if (defined $ENV{'PBKDIR'});
-print(WKSHP "      url: \`$wodbeextfqdn/user/student");
+print(WKSHP "      url: \`http://$wodbeextfqdn/user/student");
 print WKSHP <<'EOF';
 ${key}/lab?`,
       username: `student${key}`,
