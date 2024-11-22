@@ -61,7 +61,7 @@ dbstdid=$((stdid+{{ BASESTDID }}))
 
 # for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
-    curl --header "Authorization: token {{ WODBETOKEN }}" \
+	curl --header "Authorization: token {{ WODBETOKEN }}" \
             --location \
             --request DELETE \
             "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"

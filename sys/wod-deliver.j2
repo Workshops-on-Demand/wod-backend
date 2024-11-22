@@ -3,12 +3,14 @@
 WODPRIVINV=""
 ANSIBLEPRIVOPT=""
 
+LOG="/tmp/wod-deliver.log.$$"
+MAIL="/tmp/mail.$$"
 source {{ SCRIPTDIR }}/wod.sh
 
-CMD="ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml |& tee /tmp/wod-deliver.log.$$"
+CMD="ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml"
 send_mail() {
 
-        cat > /tmp/mail.$$ << EOF
+        cat > $MAIL << EOF
 MAIL FROM: {{ WODSENDER }}
 RCPT TO: {{ WODMONITOR }}
 DATA
@@ -18,14 +20,14 @@ Command $CMD finished with errors:
 ----------------------------------
 EOF
 
-	cat /tmp/wod-deliver.log.$$ >> /tmp/mail.$$
-        cat >> /tmp/mail.$$ << EOF
+	cat $LOG >> $MAIL
+        cat >> $MAIL << EOF
 ----------------------------------
 .
 QUIT
 EOF
-        cat /tmp/mail.$$ | netcat {{ WODBEFQDN }} {{ WODPOSTPORT }}
-        rm -f /tmp/mail.$$
+        cat $MAIL | netcat {{ WODBEFQDN }} {{ WODPOSTPORT }}
+        rm -f $MAIL
 }
 
 # Git doesn't collect file rights and we need to have correct ones here so forcing
@@ -44,10 +46,10 @@ done
 #
 
 cd {{ ANSIBLEDIR }}
-$CMD
+$CMD |& tee $LOG
 
 if [ $? -ne 0 ]; then
 	# We have an error in the delivery warn the admin
 	send_mail
 fi
-rm -f /tmp/wod-deliver.log.$$
+rm -f $LOG
