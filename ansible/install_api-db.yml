@@ -9,9 +9,6 @@
     - name: Base setup for a base system
       ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
 
-    - name: Setup first the Docker context (packages, deps, ...)
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
-
     - name: Ensure all required packages are installed
       become: true
       become_user: root
@@ -192,6 +189,10 @@
         daemon_reload: true
         enabled: true
         name: fail2ban
+
+    # Call docker late to avoid creation of PGDATA dir with restrictive rights
+    - name: Setup first the Docker context (packages, deps, ...)
+      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_docker.yml"
 
     - name: Test private tasks YAML file
       ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/install_api-db.yml"
