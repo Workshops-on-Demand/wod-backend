@@ -94,7 +94,7 @@
         src: "{{ item }}"
         dest: /usr/local/bin/{{ item | basename }}
         mode: "0755"
-      with_fileglob: ["{{ SCRIPTDIR }}/install/build-seeders.*"]
+      with_fileglob: ["{{ SCRIPTDIR }}/../install/build-seeders.*"]
 
     - name: Disable WoD services
       become: true
