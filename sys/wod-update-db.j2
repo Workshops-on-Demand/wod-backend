@@ -7,7 +7,8 @@ ANSIBLEPRIVOPT=""
 
 # Import required env var and functions.
 source {{ SCRIPTDIR }}/wod.sh
-source {{ SCRIPTDIR }}/../install/functions.sh
+export INSTALLDIR={{ SCRIPTDIR }}/../install
+source {{ INSTALLDIR }}/functions.sh
 
 if [ -f "$WODPRIVINV" ]; then
 	PRIVINV="-i $WODPRIVINV"
