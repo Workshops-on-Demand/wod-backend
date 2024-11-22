@@ -321,10 +321,11 @@
           - libproc-processtable-perl
           - acct
           - netcat-openbsd
+          - libtie-dbi-perl
       when:
         - ansible_os_family == "Debian"
 
-    - name: Ensure all required APT packages are installed
+    - name: Ensure all required DEB packages are installed for recent Ubuntu
       become: true
       become_user: root
       ansible.builtin.package:
@@ -334,7 +335,7 @@
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version > "20"
 
-    - name: Ensure all required APT packages are installed
+    - name: Ensure all required DEB packages are installed for older Ubuntu
       become: true
       become_user: root
       ansible.builtin.package:
@@ -363,6 +364,7 @@
           - psacct
           - golang
           - netcat
+          - perl-Tie-DBI
         state: present
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
