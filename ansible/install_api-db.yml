@@ -116,6 +116,7 @@
         use_regex: true
         patterns: ['^.*.j2$']
         recurse: true
+        excludes: data
       register: apidbtemplates
 
     - name: Copy WoD api-db branded files as ansible template for variable expansion
