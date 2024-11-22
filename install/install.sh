@@ -324,6 +324,19 @@ echo "Found $SUDO_USER home directory $HDIR with rights $HDIRSTAT"
 echo "Forcing temporarily open rights to access install scripts"
 chmod o+x $HDIR
 
+# For idempotency, kill potentially existing jobs
+set +e
+if [ $WODTYPE = "api-db" ]; then
+	# Clean potential remaining docker containers
+	docker --version 2>&1 /dev/null
+	if [ $? -eq 0 ]; then
+		docker stop postgres
+		docker stop wod-api-db-adminer-1
+	fi
+fi
+killall -u $WODUSER
+set -e
+
 # Now drop priviledges
 # Call the common install script to finish install
 echo "Installing common remaining stuff as $WODUSER"
