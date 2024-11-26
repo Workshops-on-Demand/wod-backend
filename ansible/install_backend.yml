@@ -582,6 +582,12 @@
         mode: "0644"
       with_fileglob: ["{{ ansible_env.HOME }}/.local/share/jupyter/kernels/rust/*"]
 
+    - name: Fix kernel path for rust
+      ansible.builtin.replace:
+        path: "{{ JPHUB }}/share/jupyter/kernels/rust/kernel.json"
+        regexp: (\s)+"{{ SYSDIR }}evcxr_jupyter.{{ WODDVER }}".*$
+        replace: \1"/usr/local/bin/evcxr_jupyter",
+
     - name: Ensure Rust kernel is deployed
       become: true
       become_user: root
