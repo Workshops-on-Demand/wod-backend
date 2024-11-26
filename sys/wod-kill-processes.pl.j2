@@ -3,7 +3,7 @@ use strict;
 use Proc::ProcessTable;
 use Data::Dumper;
 
-# Process eevry 60 seconds by default
+# Process every 60 seconds by default
 my $loop = 60;
 
 # Max CPU usage tolerated
@@ -58,20 +58,27 @@ while (1) {
 			$kill{$student}{uid} = $uid;
 			print(LOG "Will kill black listed process $fname ($pid) for user $student ($uid)\n");
 			print(LOG Dumper($p)."\n");
+			next;
 		}
 		# Kill commands running for more than maxruntime, using CPU and not whitelisted run by a student
 		my $st = $p->start();
 		my $pcpu = $p->pctcpu;
+		my $found = 0;
 		if (($st <= $maxruntime) && ($pcpu+0 >= $maxcpu) && ($student =~ /student[0-9]+/) ) {
 			for my $i (@whitelistcmd) {
-				if ($cmndline !~ /\b$i\b/) {
-					push(@{$kill{$student}->{fname}},$fname);
-					push(@{$kill{$student}->{pid}},$pid);
-					$kill{$student}{uid} = $uid;
-					print(LOG "Will kill process exceeding $maxcpu CPU $fname ($pid) for user $student ($uid)\n");
-					print(LOG "Start: ",scalar localtime($st)," maxruntime: ", scalar localtime($maxruntime),"\n");
-					print(LOG Dumper($p)."\n");
+				if ($cmndline =~ /\b{wb}$i\b{wb}/) {
+					$found = 1;
+					next;
 				}
+			}
+			if ($found == 0) {
+				# Not found so kill it
+				push(@{$kill{$student}->{fname}},$fname);
+				push(@{$kill{$student}->{pid}},$pid);
+				$kill{$student}{uid} = $uid;
+				print(LOG "Will kill process exceeding $maxcpu CPU $fname ($pid) for user $student ($uid)\n");
+				print(LOG "Start: ",scalar localtime($st)," maxruntime: ", scalar localtime($maxruntime),"\n");
+				print(LOG Dumper($p)."\n");
 			}
 		}
 		# Kill jupyter server kernels older than maxjuptime and processes of that student
