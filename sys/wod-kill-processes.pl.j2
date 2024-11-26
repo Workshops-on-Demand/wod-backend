@@ -18,6 +18,7 @@ my @blacklistcmd = (
 my @whitelistcmd = (
 {%if JPHUB is defined %}
 		"{{ JPHUB }}/bin/jupyterhub-singleuser",
+		"ipykernel_launcher",
 		# Isn't it a security hole as dotnet can launch whatever I guess
 		"dotnet",
 		"dotnet-interactive",
@@ -68,7 +69,7 @@ while (1) {
 					push(@{$kill{$student}->{pid}},$pid);
 					$kill{$student}{uid} = $uid;
 					print(LOG "Will kill process exceeding $maxcpu CPU $fname ($pid) for user $student ($uid)\n");
-					print(LOG "Start:$st maxruntime: $maxruntime\n");
+					print(LOG "Start: ",localtime($st)," maxruntime: ", localtime($maxruntime),"\n");
 					print(LOG Dumper($p)."\n");
 				}
 			}
