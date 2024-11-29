@@ -28,4 +28,6 @@ WODAPIDBURL: http://{{ WODAPIDBFQDN }}:{{ WODAPIDBPORT }}/api
 # Adapt to your setup - Used by installer to setup the frontend
 #
 WODAPIDBUSER: moderator
-WODAPIDBPWD: MotDePasseCompliquéAussi123!!!##
+WODAPIDBUSERPWD: MotDePasseCompliquéAussi123!!!##
+WODAPIDBUSER: hackshack
+WODAPIDBUSERPWD: MotDePasseAussiCompliqué789!!!##

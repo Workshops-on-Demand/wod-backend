@@ -20,7 +20,7 @@ get_session_token() {
 
 	ret=`curl -s --location --request POST "$WODAPIDBURL/login" \
 			--header 'Content-Type: application/json' \
-			--data "{\"username\":\"$WODAPIDBUSER\",\"password\":\"$WODAPIDBPWD\"}" | jq -r '.accessToken'`
+			--data "{\"username\":\"$WODAPIDBUSER\",\"password\":\"$WODAPIDBUSERPWD\"}" | jq -r '.accessToken'`
         echo "$ret"
 }
 
