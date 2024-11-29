@@ -119,6 +119,13 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          username: '$ENV{'WODAPIDBADMIN'}',
+          email: 'dummy',
+          password: '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {
         returning: true,

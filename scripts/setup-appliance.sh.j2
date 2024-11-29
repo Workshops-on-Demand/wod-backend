@@ -34,7 +34,7 @@ source {{ SCRIPTDIR }}/functions.sh
 echo "Prepare environment variables for Workshop $w at `date`"
 export WODAPIDBURL={{ WODAPIDBURL }}
 export WODAPIDBUSER={{ WODAPIDBUSER }}
-export WODAPIDBPWD={{ WODAPIDBPWD }}
+export WODAPIDBUSERPWD={{ WODAPIDBUSERPWD }}
 export accessToken=`get_session_token`
 # If that doesn't fail, then export the workshop name
 export wid=`get_workshop_id $w`

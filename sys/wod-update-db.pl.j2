@@ -20,7 +20,7 @@ print Dumper($h)."\n";
 
 my $dbh = DBI->connect("dbi:Pg:dbname=$ENV{'POSTGRES_DB'},host=localhost",
                     $ENV{'WODAPIDBUSER'},
-                    $ENV{'WODAPIDBPWD'},
+                    $ENV{'WODAPIDBUSERPWD'},
                     {AutoCommit => 1, RaiseError => 1, PrintError => 0}
 		    ) || die "Unable to connect to $ENV{'POSTGRES_DB'} $DBI::errstr";
 # The AutoCommit attribute should always be explicitly set

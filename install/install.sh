@@ -327,12 +327,12 @@ chmod o+x $HDIR
 # For idempotency, kill potentially existing jobs
 set +e
 if [ $WODTYPE = "api-db" ]; then
-	# Clean potential remaining docker containers
-	docker --version 2>&1 /dev/null
-	if [ $? -eq 0 ]; then
-		docker stop postgres
-		docker stop wod-api-db-adminer-1
-	fi
+    # Clean potential remaining docker containers
+    docker --version 2>&1 /dev/null
+    if [ $? -eq 0 ]; then
+        docker stop postgres
+        docker stop wod-api-db-adminer-1
+    fi
 fi
 killall -u $WODUSER
 set -e
