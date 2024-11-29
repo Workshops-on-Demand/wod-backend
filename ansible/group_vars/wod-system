@@ -29,5 +29,5 @@ WODAPIDBURL: http://{{ WODAPIDBFQDN }}:{{ WODAPIDBPORT }}/api
 #
 WODAPIDBUSER: moderator
 WODAPIDBUSERPWD: MotDePasseCompliquéAussi123!!!##
-WODAPIDBUSER: hackshack
-WODAPIDBUSERPWD: MotDePasseAussiCompliqué789!!!##
+WODAPIDBADMIN: hackshack
+WODAPIDBADMINPWD: MotDePasseAussiCompliqué789!!!##
