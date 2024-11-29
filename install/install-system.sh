@@ -258,7 +258,7 @@ EOF
 	adminroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='admin';"`
 	nbuser=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT COUNT(id) FROM users;"`
 	moderatoruserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='moderator';"`
-	adminuserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='admin';"`
+	adminuserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='hackshack';"`
 	# Every user as a role of user so it's probably useless !
 	for (( i=$nbuser ; i>=1 ; i--)) do
 		psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "INSERT INTO user_roles (roleID, userID) VALUES ($userroleid,$i);"
