@@ -253,7 +253,7 @@ EOF
 	echo "Setup $WODAPIDBADMIN"
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "UPDATE users set password=crypt('$WODAPIDBADMINPWD',gen_salt('bf')) where username='$WODAPIDBADMIN';"
 	echo "Setup user_roles table not done elsewhere"
-	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE TABLE IF NOT EXISTS user_roles ("createdAt" timestamp DEFAULT current_timestamp, "updatedAt" timestamp DEFAULT current_timestamp, "roleId" integer CONSTRAINT no_null NOT NULL REFERENCES roles (id), "userId" integer CONSTRAINT no_null NOT NULL PRIMARY KEY REFERENCES users (id) PRIMARY KEY (roleId,userId));'
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE TABLE IF NOT EXISTS user_roles ("createdAt" timestamp DEFAULT current_timestamp, "updatedAt" timestamp DEFAULT current_timestamp, "roleId" integer CONSTRAINT no_null NOT NULL REFERENCES roles (id), "userId" integer CONSTRAINT no_null NOT NULL PRIMARY KEY REFERENCES users (id), PRIMARY KEY (roleId,userId));'
 	# Get info on roles and users already declared
 	userroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='user';"`
 	moderatorroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='moderator';"`
