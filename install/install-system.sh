@@ -256,8 +256,8 @@ EOF
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE TABLE IF NOT EXISTS user_roles (createAt timestamp DEFAULT current_timestamp, updatedAt timestamp DEFAULT current_timestamp, roleID integer CONSTRAINT no_null NOT NULL, userID integer CONSTRAINT no_null NOT NULL);'
 	# Get info on roles and users already declared
 	userroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='user';"`
-	moderatorroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='$WODAPIDBUSER';"`
-	adminroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='$WODAPIDBADMIN';"`
+	moderatorroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='moderator';"`
+	adminroleid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM roles WHERE name='admin';"`
 	nbuser=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT COUNT(id) FROM users;"`
 	moderatoruserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='$WODAPIDBUSER';"`
 	adminuserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='$WODAPIDBADMIN';"`
