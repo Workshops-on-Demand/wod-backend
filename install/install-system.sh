@@ -264,12 +264,12 @@ EOF
 	adminuserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='$WODAPIDBADMIN';"`
 	# Every user as a role of user so it's probably useless !
 	for (( i=$nbuser ; i>=1 ; i--)) do
-		psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleID", "userID") VALUES ('$userroleid','$i');'
+		psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleId", "userId") VALUES ('$userroleid','$i');'
 	done
 	# Map the moderator user
-	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleID", "userID") VALUES ('$moderatorroleid','$moderatoruserid');'
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleId", "userId") VALUES ('$moderatorroleid','$moderatoruserid');'
 	# Map the admin user
-	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleID", "userID") VALUES ('$adminroleid','$adminuserid');'
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleId", "userId") VALUES ('$adminroleid','$adminuserid');'
 	echo "Starting API"
 	launch_with_pm2 $WODAPIDBDIR wod-$WODTYPE
 elif [ $WODTYPE = "frontend" ]; then
