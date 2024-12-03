@@ -247,10 +247,10 @@ EOF
 	POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.services.db.environment.POSTGRES_DB' | sed 's/"//g'`
 	echo "Reset DB data"
 	npm run reset-data
-	echo "Setup $WODAPIDBUSER"
+	echo "Setup user $WODAPIDBUSER"
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "UPDATE users set password=crypt('$WODAPIDBUSERPWD',gen_salt('bf')) where username='$WODAPIDBUSER';"
-	echo "Setup $WODAPIDBADMIN"
+	echo "Setup user $WODAPIDBADMIN"
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "UPDATE users set password=crypt('$WODAPIDBADMINPWD',gen_salt('bf')) where username='$WODAPIDBADMIN';"
 	echo "Setup user_roles table not done elsewhere"
 	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE TABLE IF NOT EXISTS user_roles ("createdAt" timestamp DEFAULT current_timestamp, "updatedAt" timestamp DEFAULT current_timestamp, "roleId" integer CONSTRAINT no_null NOT NULL REFERENCES roles (id), "userId" integer CONSTRAINT no_null NOT NULL REFERENCES users (id));'
@@ -264,12 +264,12 @@ EOF
 	adminuserid=`psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -AXqtc "SELECT id FROM users WHERE username='$WODAPIDBADMIN';"`
 	# Every user as a role of user so it's probably useless !
 	for (( i=$nbuser ; i>=1 ; i--)) do
-		psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "INSERT INTO user_roles (roleID, userID) VALUES ($userroleid,$i);"
+		psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleID", "userID") VALUES ('$userroleid','$i');'
 	done
 	# Map the moderator user
-	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "INSERT INTO user_roles (roleID, userID) VALUES ($moderatorroleid,$moderatoruserid);"
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleID", "userID") VALUES ('$moderatorroleid','$moderatoruserid');'
 	# Map the admin user
-	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c "INSERT INTO user_roles (roleID, userID) VALUES ($adminroleid,$adminuserid);"
+	psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'INSERT INTO user_roles ("roleID", "userID") VALUES ('$adminroleid','$adminuserid');'
 	echo "Starting API"
 	launch_with_pm2 $WODAPIDBDIR wod-$WODTYPE
 elif [ $WODTYPE = "frontend" ]; then
