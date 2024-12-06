@@ -43,13 +43,21 @@ if [ $ACTION != "CREATE" ]  && [ $ACTION != "CLEANUP" ]  && [ $ACTION != "RESET"
 	exit -1
 fi
 
+echo {{ WODBEFQDN }} | grep -q ',' 
+if [ $? -eq 0 ]; then
+    # Use the first backend only
+    FQDN="`echo {{ WODBEFQDN }} | cut -d: -f1`"
+else
+    FQDN="{{ WODBEFQDN }}"
+fi
+
 
 # This function creates the mail to be sent
 send_mail() {
 
 	cat > /tmp/mail.$$ << EOF
 MAIL FROM: {{ WODSENDER }}
-RCPT TO: {{ WODUSER }}@{{ WODBEFQDN }}
+RCPT TO: {{ WODUSER }}@{{ FQDN }}
 DATA
 Subject: $ACTION $1 0
 
@@ -58,7 +66,7 @@ $WKSHP
 QUIT
 EOF
 	echo "Sending a mail to $ACTION student $1 for workshop $WKSHP"
-	cat /tmp/mail.$$ | netcat {{ WODBEFQDN }} {{ WODPOSTPORT }}
+	cat /tmp/mail.$$ | netcat {{ FQDN }} {{ WODPOSTPORT }}
 	rm -f /tmp/mail.$$
 }
 

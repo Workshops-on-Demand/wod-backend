@@ -7,6 +7,14 @@ LOG="/tmp/wod-deliver.log.$$"
 MAIL="/tmp/mail.$$"
 source {{ SCRIPTDIR }}/wod.sh
 
+echo {{ WODBEFQDN }} | grep -q ',' 
+if [ $? -eq 0 ]; then
+    # Use the first backend only
+    FQDN="`echo {{ WODBEFQDN }} | cut -d: -f1`"
+else
+    FQDN="{{ WODBEFQDN }}"
+fi
+
 CMD="ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml"
 send_mail() {
 
@@ -26,7 +34,7 @@ EOF
 .
 QUIT
 EOF
-        cat $MAIL | netcat {{ WODBEFQDN }} {{ WODPOSTPORT }}
+        cat $MAIL | netcat $FQDN {{ WODPOSTPORT }}
         rm -f $MAIL
 }
 
