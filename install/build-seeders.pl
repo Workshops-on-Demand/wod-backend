@@ -58,40 +58,50 @@ $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/03-students.js";
 
 print "Generate the seeder file from collected data under $seederfile\n";
 open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
+
+# We need to loop for each backend to create USERMAX students, using the correct ids
 print(WKSHP "const N = $ENV{'USERMAX'}\n\n");
 
-# TODO: Loop per location,once locations are managed properly
-print WKSHP <<'EOF';
+	print WKSHP <<'EOF';
 module.exports = {
   up: (queryInterface) => {
-    const arr3 = [...Array(N + 1).keys()].slice(1);
-    const entries3 = arr3.map((key) => ({
+EOF
+
+# Loop per location
+my $cpt=0;
+my @backends=split(/,/,$ENV{'WODBEFQDN'});
+while my $i < @backends {
+	print WKSHP <<"EOF";
+    const arr$cpt = [...Array(N + 1).keys()].slice(1);
+    const entries$cpt = arr$cpt.map((key) => ({
       createdAt: new Date(),
       updatedAt: new Date(),
 EOF
-# This variable exists when that script is called at install
-# TODO: Also get it at run time for upgrade
-my $wodbeextfqdn = "";
-my $pbkdir = "";
-$wodbeextfqdn = $ENV{'WODBEEXTFQDN'} if (defined $ENV{'WODBEEXTFQDN'});
-$pbkdir = $ENV{'PBKDIR'} if (defined $ENV{'PBKDIR'});
-print(WKSHP "      url: \`http://$wodbeextfqdn/user/student");
-print WKSHP <<'EOF';
+	# This variable exists when that script is called at install
+	# TODO: Also get it at run time for upgrade
+	print(WKSHP "      url: \`http://$backend[$cpt]/user/student");
+	print WKSHP <<'EOF';
 ${key}/lab?`,
       username: `student${key}`,
       password: 'MyNewPassword',
 EOF
-# TODO: this is an issue with multiple backends
-print(WKSHP "      location: '$ENV{WODBEFQDN}',\n");
+print(WKSHP "      location: '$backend[$cpt]',\n");
 print WKSHP <<'EOF';
-    }));
+        }));
+EOF
+	$cpt++;
+}
+	print WKSHP "let entries = ";
+while my $i < @backends {
+        ...entries$i
+}
+	print WKSHP "];\n";
 
-    let entries = [...entries3];
-
-    return queryInterface.bulkInsert('students', entries, { returning: true });
-  },
-  down: (queryInterface) => queryInterface.bulkDelete('students', null, {}),
-};
+	print WKSHP <<"EOF";
+        return queryInterface.bulkInsert('students', entries, { returning: true });
+      },
+      down: (queryInterface) => queryInterface.bulkDelete('students', null, {}),
+    };
 EOF
 close(WKSHP);
 
