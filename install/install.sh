@@ -206,10 +206,6 @@ if [ _"$res" != _"" ]; then
 else
     export WODDISTRIB
 fi
-echo "WODUSER: $WODUSER" > /etc/wod.yml
-echo "WODSENDER: $WODSENDER" >> /etc/wod.yml
-chown $WODUSER /etc/wod.yml
-
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using api-db $WODAPIDBFQDN on port $WODAPIDBPORT"
 echo "Using backend $WODBEFQDN ($WODBEIP) on port $WODBEPORT"
@@ -292,6 +288,11 @@ else
     echo "Generating ssh keys for non-pre-existing $WODUSER"
 fi
 useradd -U -m -s /bin/bash $WODUSER
+
+# Keep conf
+echo "WODUSER: $WODUSER" > /etc/wod.yml
+echo "WODSENDER: $WODSENDER" >> /etc/wod.yml
+chown $WODUSER /etc/wod.yml
 
 # Manage passwd
 export WODPWD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1`
