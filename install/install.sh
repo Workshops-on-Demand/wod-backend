@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport]][-f frontend[:feport]][-a api-db[:apidbport]][-e external][-u user][-p postport][-k][-s sender]"
+    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport]][-x basestdid][-f frontend[:feport]][-a api-db[:apidbport]][-e external][-u user][-p postport][-k][-s sender]"
     echo " "
     echo "where:"
     echo "type      is the installation type"
@@ -20,6 +20,9 @@ usage() {
     echo "backend   is the FQDN of the backend JupyterHub server, potentially with a port"
     echo "          example: be.internal.example.org  "
     echo "          if empty using the local name for the backend                "
+    echo "-x bstid  is the base id used for this backend to create the students range"
+    echo "          example: -x 2000  "
+    echo "          if empty using 0               "
     echo "frontend  is the FQDN of the frontend Web server, potentially with a port"
     echo "          example: fe.example.org  "
     echo "          if empty using the external name for the backend                "
@@ -58,7 +61,7 @@ i=""
 p=""
 WODGENKEYS=0
 
-while getopts "t:f:e:b:a:g:i:u:s:p:hk" option; do
+while getopts "t:f:e:b:x:a:g:i:u:s:p:hk" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -79,6 +82,9 @@ while getopts "t:f:e:b:a:g:i:u:s:p:hk" option; do
             ;;
         b)
             b=${OPTARG}
+            ;;
+        x)
+            x=${OPTARG}
             ;;
         g)
             g=${OPTARG}
@@ -175,6 +181,12 @@ set -e
 fi
 export WODBEIP
 
+if [ ! -z "${x}" ]; then
+    export WODBASESTDID="${x}"
+else
+    export WODBASESTDID="0"
+fi
+
 if [ ! -z "${u}" ]; then
     export WODUSER="${u}"
 else
@@ -196,7 +208,7 @@ if [ ! -z "${g}" ]; then
 else
     WODGROUP="production"
 fi
-export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIDBPORT WODBEEXTPORT WODPOSTPORT
+export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIDBPORT WODBEEXTPORT WODPOSTPORT WODBASESTDID
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 res=`echo $WODDISTRIB | { grep -i rocky || true; }`
@@ -211,6 +223,7 @@ echo "Using api-db $WODAPIDBFQDN on port $WODAPIDBPORT"
 echo "Using backend $WODBEFQDN ($WODBEIP) on port $WODBEPORT"
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
+echo "Using WoD base student id $WODBASESTDID"
 
 if [ ${t} != "appliance" ]; then
     echo "Using frontend $WODFEFQDN on port $WODFEPORT"
@@ -371,12 +384,13 @@ export WODBEPORT="$WODBEPORT"
 export WODBEEXTPORT="$WODBEEXTPORT"
 export WODAPIDBPORT="$WODAPIDBPORT"
 export WODPOSTPORT="$WODPOSTPORT"
+export WODBASESTDID="$WODBASESTDID"
 EOF
     chmod 644 /tmp/wodexports
     su - $WODUSER -c "source /tmp/wodexports ; $EXEPATH/install-system-common.sh"
     rm -f /tmp/wodexports
 else
-    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODBEEXTPORT,WODAPIDBPORT,WODPOSTPORT -c "$EXEPATH/install-system-common.sh"
+    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODBEEXTPORT,WODAPIDBPORT,WODPOSTPORT,WODBASESTDID -c "$EXEPATH/install-system-common.sh"
 fi
 
 echo "Setting up original rights for $WODHDIR with $BKPSTAT"
