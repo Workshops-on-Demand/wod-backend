@@ -6,7 +6,7 @@
 #
 # Do not change as the port is fixed in JupyterHub install
 #
-WODBEAPIURL: http://{{ WODBEFQDN }}:{{ WODBEPORT }}
+WODBEAPIURL: http://{{ WODBEFQDN.split(',')[0].split(':')[0] }}:{{ WODBEPORT }}
 
 #
 # Replace with a random one - TODO Do that automatically at install time
