@@ -134,14 +134,14 @@ else
     WODTYPE="backend"
 fi
 
+WODBEFQDNS=""
+WODBEPORTS=""
+
 if [ $WODTYPE = "api-db" ]; then
     if [ ! -z "${b}" ]; then
         # Handle multi-backend install - table keep them in order
         WODBEFQDNS=(`echo ${b} | perl -p -e 's|:[0-9]+||g' | tr ',' ' '`)
         WODBEPORTS=(`echo ${b} | perl -p -e 's|[^:,]+:||g' | tr ',' ' '`)
-    else
-        WODBEFQDNS=""
-        WODBEPORTS=""
     fi
 else
     # Here we only deal with one backend (install backend or pther which doesn't care anyway
