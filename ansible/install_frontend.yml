@@ -83,7 +83,7 @@
           - npm
       when:
         - ansible_os_family == "Debian"
-        - ansible_distribution_major_version <= "24"
+        - ansible_distribution_major_version <= "22"
 
     - name: Ensure all required DEB packages are installed
       become: true
