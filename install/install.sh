@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 usage() {
-    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport]][-x basestdid][-f frontend[:feport]][-a api-db[:apidbport]][-e external][-u user][-p postport][-k][-s sender]"
+    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport][-n number][-f frontend[:feport]][-a api-db[:apidbport]][-e external][-u user][-p postport][-k][-s sender]"
     echo " "
     echo "where:"
     echo "type      is the installation type"
@@ -18,11 +18,20 @@ usage() {
     echo "          if empty, try to be autodetected from FQDN"
     echo "          Used in particuler when the IP can't be guessed such as with Vagrant"
     echo "backend   is the FQDN of the backend JupyterHub server, potentially with a port"
-    echo "          example: be.internal.example.org  "
-    echo "          if empty using the local name for the backend                "
-    echo "-x bstid  is the base id used for this backend to create the students range"
-    echo "          example: -x 2000  "
-    echo "          if empty using 0               "
+    echo "          if empty using the local name for the backend and default port               "
+    echo "          If you use multiple backend systems corresponding to multiple locations, "
+    echo "          use option -n to give the backend number currently being installed."
+    echo " "
+    echo "          When installing the api-db server you have to specify one or multiple backend servers,"
+    echo "          using the same order as given with the -n option during backend installation."
+    echo " "
+    echo "-n        if used, this indicates the number of the backend currently installed"
+    echo "          used for the backend installation only, when  multiple backend systems will be used in the configuration"
+    echo "          example: -b be.internal.example.org:9999  (for a single backend server installation using port 9999)"
+    echo "          example: -b be.internal.example.org:8888 -n 1 (for the first of the 2 backends installed)"
+    echo "          example: -b be2.internal.example.org:8888 -n 2 (for the second of the 2 backends installed)"
+    echo "          example: -b be.internal.example.org:8888,be2.internal.example.org:8888 (for the installation of the corresponding api-db server)"
+    echo " "
     echo "frontend  is the FQDN of the frontend Web server, potentially with a port"
     echo "          example: fe.example.org  "
     echo "          if empty using the external name for the backend                "
@@ -38,7 +47,7 @@ usage() {
     echo "postport  is the port on which listen the postfix service on the backend"
     echo "          example: -p 10030 "
     echo "          if empty using 10025               "
-    echo "-k        is used, force the re-creation of ssh keys for the previously created admin user"
+    echo "-k        if used, force the re-creation of ssh keys for the previously created admin user"
     echo "          if not used keep the existing keys in place if any (backed up and restored)"
     echo "          if the name of the admin user is changed, new keys are created"
     echo "sender    is the e-mail address used in the WoD frontend to send API procmail mails to the WoD backend"
@@ -59,9 +68,10 @@ s=""
 k=""
 i=""
 p=""
+n=""
 WODGENKEYS=0
 
-while getopts "t:f:e:b:x:a:g:i:u:s:p:hk" option; do
+while getopts "t:f:e:b:o:n:a:g:i:u:s:p:hk" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -83,8 +93,8 @@ while getopts "t:f:e:b:x:a:g:i:u:s:p:hk" option; do
         b)
             b=${OPTARG}
             ;;
-        x)
-            x=${OPTARG}
+        n)
+            n=${OPTARG}
             ;;
         g)
             g=${OPTARG}
@@ -123,43 +133,58 @@ if [ ! -z "${t}" ]; then
 else
     WODTYPE="backend"
 fi
-WODBEPORT=8000
-if [ ! -z "${b}" ]; then
-    WODBEFQDN="`echo ${b} | cut -d: -f1`"
-	res=`echo "${b}" | { grep ':' || true; }`
-	if [ _"$res" != _"" ]; then
-		WODBEPORT="`echo ${b} | cut -d: -f2`"
-	fi
+
+if [ $WODTYPE = "api-db" ]; then
+    if [ ! -z "${b}" ]; then
+        # Handle multi-backend install - table keep them in order
+        WODBEFQDNS=(`echo ${b} | perl -p -e 's|:[0-9]+||g' | tr ',' ' '`)
+        WODBEPORTS=(`echo ${b} | perl -p -e 's|[^:,]+:||g' | tr ',' ' '`)
+    else
+        WODBEFQDNS=""
+        WODBEPORTS=""
+    fi
 else
-    WODBEFQDN=`hostname -f`
+    # Here we only deal with one backend (install backend or pther which doesn't care anyway
+    WODBEPORT=8000
+    if [ ! -z "${b}" ]; then
+        WODBEFQDN="`echo ${b} | cut -d: -f1`"
+        res=`echo "${b}" | { grep ':' || true; }`
+        if [ _"$res" != _"" ]; then
+            WODBEPORT="`echo ${b} | cut -d: -f2`"
+        fi
+    else
+        WODBEFQDN=`hostname -f`
+    fi
 fi
+
+
 WODBEEXTPORT=8000
 if [ ! -z "${e}" ]; then
     WODBEEXTFQDN="`echo ${e} | cut -d: -f1`"
-	res=`echo "${e}" | { grep ':' || true; }`
-	if [ _"$res" != _"" ]; then
-		WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
-	fi
+    res=`echo "${e}" | { grep ':' || true; }`
+    if [ _"$res" != _"" ]; then
+        WODBEEXTPORT="`echo ${e} | cut -d: -f2`"
+    fi
 else
     WODBEEXTFQDN=$WODBEFQDN
 fi
 WODFEPORT=8000
 if [ ! -z "${f}" ]; then
     WODFEFQDN="`echo ${f} | cut -d: -f1`"
-	res=`echo "${f}" | { grep ':' || true; }`
-	if [ _"$res" != _"" ]; then
-		WODFEPORT="`echo ${f} | cut -d: -f2`"
-	fi
+    res=`echo "${f}" | { grep ':' || true; }`
+    if [ _"$res" != _"" ]; then
+        WODFEPORT="`echo ${f} | cut -d: -f2`"
+    fi
 else
     WODFEFQDN=$WODBEFQDN
 fi
 WODAPIDBPORT=8021
 if [ ! -z "${a}" ]; then
     WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
-	res=`echo "${a}" | { grep ':' || true; }`
-	if [ _"$res" != _"" ]; then
-		WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
-	fi
+    res=`echo "${a}" | { grep ':' || true; }`
+    if [ _"$res" != _"" ]; then
+        WODAPIDBPORT="`echo ${a} | cut -d: -f2`"
+    fi
 else
     WODAPIDBFQDN=$WODFEFQDN
 fi
@@ -167,24 +192,24 @@ if [ ! -z "${i}" ]; then
     WODBEIP="${i}"
 else
     if [ ! -x /usr/bin/ping ] || [ ! -x /bin/ping ]; then
-	    echo "Please install the ping command before re-running this install script"
-	    exit -1
+        echo "Please install the ping command before re-running this install script"
+        exit -1
     fi
     # If ping doesn't work continue if we got the IP address
 set +e
     WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
 set -e
     if [ _"$WODBEIP" = _"" ]; then
-	    echo "Unable to find IP address for server $WODBEFQDN"
-	    exit -1
+        echo "Unable to find IP address for server $WODBEFQDN"
+        exit -1
     fi
 fi
 export WODBEIP
 
-if [ ! -z "${x}" ]; then
-    export WODBASESTDID="${x}"
+if [ ! -z "${n}" ]; then
+    export WODBASECOEF=$((n-1))
 else
-    export WODBASESTDID="0"
+    export WODBASECOEF="0"
 fi
 
 if [ ! -z "${u}" ]; then
@@ -208,7 +233,7 @@ if [ ! -z "${g}" ]; then
 else
     WODGROUP="production"
 fi
-export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIDBPORT WODBEEXTPORT WODPOSTPORT WODBASESTDID
+export WODGROUP WODFEFQDN WODBEFQDN WODBEFQDNS WODAPIDBFQDN WODBEEXTFQDN WODTYPE WODBEPORT WODBEPORTS WODFEPORT WODAPIDBPORT WODBEEXTPORT WODPOSTPORT WODBASECOEF
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 res=`echo $WODDISTRIB | { grep -i rocky || true; }`
@@ -221,9 +246,12 @@ fi
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using api-db $WODAPIDBFQDN on port $WODAPIDBPORT"
 echo "Using backend $WODBEFQDN ($WODBEIP) on port $WODBEPORT"
+if [ _"$WODBEFQDNS" != _"" ]; then
+    echo "Using additional backends $WODBEFQDNS on ports $WODBEPORTS"
+fi
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
-echo "Using WoD base student id $WODBASESTDID"
+echo "Using WoD base student coef $WODBASECOEF"
 
 if [ ${t} != "appliance" ]; then
     echo "Using frontend $WODFEFQDN on port $WODFEPORT"
@@ -360,6 +388,7 @@ if [ $WODDISTRIB = "centos-7" ] || [ $WODDISTRIB = "rocky-8" ] ; then
 export WODGROUP="$WODGROUP"
 export WODFEFQDN="$WODFEFQDN"
 export WODBEFQDN="$WODBEFQDN"
+export WODBEFQDNS="$WODBEFQDNS"
 export WODAPIDBFQDN="$WODAPIDBFQDN"
 export WODBEEXTFQDN="$WODBEEXTFQDN"
 export WODTYPE="$WODTYPE"
@@ -381,16 +410,17 @@ export WODGENKEYS="$WODGENKEYS"
 export WODTMPDIR="$WODTMPDIR"
 export WODFEPORT="$WODFEPORT"
 export WODBEPORT="$WODBEPORT"
+export WODBEPORTS="$WODBEPORTS"
 export WODBEEXTPORT="$WODBEEXTPORT"
 export WODAPIDBPORT="$WODAPIDBPORT"
 export WODPOSTPORT="$WODPOSTPORT"
-export WODBASESTDID="$WODBASESTDID"
+export WODBASECOEF="$WODBASECOEF"
 EOF
     chmod 644 /tmp/wodexports
     su - $WODUSER -c "source /tmp/wodexports ; $EXEPATH/install-system-common.sh"
     rm -f /tmp/wodexports
 else
-    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODBEEXTPORT,WODAPIDBPORT,WODPOSTPORT,WODBASESTDID -c "$EXEPATH/install-system-common.sh"
+    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODBEFQDNS,WODAPIDBFQDN,WODBEEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODBEPORTS,WODBEEXTPORT,WODAPIDBPORT,WODPOSTPORT,WODBASECOEF -c "$EXEPATH/install-system-common.sh"
 fi
 
 echo "Setting up original rights for $WODHDIR with $BKPSTAT"

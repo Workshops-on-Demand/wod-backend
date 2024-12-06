@@ -69,12 +69,21 @@
           - moreutils
           - net-tools
           - nodejs
-          - npm
           - telnet
           - man
           - unzip
         state: present
         update_cache: true
+
+    - name: Ensure all required packages are installed
+      become: true
+      become_user: root
+      ansible.builtin.package:
+        name:
+          - npm
+      when:
+        - ansible_os_family == "Debian"
+        - ansible_distribution_major_version <= "24"
 
     - name: Ensure all required DEB packages are installed
       become: true
