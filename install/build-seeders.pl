@@ -81,7 +81,8 @@ ${key}/lab?`,
       username: `student${key}`,
       password: 'MyNewPassword',
 EOF
-print(WKSHP "      location: '$pbkdir',\n");
+# TODO: this is an issue with multiple backends
+print(WKSHP "      location: '$ENV{WODBEFQDN}',\n");
 print WKSHP <<'EOF';
     }));
 
