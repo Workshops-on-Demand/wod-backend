@@ -188,6 +188,34 @@ elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0"
 fi
 
+# Import the USERMAX value here as needed for both backend and api-db
+export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $WODPRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
+
+if [ $WODTYPE = "backend" ]; then
+	# In this case WODBEFQDN represents a single system
+	cat > $HOME/wod-backend/ansible/inventory << EOF
+[$WODGROUP]
+$WODBEFQDN ansible_connection=local
+EOF
+	# COmpute WODBASESTDID based on the number that this backend server is multiplied by the number of users wanted
+	WODBASESTDID=$(($USERMAX*$WODBENBR))
+	cat >>  $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
+#
+# WODBASESTDID is the offset used to create users in the DB. It is required that each backend has a different non overlapping value.
+# Overlap is defined by adding USERMAX (from all.yml)
+# The number of the deployed a backend in a specific location is used to compute the range available here
+#
+# Example:
+# for student 35 in location A having WODBASESTDID to 0 the user is created as id 35
+# for student 35 in location B having WODBASESTDID to 2000 the user is created as id 2035
+# There is no overlap as long as you do not create more than 2000 users which should be the value of USERMAX in that case.
+#
+# This is different from the offset UIDBASE used for Linux uid
+#
+WODBASESTDID: $WODBASESTDID
+EOF
+
+
 if [ $WODTYPE != "appliance" ]; then
 	# Automatic Installation script for the system 
 	ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT install_$WODTYPE.yml
@@ -204,7 +232,6 @@ fi
 if [ $WODTYPE = "api-db" ]; then
 	# We can now generate the seeders files 
 	# for the api-db server using the backend content installed as well
-	export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 
 	$INSTALLDIR/build-seeders.sh
 
