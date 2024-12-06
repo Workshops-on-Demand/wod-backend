@@ -95,7 +95,7 @@
       ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
         regex: ^mydestination =
-        line: mydestination = $myhostname, {{ WODBEFQDN.split('.')[0] }}, {{ WODBEEXTFQDN }}, {{ WODBEEXTFQDN.split('.')[0] }}, localhost, localhost.localdomain
+        line: mydestination = $myhostname, {{ WODBEFQDN }}, localhost, localhost.localdomain
         state: present
 
     - name: Ensure hostname is not modified (useful for vagrant setup e.g.)
