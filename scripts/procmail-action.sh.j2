@@ -57,7 +57,7 @@ export accessToken=`get_session_token`
 
 # Increment the student ID by Number of jupyterhub students in students table
 # Only for API Calls 
-dbstdid=$((stdid+{{ BASESTDID }}))
+dbstdid=$((stdid+{{ WODBASESTDID }}))
 
 # for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
@@ -275,8 +275,8 @@ elif [ "$action" = "RESET" ]; then
 			teststdid $min
 			max=`echo $stdid | cut -d, -f2`
 			teststdid $max
-			min=$((min+{{ BASESTDID }}))
-			max=$((max+{{ BASESTDID }}))
+			min=$((min+{{ WODBASESTDID }}))
+			max=$((max+{{ WODBASESTDID }}))
 			i=$max
 			j=$max
 			cap=$((max-min+1))
@@ -289,15 +289,15 @@ elif [ "$action" = "RESET" ]; then
 		else
 			teststdid $stdid
 			# We have a single value to manage
-			i=$((stdid+{{ BASESTDID }}))
-			j=$((stdid+{{ BASESTDID }}))
-			min=$((stdid+{{ BASESTDID }}))
+			i=$((stdid+{{ WODBASESTDID }}))
+			j=$((stdid+{{ WODBASESTDID }}))
+			min=$((stdid+{{ WODBASESTDID }}))
 		fi
 
 		while [ $i -ge $min ]; do
 			# Then call the reset script
 			# Now change passwd as sometimes the reset script needs to have it
-			stdid=$((i-{{ BASESTDID }}))
+			stdid=$((i-{{ WODBASESTDID }}))
 			generate_randompwd
 	
 			# Some Notebooks need an LDAP passwd update as well
@@ -329,7 +329,7 @@ elif [ "$action" = "RESET" ]; then
 				--request PUT \
 				--data '{"assigned":"false"}' \
 				"$WODAPIDBURL/student/$j"
-			stdid=$((j-{{ BASESTDID }}))
+			stdid=$((j-{{ WODBASESTDID }}))
 			stddir="{{ STUDDIR }}/student$stdid"
 			erase_student
 			cleanup_processes_student
