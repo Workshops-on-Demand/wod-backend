@@ -94,15 +94,14 @@ PBKDIR: $WODGROUP
 # Installation specific values
 # Modify afterwards or re-run the installer to update
 #
+# WODBEFQDN may represents multiple systems
 WODBEFQDN: $WODBEFQDN
 WODBEIP: $WODBEIP
-WODBEEXTFQDN: $WODBEEXTFQDN
 WODFEFQDN: $WODFEFQDN
 WODAPIDBFQDN: $WODAPIDBFQDN
 WODDISTRIB: $WODDISTRIB
 WODBEPORT: $WODBEPORT
 WODFEPORT: $WODFEPORT
-WODBEEXTPORT: $WODBEEXTPORT
 WODAPIDBPORT: $WODAPIDBPORT
 WODPOSTPORT: $WODPOSTPORT
 EOF
@@ -115,6 +114,7 @@ fi
 
 # Inventory based on the installed system
 if [ $WODTYPE = "backend" ]; then
+	# In this case WODBEFQDN represents a single system
 	cat > $HOME/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
 $WODBEFQDN ansible_connection=local

@@ -67,9 +67,6 @@ export WODTYPE=$WODTYPE
 # Location of the backend directory
 export WODBEDIR=$WODBEDIR
 #
-# Name of the backend server seen from outside
-export WODBEEXTFQDN=$WODBEEXTFQDN
-
 # Name of the api-db server
 export WODAPIDBFQDN="$WODAPIDBFQDN"
 EOF
