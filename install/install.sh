@@ -208,6 +208,7 @@ else
 fi
 echo "WODUSER: $WODUSER" > /etc/wod.yml
 echo "WODSENDER: $WODSENDER" >> /etc/wod.yml
+chown $WODUSER /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using api-db $WODAPIDBFQDN on port $WODAPIDBPORT"
@@ -304,7 +305,6 @@ Defaults:$WODUSER !requiretty
 $WODUSER ALL=(ALL) NOPASSWD: ALL
 EOF
 chmod 440 /etc/sudoers.d/$WODUSER
-chown $WODUSER /etc/wod.yml
 
 export WODGENKEYS
 
