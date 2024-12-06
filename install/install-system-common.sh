@@ -113,28 +113,7 @@ EOF
 fi
 
 # Inventory based on the installed system
-if [ $WODTYPE = "backend" ]; then
-	# In this case WODBEFQDN represents a single system
-	cat > $HOME/wod-backend/ansible/inventory << EOF
-[$WODGROUP]
-$WODBEFQDN ansible_connection=local
-EOF
-	cat >>  $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
-#
-# WODBASESTDID is the offset used to create users in the DB. It is required that each backend has a different non overlapping value.
-# Overlap is defined by WODBASESTDID + USERMAX (from all.yml)
-# The value is given to the installer when deploying a backend in a specific location
-#
-# Example:
-# for student 35 in location A having WODBASESTDID to 0 the user is created as id 35
-# for student 35 in location B having WODBASESTDID to 2000 the user is created as id 2035
-# There is no overlap as long as you do not create more than 2000 users which should be the value of USERMAX in that case.
-#
-# This is different from the offset UIDBASE used for Linux uid
-#
-WODBASESTDID: $WODBASESTDID
-EOF
-elif [ $WODTYPE = "api-db" ]; then
+if [ $WODTYPE = "api-db" ]; then
 	cat > $HOME/wod-backend/ansible/inventory << EOF
 [$WODGROUP]
 $WODAPIDBFQDN ansible_connection=local
