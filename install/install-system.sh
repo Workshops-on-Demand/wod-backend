@@ -207,13 +207,13 @@ fi
 if [ $WODTYPE = "api-db" ]; then
 	# We can now generate the seeders files 
 	# for the api-db server using the backend content installed as well
+	export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
+
 	$INSTALLDIR/build-seeders.sh
 
 	cd $WODAPIDBDIR
 	echo "Launching npm install..."
 	npm install
-
-	export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
 
 	cat > .env << EOF
 FROM_EMAIL_ADDRESS="$WODSENDER"
