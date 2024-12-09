@@ -43,10 +43,6 @@ email = $WODUSER@nowhere.org
 EOF
 fi
 
-SCRIPT=`realpath $0`
-# This is the installation directory where install scripts are located.
-export INSTALLDIR=`dirname $SCRIPT`
-
 source $INSTALLDIR/functions.sh
 
 # This main dir is computed and is the backend main dir
@@ -229,10 +225,10 @@ WODFEPORT: $WODFEPORT
 WODAPIDBPORT: $WODAPIDBPORT
 WODPOSTPORT: $WODPOSTPORT
 EOF
-	cat $HOME/$ANSIBLEDIR/group_vars/wod-system >> $HOME/$ANSIBLEDIR/group_vars/$WODGROUP
+	cat $ANSIBLEDIR/group_vars/wod-system >> $ANSIBLEDIR/group_vars/$WODGROUP
 
-	if [ -f $HOME/$ANSIBLEDIR/group_vars/wod-$WODTYPE ]; then
-		cat $HOME/$ANSIBLEDIR/group_vars/wod-$WODTYPE >> $HOME/$ANSIBLEDIR/group_vars/$WODGROUP
+	if [ -f $ANSIBLEDIR/group_vars/wod-$WODTYPE ]; then
+		cat $ANSIBLEDIR/group_vars/wod-$WODTYPE >> $ANSIBLEDIR/group_vars/$WODGROUP
 	fi
 fi
 
