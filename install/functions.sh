@@ -23,7 +23,7 @@ if [ -f "$ANSIBLEDIR/group_vars/$PBKDIR" ]; then
 	if [ _"$WODAPIDBUSERPWD" = _"null" ]; then
 		WODAPIDBUSERPWD=""
 	fi
-	WODAPIDBADMINPWD=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBPADMINWD' | sed 's/"//g'`
+	WODAPIDBADMINPWD=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | yq '.WODAPIDBADMINPWD' | sed 's/"//g'`
 	if [ _"$WODAPIDBADMINPWD" = _"null" ]; then
 		WODAPIDBADMINPWD=""
 	fi
