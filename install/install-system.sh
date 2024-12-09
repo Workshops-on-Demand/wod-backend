@@ -152,7 +152,7 @@ fi
 ansible-galaxy collection install ansible.posix
 
 # Execute private script if any
-SCRIPTREL=`echo $SCRIPT | perl -p -e "s|$WODBEDIR||"`
+SCRIPTREL=`echo $SCRIPTDIR | perl -p -e "s|$WODBEDIR||"`
 if [ -x $WODPRIVDIR/$SCRIPTREL ];
 then
     echo "Executing additional private script $WODPRIVDIR/$SCRIPTREL"
