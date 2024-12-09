@@ -126,7 +126,7 @@ fi
 chmod 755 $SCRIPTDIR/wod.sh
 source $SCRIPTDIR/wod.sh
 
-cd $SCRIPTDIR/../ansible
+cd $ANSIBLEDIR
 PBKDIR=$WODGROUP
 
 if [ $WODTYPE = "backend" ]; then
@@ -188,18 +188,58 @@ elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0"
 fi
 
-# Import the USERMAX value here as needed for both backend and api-db
-export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $WODPRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
-
+# Inventory based on the installed system
 if [ $WODTYPE = "backend" ]; then
 	# In this case WODBEFQDN represents a single system
-	cat > $HOME/wod-backend/ansible/inventory << EOF
+	cat > $ANSIBLEDIR/inventory << EOF
 [$WODGROUP]
 $WODBEFQDN ansible_connection=local
 EOF
-	# COmpute WODBASESTDID based on the number that this backend server is multiplied by the number of users wanted
+elif [ $WODTYPE = "api-db" ]; then
+	cat > $ANSIBLEDIR/inventory << EOF
+[$WODGROUP]
+$WODAPIDBFQDN ansible_connection=local
+EOF
+elif [ $WODTYPE = "frontend" ]; then
+	cat > $ANSIBLEDIR/inventory << EOF
+[$WODGROUP]
+$WODFEFQDN ansible_connection=local
+EOF
+fi
+
+# Import the USERMAX value here as needed for both backend and api-db
+export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $WODPRIVINV --host $PBKDIR --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
+
+if [ $WODTYPE != "appliance" ]; then
+	# Setup this using the group for WoD
+	cat > $ANSIBLEDIR/group_vars/$WODGROUP << EOF
+PBKDIR: $WODGROUP
+# 
+# Installation specific values
+# Modify afterwards or re-run the installer to update
+#
+# WODBEFQDN may represents multiple systems
+WODBEFQDN: $WODBEFQDN
+WODBEIP: $WODBEIP
+WODFEFQDN: $WODFEFQDN
+WODAPIDBFQDN: $WODAPIDBFQDN
+WODDISTRIB: $WODDISTRIB
+WODBEPORT: $WODBEPORT
+WODFEPORT: $WODFEPORT
+WODAPIDBPORT: $WODAPIDBPORT
+WODPOSTPORT: $WODPOSTPORT
+EOF
+	cat $HOME/$ANSIBLEDIR/group_vars/wod-system >> $HOME/$ANSIBLEDIR/group_vars/$WODGROUP
+
+	if [ -f $HOME/$ANSIBLEDIR/group_vars/wod-$WODTYPE ]; then
+		cat $HOME/$ANSIBLEDIR/group_vars/wod-$WODTYPE >> $HOME/$ANSIBLEDIR/group_vars/$WODGROUP
+	fi
+fi
+
+if [ $WODTYPE = "backend" ]; then
+	# Compute WODBASESTDID based on the number that this backend server is multiplied by the number of users wanted
 	WODBASESTDID=$(($USERMAX*$WODBENBR))
-	cat >>  $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
+	cat >> $ANSIBLEDIR/group_vars/$WODGROUP << EOF
 #
 # WODBASESTDID is the offset used to create users in the DB. It is required that each backend has a different non overlapping value.
 # Overlap is defined by adding USERMAX (from all.yml)
@@ -214,7 +254,7 @@ EOF
 #
 WODBASESTDID: $WODBASESTDID
 EOF
-
+fi
 
 if [ $WODTYPE != "appliance" ]; then
 	# Automatic Installation script for the system 

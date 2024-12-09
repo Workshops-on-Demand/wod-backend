@@ -86,45 +86,6 @@ else
 fi
 # temp dir remove in caller by root to avoid issues
 
-if [ $WODTYPE != "appliance" ]; then
-	# Setup this using the group for WoD
-	cat > $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
-PBKDIR: $WODGROUP
-# 
-# Installation specific values
-# Modify afterwards or re-run the installer to update
-#
-# WODBEFQDN may represents multiple systems
-WODBEFQDN: $WODBEFQDN
-WODBEIP: $WODBEIP
-WODFEFQDN: $WODFEFQDN
-WODAPIDBFQDN: $WODAPIDBFQDN
-WODDISTRIB: $WODDISTRIB
-WODBEPORT: $WODBEPORT
-WODFEPORT: $WODFEPORT
-WODAPIDBPORT: $WODAPIDBPORT
-WODPOSTPORT: $WODPOSTPORT
-EOF
-	cat $HOME/wod-backend/ansible/group_vars/wod-system >> $HOME/wod-backend/ansible/group_vars/$WODGROUP
-
-	if [ -f $HOME/wod-backend/ansible/group_vars/wod-$WODTYPE ]; then
-		cat $HOME/wod-backend/ansible/group_vars/wod-$WODTYPE >> $HOME/wod-backend/ansible/group_vars/$WODGROUP
-	fi
-fi
-
-# Inventory based on the installed system
-if [ $WODTYPE = "api-db" ]; then
-	cat > $HOME/wod-backend/ansible/inventory << EOF
-[$WODGROUP]
-$WODAPIDBFQDN ansible_connection=local
-EOF
-elif [ $WODTYPE = "frontend" ]; then
-	cat > $HOME/wod-backend/ansible/inventory << EOF
-[$WODGROUP]
-$WODFEFQDN ansible_connection=local
-EOF
-fi
-
 # Change default passwd for vagrant and root
 
 # Install WoD - install scripts managed in backend whatever system we install
