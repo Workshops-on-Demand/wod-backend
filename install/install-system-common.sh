@@ -64,6 +64,11 @@ fi
 # We'll store in backend dir the data we need whatever the type we're building
 clean_clone_log $WODBEBRANCH $WODBEREPO
 clean_clone_log $WODPRIVBRANCH $WODPRIVREPO
+#
+# Install WoD - install scripts managed in backend whatever system we install
+WODBEREPODIR=`echo "$WODBEREPO" | tr '/' '\n' | tail -1 | sed 's/\.git$//'`
+# This is the installation directory where install scripts are located.
+export INSTALLDIR="$HOME/$WODBEREPODIR"
 
 if [ $WODGENKEYS -eq 0 ] && [ -f "$WODTMPDIR/id_rsa" ]; then
 	# We do not have to regenerate keys and reuse existing one preserved
@@ -81,15 +86,11 @@ else
 	# Setup ssh for WODUSER
 	echo "Generating ssh keys for $WODUSER"
 	ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa
-	install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
+	install -m 0600 $WODBEREPODIR/skel/.ssh/authorized_keys .ssh/
 	cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
 # temp dir remove in caller by root to avoid issues
 
 # Change default passwd for vagrant and root
 
-# Install WoD - install scripts managed in backend whatever system we install
-SCRIPT=`realpath $0`
-# This is the installation directory where install scripts are located.
-export INSTALLDIR=`dirname $SCRIPT`
 $INSTALLDIR/install-system.sh $WODTYPE
