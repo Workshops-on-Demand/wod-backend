@@ -91,7 +91,7 @@ print WKSHP <<'EOF';
 EOF
 	$cpt++;
 }
-	print WKSHP "let entries = ";
+	print WKSHP "let entries = [";
 $cpt = 0;
 while ($cpt < @backends) {
     print WKSHP "...entries$cpt";
