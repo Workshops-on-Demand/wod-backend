@@ -125,24 +125,6 @@ source $SCRIPTDIR/wod.sh
 cd $ANSIBLEDIR
 PBKDIR=$WODGROUP
 
-if [ $WODTYPE = "backend" ]; then
-    JPHUB=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | grep -E '^JPHUB:' | cut -d: -f2`
-    # In case of update remove first old jupyterhub version
-    if [ _"$JPHUB" = _"" ]; then
-        echo "Directory for jupyterhub is empty"
-        exit -1
-    fi
-    if [ _"$JPHUB" = _"/" ]; then
-        echo "Directory for jupyterhub is /"
-        exit -1
-    fi
-    if [ _"$JPHUB" = _"$HOME" ]; then
-        echo "Directory for jupyterhub is $HOME"
-        exit -1
-    fi
-    sudo rm -rf $JPHUB
-fi
-
 
 # Declares shell variables as ansible variables as well
 # then they can be used in playbooks
@@ -262,6 +244,24 @@ if [ $WODTYPE = "backend" ]; then
 #
 WODBASESTDID: $WODBASESTDID
 EOF
+fi
+
+if [ $WODTYPE = "backend" ]; then
+    JPHUB=`cat "$ANSIBLEDIR/group_vars/$PBKDIR" | grep -E '^JPHUB:' | cut -d: -f2`
+    # In case of update remove first old jupyterhub version
+    if [ _"$JPHUB" = _"" ]; then
+        echo "Directory for jupyterhub is empty"
+        exit -1
+    fi
+    if [ _"$JPHUB" = _"/" ]; then
+        echo "Directory for jupyterhub is /"
+        exit -1
+    fi
+    if [ _"$JPHUB" = _"$HOME" ]; then
+        echo "Directory for jupyterhub is $HOME"
+        exit -1
+    fi
+    sudo rm -rf $JPHUB
 fi
 
 if [ $WODTYPE != "appliance" ]; then
