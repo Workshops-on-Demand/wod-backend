@@ -20,7 +20,7 @@ usage() {
     echo "          This FQDN address should be reachable from Your clients or the Internet if providing external services."
     echo "          if empty using the local name for the backend and default port               "
     echo "          If you use multiple backend systems corresponding to multiple locations, "
-    echo "          use option -n to give the backend number currently being installed."
+    echo "          use option -n to give the backend number currently being installed, starting at 1."
     echo " "
     echo "          When installing the api-db server you have to specify one or multiple backend servers,"
     echo "          using their FQDN separated with ','"
