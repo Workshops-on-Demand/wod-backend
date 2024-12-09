@@ -89,4 +89,7 @@ fi
 # Change default passwd for vagrant and root
 
 # Install WoD - install scripts managed in backend whatever system we install
-$HOME/wod-backend/install/install-system.sh $WODTYPE
+SCRIPT=`realpath $0`
+# This is the installation directory where install scripts are located.
+export INSTALLDIR=`dirname $SCRIPT`
+$INSTALLDIR/install-system.sh $WODTYPE
