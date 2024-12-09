@@ -70,7 +70,7 @@ EOF
 # Loop per location
 my $cpt=0;
 my @backends=split(/,/,$ENV{'WODBEFQDN'});
-while my $i < @backends {
+while ($cpt < @backends) {
 	print WKSHP <<"EOF";
     const arr$cpt = [...Array(N + 1).keys()].slice(1);
     const entries$cpt = arr$cpt.map((key) => ({
@@ -79,21 +79,22 @@ while my $i < @backends {
 EOF
 	# This variable exists when that script is called at install
 	# TODO: Also get it at run time for upgrade
-	print(WKSHP "      url: \`http://$backend[$cpt]/user/student");
+	print(WKSHP "      url: \`http://$backends[$cpt]/user/student");
 	print WKSHP <<'EOF';
 ${key}/lab?`,
       username: `student${key}`,
       password: 'MyNewPassword',
 EOF
-print(WKSHP "      location: '$backend[$cpt]',\n");
+print(WKSHP "      location: '$backends[$cpt]',\n");
 print WKSHP <<'EOF';
         }));
 EOF
 	$cpt++;
 }
 	print WKSHP "let entries = ";
-while my $i < @backends {
-        ...entries$i
+$cpt = 0;
+while ($cpt < @backends) {
+        print WKSHP "...entries$cpt";
 }
 	print WKSHP "];\n";
 
