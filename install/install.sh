@@ -173,10 +173,10 @@ if [ ! -z "${n}" ]; then
     if [ $WODTYPE = "backend" ]; then
         export WODBENBR=$((n-1))
     else
-	echo "Numbering backends is only possible when installing a backend machine"
-	echo " "
-	usage
-	exit -1
+        echo "Numbering backends is only possible when installing a backend machine"
+        echo " "
+        usage
+        exit -1
     fi
 else
     export WODBENBR="0"
