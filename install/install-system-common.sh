@@ -68,7 +68,7 @@ clean_clone_log $WODPRIVBRANCH $WODPRIVREPO
 # Install WoD - install scripts managed in backend whatever system we install
 WODBEREPODIR=`echo "$WODBEREPO" | tr '/' '\n' | tail -1 | sed 's/\.git$//'`
 # This is the installation directory where install scripts are located.
-export INSTALLDIR="$HOME/$WODBEREPODIR"
+export INSTALLDIR="$HOME/$WODBEREPODIR/install"
 
 if [ $WODGENKEYS -eq 0 ] && [ -f "$WODTMPDIR/id_rsa" ]; then
 	# We do not have to regenerate keys and reuse existing one preserved
