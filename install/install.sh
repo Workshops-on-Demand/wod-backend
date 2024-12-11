@@ -213,7 +213,7 @@ else
         exit -1
     fi
     # If ping doesn't work continue if we got the IP address
-    FQDN="`echo $WODBEFQDN | cut -d: -f1`"
+    FQDN="`echo $WODBEFQDN | cut -d, -f1 | cut -d: -f1`"
 set +e
     WODBEIP=`ping -c 1 $FQDN 2>/dev/null | grep PING | grep $FQDN | cut -d'(' -f2 | cut -d')' -f1`
 set -e
