@@ -306,8 +306,10 @@ export WODTMPDIR=/tmp/wod.$$
 
 # Create the WODUSER user
 if grep -qE "^$WODUSER:" /etc/passwd; then
-    if ps auxww | grep -qE "^$WODUSER:"; then
+    if ps auxww | grep -qE "^$WODUSER"; then
         pkill -u $WODUSER
+		sleep 1
+        pkill -9 -u $WODUSER
     fi
     WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
     echo "$WODUSER home directory: $WODHDIR"
