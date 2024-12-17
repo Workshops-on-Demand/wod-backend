@@ -390,7 +390,6 @@ if [ $WODTYPE = "api-db" ]; then
         docker stop wod-api-db-adminer-1
     fi
 fi
-killall -u $WODUSER
 set -e
 
 # Now drop priviledges
