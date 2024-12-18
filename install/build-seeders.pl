@@ -113,8 +113,8 @@ $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/07-location.js";
 print "Generate the location file from collected data under $seederfile\n";
 open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
 # Loop per location
-my $cpt=0;
-my @backends=split(/,/,$ENV{'WODBEFQDN'});
+$cpt=0;
+@backends=split(/,/,$ENV{'WODBEFQDN'});
 print WKSHP <<"EOF";
 module.exports = {
   up: (queryInterface) =>
