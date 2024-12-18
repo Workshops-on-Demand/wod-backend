@@ -125,7 +125,7 @@ EOF
 while ($cpt < @backends) {
         print WKSHP <<"EOF";
 		{
-          name: $backends[$cpt],
+          name: '$backends[$cpt]',
           basestdid: $ENV{'USERMAX'}*$cpt+1,
         },
 EOF
