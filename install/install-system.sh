@@ -321,6 +321,8 @@ EOF
     sudo su - -c "rm -rf $PGSQLDIR"
     sudo su - $WODUSER -c "cd $WODAPIDBDIR ; docker compose config ; docker compose up -d"
     POSTGRES_DB=`cat $WODAPIDBDIR/docker-compose.yml | yq '.services.db.environment.POSTGRES_DB' | sed 's/"//g'`
+	# Manage locations
+    #psql --dbname=$POSTGRES_DB --username=postgres --host=localhost -c 'CREATE TABLE IF NOT EXISTS locations ("createdAt" timestamp DEFAULT current_timestamp, "updatedAt" timestamp DEFAULT current_timestamp, "location" varchar CONSTRAINT no_null NOT NULL, "basestdid" integer CONSTRAINT no_null NOT NULL);'
     echo "Reset DB data"
     npm run reset-data
     echo "Setup user $WODAPIDBUSER"

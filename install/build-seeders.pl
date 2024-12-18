@@ -107,6 +107,42 @@ while ($cpt < @backends) {
 EOF
 close(WKSHP);
 
+# Now deal with locations
+$seederfile = "$ENV{'WODAPIDBDIR'}/seeders/07-location.js";
+
+print "Generate the location file from collected data under $seederfile\n";
+open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
+# Loop per location
+my $cpt=0;
+my @backends=split(/,/,$ENV{'WODBEFQDN'});
+print WKSHP <<"EOF";
+module.exports = {
+  up: (queryInterface) =>
+    queryInterface.bulkInsert(
+      'locations',
+      [
+EOF
+while ($cpt < @backends) {
+        print WKSHP <<"EOF";
+		{
+          name: $backends[$cpt],
+          basestdid: $ENV{'USERMAX'}*$cpt+1,
+        },
+EOF
+	$cpt++;
+}
+print WKSHP <<"EOF";
+      ],
+      {
+        returning: true,
+      }
+    ),
+
+  down: (queryInterface) => queryInterface.bulkDelete('locations', null, {}),
+};
+EOF
+close(WKSHP);
+
 # Now deal with users
 $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/06-users.js";
 
