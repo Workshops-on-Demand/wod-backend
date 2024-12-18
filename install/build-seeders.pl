@@ -127,6 +127,7 @@ while ($cpt < @backends) {
 		{
           name: '$backends[$cpt]',
           basestdid: $ENV{'USERMAX'}*$cpt+1,
+          updatedAt: new Date(),
         },
 EOF
 	$cpt++;
