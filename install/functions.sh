@@ -100,6 +100,8 @@ EOF
 # This function launch or relaunch an npm app (api server of frontend server)
 relaunch_with_pm2() {
     APP=$1
+    # Needed at install as we do not re-log
+    source $HOME/.bash_profile
     shift
     # Allow error to occur
     set +e
