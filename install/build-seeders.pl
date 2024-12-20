@@ -44,11 +44,17 @@ foreach my $w (sort keys %$h) {
 	}
 	print(WKSHP "        notebook: '$w',\n");
 	print(WKSHP "        active: true,\n");
-	print(WKSHP "        location: $backends[0],\n");
-	print(WKSHP "        alternateLocation: [",join(',',@altbackends),"],\n");
+	print(WKSHP "        location: '$backends[0]',\n");
 	print(WKSHP "        sessionType: 'Workshops-on-Demand',\n");
 	print(WKSHP "        createdAt: new Date(),\n");
 	print(WKSHP "        updatedAt: new Date(),\n");
+	my $alt="";
+	foreach my $a (@altbackends) {
+		$alt=$alt."'$a',";
+	}
+	# remove last ,
+	$alt =~ s/,$//;
+	print(WKSHP "        alternateLocation: [$alt],\n");
 	print(WKSHP "      },\n");
 }
 print(WKSHP "    ]);\n");
