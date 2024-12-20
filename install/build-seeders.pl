@@ -17,6 +17,10 @@ my $h = get_wod_metadata();
 # Generating workshop seeder file
 my $seederfile = "$ENV{'WODAPIDBDIR'}/seeders/01-workshop.js";
 
+# The first
+my @backends=split(/,/,$ENV{'WODBEFQDN'});
+# The others
+my @altbackends=@backends[ 1 .. $#backends ];
 print "Generate the seeder file from collected data under $seederfile\n";
 open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
 print(WKSHP "'use strict';\n\n") if ($seederfile =~ /01-/);
@@ -40,6 +44,8 @@ foreach my $w (sort keys %$h) {
 	}
 	print(WKSHP "        notebook: '$w',\n");
 	print(WKSHP "        active: true,\n");
+	print(WKSHP "        location: $backends[0],\n");
+	print(WKSHP "        alternateLocation: [",join(',',@altbackends),"]\n");
 	print(WKSHP "        sessionType: 'Workshops-on-Demand',\n");
 	print(WKSHP "        createdAt: new Date(),\n");
 	print(WKSHP "        updatedAt: new Date(),\n");
@@ -69,7 +75,6 @@ EOF
 
 # Loop per location
 my $cpt=0;
-my @backends=split(/,/,$ENV{'WODBEFQDN'});
 while ($cpt < @backends) {
 	print WKSHP <<"EOF";
     const arr$cpt = [...Array(N + 1).keys()].slice(1);
@@ -114,7 +119,6 @@ print "Generate the location file from collected data under $seederfile\n";
 open(WKSHP,"> $seederfile") || die "Unable to create $seederfile";
 # Loop per location
 $cpt=0;
-@backends=split(/,/,$ENV{'WODBEFQDN'});
 print WKSHP <<"EOF";
 module.exports = {
   up: (queryInterface) =>
