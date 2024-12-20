@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Launch the API server
+#
+source {{ SCRIPTDIR }}/wod.sh
+source {{ SCRIPTDIR }}/../install/functions.sh
+
+relaunch_with_pm2 wod-$WODTYPE

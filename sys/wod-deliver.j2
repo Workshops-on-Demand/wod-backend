@@ -18,7 +18,7 @@ fi
 CMD="ansible-playbook -i inventory $WODPRIVINV --limit {{ PBKDIR }} $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml"
 send_mail() {
 
-        cat > $MAIL << EOF
+    cat > $MAIL << EOF
 MAIL FROM: {{ WODSENDER }}
 RCPT TO: {{ WODMONITOR }}
 DATA
@@ -29,7 +29,7 @@ Command $CMD finished with errors:
 EOF
 
 	cat $LOG >> $MAIL
-        cat >> $MAIL << EOF
+    cat >> $MAIL << EOF
 ----------------------------------
 .
 QUIT
@@ -38,19 +38,21 @@ EOF
         rm -f $MAIL
 }
 
-# Git doesn't collect file rights and we need to have correct ones here so forcing
-for d in {{ WODBEDIR }}/skel  {{ WODPRIVDIR }}/skel; do
-	if [ -d $d ]; then
-		cd $d
-		find .ssh -type f | xargs chmod 600
-		chmod 700 .ssh
-		# Avoids error msgs
-		touch .ssh/toto.pub
-		find .ssh -type f -name '*.pub' | xargs chmod 644
-		rm -f .ssh/toto.pub
-		cd ..
-	fi
-done
+if [ "$WODTYPE" = "backend" ]; then
+	# Git doesn't collect file rights and we need to have correct ones here so forcing
+	for d in {{ WODBEDIR }}/skel  {{ WODPRIVDIR }}/skel; do
+		if [ -d $d ]; then
+			cd $d
+			find .ssh -type f | xargs chmod 600
+			chmod 700 .ssh
+			# Avoids error msgs
+			touch .ssh/toto.pub
+			find .ssh -type f -name '*.pub' | xargs chmod 644
+			rm -f .ssh/toto.pub
+			cd ..
+		fi
+	done
+fi
 #
 
 cd {{ ANSIBLEDIR }}
