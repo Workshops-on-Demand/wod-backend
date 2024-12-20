@@ -28,16 +28,22 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Enable WoD services
-      become: true
-      become_user: root
-      ansible.builtin.systemd:
-        state: restarted
-        daemon_reload: true
-        enabled: true
-        name: "{{ item }}"
-      with_items:
-        - docker
+    - name: Find WoD api-db branded files
+      ansible.builtin.find:
+        paths: "{{ WODAPIDBDIR }}"
+        file_type: file
+        use_regex: true
+        patterns: ['^.*.j2$']
+        recurse: true
+        excludes: data
+      register: apidbtemplates
+
+    - name: Copy WoD api-db branded files as ansible template for variable expansion
+      ansible.builtin.template:
+        src: "{{ item.path }}"
+        dest: "{{ item.path | regex_replace('.j2$') }}"
+        mode: "0644"
+      with_items: "{{ apidbtemplates.files }}"
 
     - name: Test private tasks YAML file
       ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
@@ -49,3 +55,17 @@
       ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/check_api-db.yml"
       when:
         - acj_path.rc == 0
+
+    - name: Enable WoD services
+      become: true
+      become_user: root
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: true
+        enabled: true
+        name: "{{ item }}"
+      with_items:
+        - docker
+        - wod-npm-app
+
+
