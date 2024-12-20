@@ -389,6 +389,8 @@ if [ $WODTYPE = "api-db" ]; then
         docker stop postgres
         docker stop wod-api-db-adminer-1
     fi
+	# Avoid errors with wod-api-db/data removal as WODUSER
+	rm -rf $WODHDIR/wod-$WODTYPE/data
 fi
 set -e
 
