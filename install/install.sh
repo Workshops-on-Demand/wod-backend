@@ -146,18 +146,18 @@ if [ ! -z "${b}" ]; then
     WODBEFQDN="`echo ${b} | cut -d: -f1`"
     res=`echo "${b}" | { grep ',' || true; }`
     if [ _"$res" != _"" ]; then
-	# We have multiple backends only meaningful in api-db install
+   # We have multiple backends only meaningful in api-db install
         if [ $WODTYPE = "api-db" ]; then
-	    WODBEFQDN="${b}"
-	    MULTIBCKEND=1
+       WODBEFQDN="${b}"
+       MULTIBCKEND=1
         else
-	    echo "Multiple backends are only possible when installing an api-db machine"
-	    echo " "
-	    usage
-	    exit -1
-	fi
+       echo "Multiple backends are only possible when installing an api-db machine"
+       echo " "
+       usage
+       exit -1
+   fi
     else
-	# Single backend get its port
+   # Single backend get its port
         res=`echo "${b}" | { grep ':' || true; }`
         if [ _"$res" != _"" ]; then
             WODBEPORT="`echo ${b} | cut -d: -f2`"
@@ -306,12 +306,29 @@ export WODTMPDIR=/tmp/wod.$$
 
 # Create the WODUSER user
 if grep -qE "^$WODUSER:" /etc/passwd; then
-    if ps auxww | grep -qE "^$WODUSER"; then
-        pkill -u $WODUSER
-		sleep 1
-        pkill -9 -u $WODUSER
-    fi
     WODHDIR=`grep -E "^$WODUSER" /etc/passwd | cut -d: -f6`
+
+   # For idempotency, kill potentially existing jobs
+   if [ $WODTYPE = "api-db" ]; then
+       set +e
+       # Clean potential remaining docker containers
+       docker --version 2>&1 /dev/null
+       if [ $? -eq 0 ]; then
+           systemctl restart docker
+            docker stop postgres
+            docker stop wod-api-db-adminer-1
+           systemctl stop docker
+       fi
+       # Avoid errors with wod-api-db/data removal as WODUSER
+       rm -rf $WODHDIR/wod-$WODTYPE/data
+       set -e
+   fi
+
+    if ps auxww | grep -qE "^$WODUSER"; then
+       pkill -u $WODUSER
+       sleep 1
+       pkill -9 -u $WODUSER
+    fi
     echo "$WODUSER home directory: $WODHDIR"
     if [ -d "$WODHDIR/.ssh" ]; then
         echo "Original SSH keys"
@@ -379,20 +396,6 @@ HDIRSTAT=`stat --printf '%a' $HDIR`
 echo "Found $SUDO_USER home directory $HDIR with rights $HDIRSTAT"
 echo "Forcing temporarily open rights to access install scripts"
 chmod o+x $HDIR
-
-# For idempotency, kill potentially existing jobs
-set +e
-if [ $WODTYPE = "api-db" ]; then
-    # Clean potential remaining docker containers
-    docker --version 2>&1 /dev/null
-    if [ $? -eq 0 ]; then
-        docker stop postgres
-        docker stop wod-api-db-adminer-1
-    fi
-	# Avoid errors with wod-api-db/data removal as WODUSER
-	rm -rf $WODHDIR/wod-$WODTYPE/data
-fi
-set -e
 
 # Now drop priviledges
 # Call the common install script to finish install
