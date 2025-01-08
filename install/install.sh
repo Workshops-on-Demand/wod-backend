@@ -315,8 +315,8 @@ if grep -qE "^$WODUSER:" /etc/passwd; then
        docker --version 2>&1 /dev/null
        if [ $? -eq 0 ]; then
            systemctl restart docker
-            docker stop postgres
-            docker stop wod-api-db-adminer-1
+           docker stop postgres
+           docker stop wod-api-db-adminer-1
            systemctl stop docker
        fi
        # Avoid errors with wod-api-db/data removal as WODUSER
