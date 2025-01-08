@@ -269,11 +269,9 @@ if [ $WODTYPE = "api-db" ]; then
 FROM_EMAIL_ADDRESS="$WODSENDER"
 DB_PW=$PGPASSWORD
 DURATION=4
-# TODO: This is wrong now we can have multiple servers here. Needs to be handled in javascript correctly
-POSTFIX_EMAIL=$WODUSER@$WODBEFQDN
+# Target user to send mail to, managed with procmail
+POSTFIX_EMAIL=$WODUSER
 POSTFIX_PORT=$WODPOSTPORT
-# TODO: Manage multi-backend
-POSTFIX_HOST=$WODBEFQDN
 FEEDBACK_WORKSHOP_URL="None"
 WODAPIDBPORT=$WODAPIDBPORT
 SLACK_CHANNEL_WORKSHOPS_ON_DEMAND="None"
