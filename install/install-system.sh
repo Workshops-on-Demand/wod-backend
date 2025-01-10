@@ -205,8 +205,8 @@ EOF
 fi
 
 if [ $WODTYPE = "backend" ]; then
-    # Compute WODBASESTDID based on the number that this backend server is multiplied by the number of users wanted
-    WODBASESTDID=$(($USERMAX*$WODBENBR+1))
+    # Compute WODBASESTDID based on the number of this backend server multiplied by the number of users wanted
+    WODBASESTDID=$(($USERMAX*$WODBENBR))
     cat >> $ANSIBLEDIR/group_vars/$WODGROUP << EOF
 #
 # WODBASESTDID is the offset used to create users in the DB. It is required that each backend has a different non overlapping value.
