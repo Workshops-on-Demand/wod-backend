@@ -15,6 +15,5 @@ else
 fi
 # Only valid for wod-apidb anyway
 export USERMAX=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $WODAPIDBFQDN --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".USERMAX"`
-export WODBASESTDID=`ansible-inventory -i $ANSIBLEDIR/inventory $PRIVINV --host $WODAPIDBFQDN --playbook-dir $ANSIBLEDIR --playbook-dir $ANSIBLEPRIVDIR | jq ".WODBASESTDID"`
 get_wodapidb_userpwd
 $INSTALLDIR/build-seeders.pl
