@@ -136,7 +136,7 @@ while ($cpt < @backends) {
         print WKSHP <<"EOF";
 		{
           name: '$backends[$cpt]',
-          basestdid: $ENV{'WODBASESTDID'},
+          basestdid: $ENV{'USERMAX'}*$cpt,
           updatedAt: new Date(),
         },
 EOF
