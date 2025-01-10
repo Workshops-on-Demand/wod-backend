@@ -48,8 +48,8 @@ get_workshop_id() {
 teststdid() {
 	
 	# We need to ensure that we've got a correct id as parameter if needed
-	MIN={{ USERMIN }}
-	MAX={{ USERMAX }}
+	MIN={{ USERMIN }}+{{ WODBASESTDID }}
+	MAX={{ USERMAX }}+{{ WODBASESTDID }}
 
 	if [ $1 -lt $MIN ] ||  [ $1 -gt $MAX ]; then
                 echo "Student id ($1) should be between $MIN and $MAX"
