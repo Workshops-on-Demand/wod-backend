@@ -325,12 +325,7 @@ EOF
 elif [ $WODTYPE = "frontend" ]; then
     cd $WODFEDIR
     cat > .env << EOF
-GATSBY_WORKSHOP_API_ENDPOINT=http://$WODAPIDBFQDN:$WODAPIDBPORT
-GATSBY_USERNAME=''
-GATSBY_PASSWORD=''
-GATSBY_NEWSLETTER_API=''
-WODUID=`id -u`
-WODGID=`id -g`
+WODAPIDBURL=http://$WODAPIDBFQDN:$WODAPIDBPORT/api
 EOF
     echo "Launching npm install..."
     npm install
