@@ -268,16 +268,15 @@ if [ $WODTYPE = "api-db" ]; then
     cat > .env << EOF
 FROM_EMAIL_ADDRESS="$WODSENDER"
 DB_PW=$PGPASSWORD
-DURATION=4
 # Target user to send mail to, managed with procmail
 POSTFIX_EMAIL=$WODUSER
 POSTFIX_PORT=$WODPOSTPORT
 FEEDBACK_WORKSHOP_URL="None"
 WODAPIDBPORT=$WODAPIDBPORT
-SLACK_CHANNEL_WORKSHOPS_ON_DEMAND="None"
-SENDGRID_API_KEY="None"
 WODUID=`id -u`
 WODGID=`id -g`
+SLACK_CHANNEL_WORKSHOPS_ON_DEMAND="None"
+SENDGRID_API_KEY="None"
 # Blacklist for input field
 DENYLIST='@alilot.com,@leadwizzer.com,@thecarinformation.com,@acrossgracealley.com,@onekisspresave.com,@vusra.com,@tempmailin.com,@musiccode.me,@metalunits.com,@1secmail.com,@1secmail.org,@1secmail.net,@xojxe.com,@yoggm.com,@wwjmp.com,@esiix.com,@oosln.com,@vddaz.com,@trythe.net,uniromax.com,@pussport.com,@gpromotedx.com,@vusra.com,@atxcrunner.com,@efind.com,@acrossgracealley.com,causeweapo.n.6138@gmail.com,mailstop1483@gmail.com,oliviamacleo.d8.9.3.9640@gmail.com,onekisspresave.com,@kellychibale-researchgroup-uct.com,@tlbreaksm.com,cori.aniv@logdots.com,@wolfpat.com,@spam4.me,@guerillamail.bi,@belaca@famytown.club,@belaca@clark-college.cf,@sharkfaces.com,@chewydonut.com,@spamsandwich.com,@pizzajunk.com,@realquickemail.com,@sociallymediocre.com,@silenceofthespam.com,@silenceofthespam.com,@mailbiscuit.com,@snakebutt.com,@itsjiff.com,@hypenated-domain.com,lilspam.com,@whaaaaaaaaaat.com,@thespamfather.com,@spamfellas.com,@alilot.com,@vixej.com,@smartinbox.online,@nicoric.com,@dgzlweb.com,@chapedia.net,@smartinbox.online,@freemailus.com,@Grabmail.club,@Betaalverzoek.cyou,@Beezom.buzz,@Fitshot.xyz,@emailnax.com,@btzyud.tk,@wifaide.ml,@2fexbox.ru,@chitthi.in,@facetek.store,@litrs.site,@treamysell.store,@treamysell.store'
 EOF
