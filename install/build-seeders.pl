@@ -54,6 +54,9 @@ foreach my $w (sort keys %$h) {
 	}
 	# remove last ,
 	$alt =~ s/,$//;
+	# Handle mono-backend here no altenat is available
+	# npx migration needs a field, even ''
+	$alt = "''" if ($alt =~ /^$/);
 	print(WKSHP "        alternateLocation: [$alt],\n");
 	print(WKSHP "      },\n");
 }
