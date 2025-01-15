@@ -327,7 +327,9 @@ if grep -qE "^$WODUSER:" /etc/passwd; then
     if ps auxww | grep -qE "^$WODUSER"; then
        pkill -u $WODUSER
        sleep 1
+       set +e
        pkill -9 -u $WODUSER
+       set -e
     fi
     echo "$WODUSER home directory: $WODHDIR"
     if [ -d "$WODHDIR/.ssh" ]; then
