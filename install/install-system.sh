@@ -42,6 +42,10 @@ export WODBEDIR=$WODBEDIR
 #
 # Name of the api-db server
 export WODAPIDBFQDN="$WODAPIDBFQDN"
+# Port of the api-db server
+export WODAPIDBPORT="$WODAPIDBPORT"
+# Combined URL for API access
+export WODAPIDBURL=http://$WODAPIDBFQDN:$WODAPIDBPORT/api
 EOF
 
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
@@ -324,9 +328,6 @@ EOF
 	install_pm2 $WODAPIDBDIR
 elif [ $WODTYPE = "frontend" ]; then
     cd $WODFEDIR
-    cat > .env << EOF
-WODAPIDBURL=http://$WODAPIDBFQDN:$WODAPIDBPORT/api
-EOF
     echo "Launching npm install..."
     npm install
     echo "Patching package.json to allow listening on the right host:port"
