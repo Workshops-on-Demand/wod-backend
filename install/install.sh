@@ -449,6 +449,8 @@ fi
 
 echo "Setting up original rights for $WODHDIR with $BKPSTAT"
 chmod $BKPSTAT $WODHDIR
+# TODO: Bug#91
+chmod o+x $WODHDIR
 
 echo "Setting up original rights for $HDIR with $HDIRSTAT"
 chmod $HDIRSTAT $HDIR
