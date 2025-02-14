@@ -10,7 +10,7 @@ USERMIN: 1
 #
 # USERMAX indicates the ending ID of the Linux and Jupyter user account range
 #
-USERMAX: 20
+USERMAX: 100
 #
 # UIDBASE is the offset used to create the Linux user account IDs
 # Example when creating user 35 with UIDBASE of 2000, the uid created is 2035
