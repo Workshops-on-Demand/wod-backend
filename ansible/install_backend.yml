@@ -149,6 +149,16 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
+    - name: Add dotnet APT repository
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: ppa:dotnet/backports
+        state: present
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "22"
+
     - name: Remove Microsoft repo file just in case
       become: true
       become_user: root
@@ -182,7 +192,7 @@
         deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
       when:
         - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version <= "20"
 
     - name: Setup MicroSoft repo for YUM
       become: true
@@ -214,7 +224,7 @@
           - dotnet-runtime-5.0
           - dotnet-sdk-3.1
           - dotnet-sdk-5.0
-          # Incompatible with dotnet 8
+          # Incompatible with dotnet 8 and 9
           - aspnetcore-runtime-6.0
           - dotnet-runtime-6.0
           - dotnet-sdk-6.0
@@ -222,6 +232,9 @@
           - aspnetcore-runtime-7.0
           - dotnet-runtime-7.0
           - dotnet-sdk-7.0
+          - aspnetcore-runtime-8.0
+          - dotnet-runtime-8.0
+          - dotnet-sdk-8.0
           - powershell
         state: absent
 
@@ -278,10 +291,8 @@
           # - aspnetcore-runtime-7.0
           # - dotnet-runtime-7.0
           # - dotnet-sdk-7.0
-          - aspnetcore-runtime-8.0
-          - dotnet-runtime-8.0
-          - dotnet-sdk-8.0
-          - dotnet-host
+          - dotnet-runtime-9.0
+          - dotnet-sdk-9.0
           - postfix
           - procmail
           - conda
