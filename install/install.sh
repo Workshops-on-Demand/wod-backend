@@ -4,59 +4,114 @@ set -e
 set -u
 set -o pipefail
 
+WODBEPORT=8000
+WODPOSTPORT="10025"
+WODFEPORT=8000
+WODAPIDBPORT=8021
+
 usage() {
     echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport][-n number][-f frontend[:feport]][-a api-db[:apidbport]][-u user][-p postport][-k][-s sender]"
     echo " "
     echo "where:"
-    echo "type      is the installation type"
-    echo "          valid values: appliance, backend, frontend or api-db"
-    echo "          if empty using 'backend'                "
+    echo "-a api-db    is the FQDN of the API/DB server"
+    echo "             potentially with a port (default $WODAPIDBPORT)"
+    echo "             example: api.internal.example.org  "
+    echo "             if empty using the name for the frontend                "
     echo " "
-    echo "groupname is the ansible group_vars name to be used"
-    echo "          example: production, staging, test, ...  "
-    echo "          if empty using 'production'                "
+    echo "-b backend   is the FQDN of the backend JupyterHub server,"
+    echo "             potentially with a port (default $WODBEPORT)."
+    echo "             This FQDN address should be reachable from your clients"
+    echo "             or the Internet if providing external services."
+    echo "             if empty uses the local name for the backend"
+    echo "             If you use multiple backend systems corresponding to "
+    echo "             multiple locations, use option -n to give the backend"
+    echo "             number currently being installed, starting at 1."
     echo " "
-    echo "backend   is the FQDN of the backend JupyterHub server, potentially with a port."
-    echo "          This FQDN address should be reachable from Your clients or the Internet if providing external services."
-    echo "          if empty using the local name for the backend and default port               "
-    echo "          If you use multiple backend systems corresponding to multiple locations, "
-    echo "          use option -n to give the backend number currently being installed, starting at 1."
+    echo "             When installing the api-db server you have to specify one"
+    echo "             or multiple backend servers, using their FQDN separated "
+    echo "             with ',' using the same order as given with the -n option"
+    echo "             during backend installation."
     echo " "
-    echo "          When installing the api-db server you have to specify one or multiple backend servers,"
-    echo "          using their FQDN separated with ','"
-    echo "          using the same order as given with the -n option during backend installation."
+    echo "-f frontend  is the FQDN of the frontend Web server"
+    echo "             potentially with a port (default $WODFEPORT)."
+    echo "             example: fe.example.org  "
+    echo "             if empty using the external name for the backend                "
     echo " "
-    echo "-n        if used, this indicates the number of the backend currently installed"
-    echo "          used for the backend installation only, when  multiple backend systems will be used in the configuration"
-    echo "          example: -b be.internal.example.org:9999  (for a single backend server installation using port 9999)"
-    echo "          example: -b be.internal.example.org:8888 -n 1 (for the first of the 2 backends installed)"
-    echo "          example: -b be2.internal.example.org:8888 -n 2 (for the second of the 2 backends installed)"
-    echo "          example: -b be.internal.example.org:8888,be2.internal.example.org:8888 (for the installation of the corresponding api-db server)"
-    echo "ip        IP address of the backend server being used"
-    echo "          if empty, try to be autodetected from FQDN of the backend server"
-    echo "          Used in particular when the IP can't be guessed such as with Vagrant"
-    echo "          or when you want to mask the external IP returned by an internal one as its usage is for the hosts creation"
-    echo "postport  is the port on which the postfix service is listening on the backend"
-    echo "          example: -p 10030 "
-    echo "          if empty using 10025               "
-    echo "sender    is the e-mail address used in the WoD frontend to send API procmail mails to the WoD backend"
-    echo "          example: sender@example.org "
-    echo "          if empty using wodadmin@localhost"
+    echo "-g groupname is the ansible group_vars name to be used"
+    echo "             example: production, staging, test, ...  "
+    echo "             if empty using 'production'                "
     echo " "
-    echo "frontend  is the FQDN of the frontend Web server, potentially with a port"
-    echo "          example: fe.example.org  "
-    echo "          if empty using the external name for the backend                "
+    echo "-i ip        IP address of the backend server being used"
+    echo "             if empty, try to be autodetected from FQDN"
+    echo "             of the backend server"
+    echo "             Used in particular when the IP can't be guessed (Vagrant)"
+    echo "             or when you want to mask the external IP returned"
+    echo "             by an internal one for /etc/hosts creation"
     echo " "
-    echo "api-db    is the FQDN of the API/DB server, potentially with a port "
-    echo "          example: api.internal.example.org  "
-    echo "          if empty using the name for the frontend                "
+    echo "-k           if used, force the re-creation of ssh keys for"
+    echo "             the previously created admin user"
+    echo "             if not used keep the existing keys in place if any"
+    echo "            (backed up and restored)"
+    echo "             if the name of the admin user is changed, new keys "
+    echo "             systematically re-created"
     echo " "
-    echo "user      is the name of the admin user for the WoD project"
-    echo "          example: mywodadmin "
-    echo "          if empty using wodadmin               "
-    echo "-k        if used, force the re-creation of ssh keys for the previously created admin user"
-    echo "          if not used keep the existing keys in place if any (backed up and restored)"
-    echo "          if the name of the admin user is changed, new keys are created"
+    echo "-n           if used, this indicates the number of the backend "
+    echo "             currently installed"
+    echo "             used for the backend installation only, when multiple"
+    echo "             backend systems will be used in the configuration"
+    echo "             example (single backend server install on port 9999):"
+    echo "              -b be.int.example.org:9999"
+    echo "             example (first of the 2 backends installed):"
+    echo "              -b be1.int.example.org:8888 -n 1"
+    echo "             example 'second of the 2 backends installed):"
+    echo "              -b be2.int.example.org:8888 -n 2"
+    echo "             example (install of the corresponding api-db server):"
+    echo "              -b be.int.example.org:8888,be2.int.example.org:8888"
+    echo " "
+    echo "-p postport  is the port on which the postfix service is listening"
+    echo "             on the backend server"
+    echo "             example: -p 10030 "
+    echo "             if empty using default ($WODPOSTPORT)"
+    echo " "
+    echo "-s sender    is the e-mail address used in the WoD frontend to send"
+    echo "             API procmail mails to the WoD backend"
+    echo "             example: sender@example.org "
+    echo "             if empty using wodadmin@localhost"
+    echo " "
+    echo "-t type      is the installation type"
+    echo "             valid values: appliance, backend, frontend or api-db"
+    echo "             if empty using 'backend'                "
+    echo " "
+    echo "-u user      is the name of the admin user for the WoD project"
+    echo "             example: mywodadmin "
+    echo "             if empty using wodadmin               "
+    echo " "
+    echo "Full installation example of a stack with:"
+    echo "- 2 backend servers be1 and be2 using port 8010"
+    echo "- 1 api-db server apidb on port 10000"
+    echo "- 1 frontend server front on port 8000"
+    echo "- all declared on the .local network"
+    echo "- internal postfix server running on port 9000"
+    echo "- e-mail sender being wodmailer@local"
+    echo "- ansible groupname being test"
+    echo "- management user being wodmgr"
+    echo " "
+    echo "On the be1 machine:"
+    echo "  ./install.sh -a apidb.local:10000 -f front.local:8000 \\"
+    echo "  -g test -u wodmgr -p 9000 -s wodmailer@local\\"
+    echo "  -b be1.local:8010 -n 1 -t backend \\"
+    echo "On the be2 machine:"
+    echo "  ./install.sh -a apidb.local:10000 -f front.local:8000 \\"
+    echo "  -g test -u wodmgr -p 9000 -s wodmailer@local\\"
+    echo "  -b be2.local:8010 -n 2 -t backend \\"
+    echo "On the apidb machine:"
+    echo "  ./install.sh -a apidb.local:10000 -f front.local:8000 \\"
+    echo "  -g test -u wodmgr -p 9000 -s wodmailer@local\\"
+    echo "  -b be1.local:8010,be2.local:8010 -t api-db \\"
+    echo "On the frontend machine:"
+    echo "  ./install.sh -a apidb.local:10000 -f front.local:8000 \\"
+    echo "  -g test -u wodmgr -p 9000 -s wodmailer@local\\"
+    echo "  -t frontend \\"
 }
 
 echo "install.sh called with $*"
@@ -140,7 +195,6 @@ fi
 # or we have multiple of these when installing an api-db
 # WODBEFQDN will point to the list of backends with ports seprarated with ,
 # WODBEPORT will be default and not used later.
-WODBEPORT=8000
 MULTIBCKEND=0
 if [ ! -z "${b}" ]; then
     WODBEFQDN="`echo ${b} | cut -d: -f1`"
@@ -148,16 +202,16 @@ if [ ! -z "${b}" ]; then
     if [ _"$res" != _"" ]; then
    # We have multiple backends only meaningful in api-db install
         if [ $WODTYPE = "api-db" ]; then
-       WODBEFQDN="${b}"
-       MULTIBCKEND=1
+            WODBEFQDN="${b}"
+            MULTIBCKEND=1
         else
-       echo "Multiple backends are only possible when installing an api-db machine"
-       echo " "
-       usage
-       exit -1
-   fi
+            echo "Multiple backends are only possible when installing an api-db machine"
+            echo " "
+            usage
+            exit -1
+        fi
     else
-   # Single backend get its port
+        # Single backend get its port
         res=`echo "${b}" | { grep ':' || true; }`
         if [ _"$res" != _"" ]; then
             WODBEPORT="`echo ${b} | cut -d: -f2`"
@@ -183,7 +237,6 @@ else
 fi
 
 
-WODFEPORT=8000
 if [ ! -z "${f}" ]; then
     WODFEFQDN="`echo ${f} | cut -d: -f1`"
     res=`echo "${f}" | { grep ':' || true; }`
@@ -193,7 +246,6 @@ if [ ! -z "${f}" ]; then
 else
     WODFEFQDN="`echo $WODBEFQDN | cut -d: -f1`"
 fi
-WODAPIDBPORT=8021
 if [ ! -z "${a}" ]; then
     WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
     res=`echo "${a}" | { grep ':' || true; }`
@@ -236,9 +288,7 @@ else
     export WODSENDER="wodadmin@localhost"
 fi
 if [ ! -z "${p}" ]; then
-    export WODPOSTPORT="${p}"
-else
-    export WODPOSTPORT="10025"
+    WODPOSTPORT="${p}"
 fi
 if [ ! -z "${g}" ]; then
     WODGROUP="${g}"
