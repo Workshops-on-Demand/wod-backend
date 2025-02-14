@@ -18,10 +18,10 @@
 # In case you use a local token, uncomment this one and use with WODPRIVREPO
 #token=`cat $EXEPATH/token`
 #
-WODAPIBRANCH="master"
+WODAPIBRANCH="main"
 WODAPIREPO="https://github.com/Workshops-on-Demand/wod-api-db.git"
 #
-WODFEBRANCH="master"
+WODFEBRANCH="main"
 WODFEREPO="https://github.com/Workshops-on-Demand/wod-frontend.git"
 #
 WODNOBOBRANCH="main"
