@@ -5,23 +5,24 @@ set -u
 set -o pipefail
 
 WODBEPORT=8000
+WODBEEXTPORT=$WODBEPORT
 WODPOSTPORT="10025"
 WODFEPORT=8000
+WODFEEXTPORT=$WODFEPORT
 WODAPIDBPORT=8021
+WODAPIDBEXTPORT=$WODAPIDBPORT
 
 usage() {
-    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport][-n number][-f frontend[:feport]][-a api-db[:apidbport]][-u user][-p postport][-k][-s sender]"
+    echo "install.sh [-h][-t type][-i ip][-g groupname][-b backend[:beport][-n number][-j backendext[:beportext]][-f frontend[:feport]][-w frontendext[:feportext]][-a api-db[:apidbport]][-e api-dbext[:apidbportext]][-u user][-p postport][-k][-s sender]"
     echo " "
     echo "where:"
-    echo "-a api-db    is the FQDN of the API/DB server"
+    echo "-a api-db    is the FQDN of the REST API/DB server"
     echo "             potentially with a port (default $WODAPIDBPORT)"
     echo "             example: api.internal.example.org  "
-    echo "             if empty using the name for the frontend                "
+    echo "             if empty using the name of the frontend                "
     echo " "
     echo "-b backend   is the FQDN of the backend JupyterHub server,"
     echo "             potentially with a port (default $WODBEPORT)."
-    echo "             This FQDN address should be reachable from your clients"
-    echo "             or the Internet if providing external services."
     echo "             if empty uses the local name for the backend"
     echo "             If you use multiple backend systems corresponding to "
     echo "             multiple locations, use option -n to give the backend"
@@ -32,10 +33,17 @@ usage() {
     echo "             with ',' using the same order as given with the -n option"
     echo "             during backend installation."
     echo " "
+    echo "-e api-dbext is the FQDN of the REST API server accessible externally"
+    echo "             potentially with a port (default $WODAPIDBEXTPORT)"
+    echo "             example: api.external.example.org  "
+    echo "             if empty using the name of the api-db                "
+    echo "             useful when the name given with -a doesn't resolve from "
+    echo "             the client browser"
+    echo " "
     echo "-f frontend  is the FQDN of the frontend Web server"
     echo "             potentially with a port (default $WODFEPORT)."
-    echo "             example: fe.example.org  "
-    echo "             if empty using the external name for the backend                "
+    echo "             example: fe.external.example.org  "
+    echo "             if empty using the name of the backend                "
     echo " "
     echo "-g groupname is the ansible group_vars name to be used"
     echo "             example: production, staging, test, ...  "
@@ -47,6 +55,13 @@ usage() {
     echo "             Used in particular when the IP can't be guessed (Vagrant)"
     echo "             or when you want to mask the external IP returned"
     echo "             by an internal one for /etc/hosts creation"
+    echo " "
+    echo "-j backext   is the FQDN of the backend JupyterHub server accessible externally"
+    echo "             potentially with a port (default $WODBEEXTPORT)."
+    echo "             example: jupyterhub.external.example.org  "
+    echo "             if empty using the name of the backend                "
+    echo "             useful when the name given with -b doesn't resolve from "
+    echo "             the client browser"
     echo " "
     echo "-k           if used, force the re-creation of ssh keys for"
     echo "             the previously created admin user"
@@ -85,6 +100,13 @@ usage() {
     echo "-u user      is the name of the admin user for the WoD project"
     echo "             example: mywodadmin "
     echo "             if empty using wodadmin               "
+    echo "-w frontext  is the FQDN of the frontend JupyterHub server accessible externally"
+    echo "             potentially with a port (default $WODFEEXTPORT)."
+    echo "             example: frontend.external.example.org  "
+    echo "             if empty using the name of the frontend                "
+    echo "             useful to solve CORS errors when external and internal names"
+    echo "             are different"
+    echo " "
     echo " "
     echo "Full installation example of a stack with:"
     echo "- 2 backend servers be1 and be2 using port 8010"
@@ -120,6 +142,8 @@ t=""
 f=""
 b=""
 a=""
+e=""
+j=""
 g=""
 u=""
 s=""
@@ -127,9 +151,10 @@ k=""
 i=""
 p=""
 n=""
+w=""
 WODGENKEYS=0
 
-while getopts "t:f:b:o:n:a:g:i:u:s:p:hk" option; do
+while getopts "t:f:b:o:n:a:e:j:w:g:i:u:s:p:hk" option; do
     case "${option}" in
         t)
             t=${OPTARG}
@@ -153,6 +178,15 @@ while getopts "t:f:b:o:n:a:g:i:u:s:p:hk" option; do
             ;;
         g)
             g=${OPTARG}
+            ;;
+        j)
+            j=${OPTARG}
+            ;;
+        w)
+            w=${OPTARG}
+            ;;
+        e)
+            e=${OPTARG}
             ;;
         a)
             a=${OPTARG}
@@ -246,6 +280,17 @@ if [ ! -z "${f}" ]; then
 else
     WODFEFQDN="`echo $WODBEFQDN | cut -d: -f1`"
 fi
+
+if [ ! -z "${w}" ]; then
+    WODFEEXTFQDN="`echo ${w} | cut -d: -f1`"
+    res=`echo "${w}" | { grep ':' || true; }`
+    if [ _"$res" != _"" ]; then
+        WODFEEXTPORT="`echo ${w} | cut -d: -f2`"
+    fi
+else
+    WODFEEXTFQDN="`echo $WODFEFQDN | cut -d: -f1`"
+fi
+
 if [ ! -z "${a}" ]; then
     WODAPIDBFQDN="`echo ${a} | cut -d: -f1`"
     res=`echo "${a}" | { grep ':' || true; }`
@@ -254,6 +299,26 @@ if [ ! -z "${a}" ]; then
     fi
 else
     WODAPIDBFQDN=$WODFEFQDN
+fi
+
+if [ ! -z "${e}" ]; then
+    WODAPIDBEXTFQDN="`echo ${e} | cut -d: -f1`"
+    res=`echo "${e}" | { grep ':' || true; }`
+    if [ _"$res" != _"" ]; then
+        WODAPIDBEXTPORT="`echo ${e} | cut -d: -f2`"
+    fi
+else
+    WODAPIDBEXTFQDN=$WODAPIDBFQDN
+fi
+
+if [ ! -z "${j}" ]; then
+    WODBEEXTFQDN="`echo ${j} | cut -d: -f1`"
+    res=`echo "${j}" | { grep ':' || true; }`
+    if [ _"$res" != _"" ]; then
+        WODBEEXTPORT="`echo ${j} | cut -d: -f2`"
+    fi
+else
+    WODBEEXTFQDN=$WODBEFQDN
 fi
 
 # This IP address is for the backend only so makes only sense deploying a backend server
@@ -295,7 +360,7 @@ if [ ! -z "${g}" ]; then
 else
     WODGROUP="production"
 fi
-export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODTYPE WODBEPORT WODFEPORT WODAPIDBPORT WODPOSTPORT
+export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODFEEXTFQDN WODBEEXTFQDN WODAPIDBEXTFQDN WODTYPE WODBEPORT WODFEPORT WODAPIDBPORT WODBEEXTPORT WODFEEXTPORT WODAPIDBEXTPORT WODPOSTPORT
 
 WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
 res=`echo $WODDISTRIB | { grep -i rocky || true; }`
@@ -307,10 +372,16 @@ else
 fi
 echo "Installing a Workshop on Demand $WODTYPE environment"
 echo "Using api-db $WODAPIDBFQDN on port $WODAPIDBPORT"
+if [ _"$WODAPIDBEXTFQDN" != _"$WODAPIDBFQDN" ]; then
+    echo "Using external api-db $WODAPIDBEXTFQDN on port $WODAPIDBEXTPORT"
+fi
 if [ _"$MULTIBCKEND" = _"1" ]; then
     echo "Using backends $WODBEFQDN (with first IP $WODBEIP)"
 else
     echo "Using backend $WODBEFQDN ($WODBEIP) on port $WODBEPORT"
+fi
+if [ _"$WODBEEXTFQDN" != _"$WODBEFQDN" ]; then
+    echo "Using external backend $WODBEEXTFQDN on port $WODBEEXTPORT"
 fi
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
@@ -319,9 +390,13 @@ echo "Using WoD base student coef $WODBENBR"
 if [ ${t} != "appliance" ]; then
     echo "Using frontend $WODFEFQDN on port $WODFEPORT"
 fi
+if [ _"$WODFEEXTFQDN" != _"$WODFEFQDN" ]; then
+    echo "Using external frontend $WODFEEXTFQDN on port $WODFEEXTPORT"
+fi
 
+SUDOUSR=${SUDO_USER:-}
 # Needs to be root
-if [ _"$SUDO_USER" = _"" ]; then
+if [ _"$SUDOUSR" = _"" ]; then
     echo "You need to use sudo to launch this script"
     exit -1
 fi
@@ -465,6 +540,9 @@ export WODGROUP="$WODGROUP"
 export WODFEFQDN="$WODFEFQDN"
 export WODBEFQDN="$WODBEFQDN"
 export WODAPIDBFQDN="$WODAPIDBFQDN"
+export WODFEEXTFQDN="$WODFEEXTFQDN"
+export WODBEEXTFQDN="$WODBEEXTFQDN"
+export WODAPIDBEXTFQDN="$WODAPIDBEXTFQDN"
 export WODTYPE="$WODTYPE"
 export WODBEIP="$WODBEIP"
 export WODDISTRIB="$WODDISTRIB"
@@ -485,6 +563,9 @@ export WODTMPDIR="$WODTMPDIR"
 export WODFEPORT="$WODFEPORT"
 export WODBEPORT="$WODBEPORT"
 export WODAPIDBPORT="$WODAPIDBPORT"
+export WODFEEXTPORT="$WODFEEXTPORT"
+export WODBEEXTPORT="$WODBEEXTPORT"
+export WODAPIDBEXTPORT="$WODAPIDBEXTPORT"
 export WODPOSTPORT="$WODPOSTPORT"
 export WODBENBR="$WODBENBR"
 export SENDGRID_API_KEY="$SENDGRID_API_KEY"
@@ -494,7 +575,7 @@ EOF
     su - $WODUSER -c "source /tmp/wodexports ; $EXEPATH/install-system-common.sh"
     rm -f /tmp/wodexports
 else
-    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIDBBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODAPIDBPORT,WODPOSTPORT,WODBENBR,SENDGRID_API_KEY,DENYLIST -c "$EXEPATH/install-system-common.sh"
+    su - $WODUSER -w WODGROUP,WODFEFQDN,WODBEFQDN,WODAPIDBFQDN,WODFEEXTFQDN,WODBEEXTFQDN,WODAPIDBEXTFQDN,WODTYPE,WODBEIP,WODDISTRIB,WODUSER,WODFEREPO,WODBEREPO,WODAPIREPO,WODNOBOREPO,WODPRIVREPO,WODFEBRANCH,WODBEBRANCH,WODAPIDBBRANCH,WODNOBOBRANCH,WODPRIVBRANCH,WODSENDER,WODGENKEYS,WODTMPDIR,WODFEPORT,WODBEPORT,WODAPIDBPORT,WODFEEXTPORT,WODBEEXTPORT,WODAPIDBEXTPORT,WODPOSTPORT,WODBENBR,SENDGRID_API_KEY,DENYLIST -c "$EXEPATH/install-system-common.sh"
 fi
 
 echo "Setting up original rights for $WODHDIR with $BKPSTAT"
