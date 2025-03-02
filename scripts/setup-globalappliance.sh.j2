@@ -8,16 +8,16 @@ source {{ WODSCRIPTDIR }}/functions.sh
 # Do we need LDAP setup or not
 if [ _"`get_ldap_status $wid`" != _"false" ]; then
 	echo "This is a setup with LDAP"
-	LDAPSETUP=1
+	WODLDAPSETUP=1
 else
-	LDAPSETUP=0
+	WODLDAPSETUP=0
 fi
 
 echo "Use ansible to setup generic remote appliance at $WODRTARGET"
-ansible-playbook {{ WODANSIBLEDIR }}/setup_appliance.yml -i $WODRTARGET, -e "WODRTARGET=$WODRTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP LDAPDMN={{ LDAPDMN }} LDAPSRVNAME={{ LDAPSRVNAME }}" $ANSPLAYOPT $ANSPRIVOPT
+ansible-playbook {{ WODANSIBLEDIR }}/setup_appliance.yml -i $WODRTARGET, -e "WODRTARGET=$WODRTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX WODLDAPSETUP=$WODLDAPSETUP WODLDAPDMN={{ WODLDAPDMN }} WODLDAPSRVNAME={{ WODLDAPSRVNAME }}" $ANSPLAYOPT $ANSPRIVOPT
 if [ -f "{{ WODANSIBLEDIR }}/setup_${w}_appliance.yml" ]; then
 	echo "Use ansible to setup specificities for $w on remote appliance $WODRTARGET"
-	ansible-playbook {{ WODANSIBLEDIR }}/setup_${w}_appliance.yml -i $WODRTARGET, -e "WODRTARGET=$WODRTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX LDAPSETUP=$LDAPSETUP LDAPDMN={{ LDAPDMN }} LDAPSRVNAME={{ LDAPSRVNAME }}" $ANSPLAYOPT $ANSPRIVOPT
+	ansible-playbook {{ WODANSIBLEDIR }}/setup_${w}_appliance.yml -i $WODRTARGET, -e "WODRTARGET=$WODRTARGET WORKSHOP=$w APPMIN=$APPMIN APPMAX=$APPMAX WODLDAPSETUP=$WODLDAPSETUP WODLDAPDMN={{ WODLDAPDMN }} WODLDAPSRVNAME={{ WODLDAPSRVNAME }}" $ANSPLAYOPT $ANSPRIVOPT
 fi
 
 echo "Final script setup phase for $w on remote appliance $WODRTARGET"

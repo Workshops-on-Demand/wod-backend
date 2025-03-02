@@ -41,7 +41,7 @@
     state: present
     gid: "{{ item + GIDBASE }}"
   loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
-  when: LDAPSETUP != "1"
+  when: WODLDAPSETUP != "1"
 
 - name: Ensure Linux students users exists with their home dir
   become: true
@@ -56,7 +56,7 @@
     uid: "{{ item + UIDBASE }}"
     group: "{{ 'student%s' | format(item) }}"
   loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
-  when: LDAPSETUP != "1"
+  when: WODLDAPSETUP != "1"
 
 - name: Disable SELinux for now as our students are non-standard
   become: true

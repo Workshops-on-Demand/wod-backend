@@ -17,7 +17,7 @@ scp $TMPDIR/id_rsa.pub $WODRTARGET:$TMPDIR/
 HOMEDIR=`ssh $WODRTARGET getent passwd student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ]; then
 	# Avoid changing passwd in case of LDAP
-	[ -z ${LDAPSETUP+x} ] && ssh $WODRTARGET "echo student$stdid:$randompw | sudo chpasswd"
+	[ -z ${WODLDAPSETUP+x} ] && ssh $WODRTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	# Preventive cleanup
 	cat > $TMPDIR/preventive-cleanup << EOF
 #!/bin/bash

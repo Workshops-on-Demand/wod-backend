@@ -10,7 +10,7 @@ fi
 HOMEDIR=`ssh $WODRTARGET getent passwd student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ]; then
 	ssh -q $WODRTARGET sudo rm -rf $HOMEDIR/.ssh
-	[ -z ${LDAPSETUP+x} ] && ssh -q $WODRTARGET "echo student$stdid:$randompw | sudo chpasswd"
+	[ -z ${WODLDAPSETUP+x} ] && ssh -q $WODRTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	EXITVAL=0
 else
 	echo "student$stdid doesn't exist on the appliance $WODRTARGET for workshop $w"
