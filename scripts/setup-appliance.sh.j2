@@ -74,7 +74,7 @@ for i in $(seq $basedigit $lastdigit); do
 		export APPMAX=$(($APPMIN+1))
 		j=$((j+1))
 	fi
-	export RTARGET="$netip.$i"
+	export WODRTARGET="$netip.$i"
 	if [ -x "{{ WODSCRIPTDIR }}/setup-pre-$w.sh" ]; then
 		echo "Setup Appliance for Workshop $w by executing {{ WODSCRIPTDIR }}/setup-pre-$w.sh at `date`"
 		{{ WODSCRIPTDIR }}/setup-pre-$w.sh
@@ -110,21 +110,21 @@ for i in $(seq $basedigit $lastdigit); do
 	if [ -x "{{ WODSCRIPTDIR }}/setup-$w.sh" ]; then
 		echo "Setup Appliance for Workshop $w by executing remotely {{ WODSCRIPTDIR }}/setup-$w.sh at `date`"
 		TMPDIR=/tmp/sa.$$
-		ssh $RTARGET mkdir -p $TMPDIR
-		scp {{ WODSCRIPTDIR }}/setup-$w.sh $RTARGET:$TMPDIR/
+		ssh $WODRTARGET mkdir -p $TMPDIR
+		scp {{ WODSCRIPTDIR }}/setup-$w.sh $WODRTARGET:$TMPDIR/
 		# We have to pass the Workshop name to have it remotely as well as the $w variable
-		ssh $RTARGET "$TMPDIR/setup-$w.sh $w"
-		ssh $RTARGET rm -rf $TMPDIR
+		ssh $WODRTARGET "$TMPDIR/setup-$w.sh $w"
+		ssh $WODRTARGET rm -rf $TMPDIR
 		echo "End of Appliance setup for Workshop $w at `date`"
 	fi
 
 	if [ -x "{{ WODSCRIPTPRIVDIR }}/setup-$w.sh" ]; then
 		echo "Setup Appliance for private Workshop $w by executing remotely {{ WODSCRIPTPRIVDIR }}/setup-$w.sh at `date`"
 		TMPDIR=/tmp/sa.$$
-		ssh $RTARGET mkdir -p $TMPDIR
-		scp {{ WODSCRIPTPRIVDIR }}/setup-$w.sh $RTARGET:$TMPDIR/
-		ssh $RTARGET "$TMPDIR/setup-$w.sh $w"
-		ssh $RTARGET rm -rf $TMPDIR
+		ssh $WODRTARGET mkdir -p $TMPDIR
+		scp {{ WODSCRIPTPRIVDIR }}/setup-$w.sh $WODRTARGET:$TMPDIR/
+		ssh $WODRTARGET "$TMPDIR/setup-$w.sh $w"
+		ssh $WODRTARGET rm -rf $TMPDIR
 		echo "End of Appliance setup for private Workshop $w at `date`"
 	fi
 done

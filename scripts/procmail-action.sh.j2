@@ -103,12 +103,12 @@ if [ _"`get_multiappliance_status $wid`" = _"true" ]; then
 	basedigit=`echo $baseip | cut -d'.' -f4`
 	netip=`echo $baseip | cut -d'.' -f1-3`
 	ip=$(($basedigit+$delta))
-	export RTARGET="$netip.$ip"
+	export WODRTARGET="$netip.$ip"
 else
 	if [ _"`get_monoappliance_status $wid`" = _"true" ]; then
-		export RTARGET=`get_appliance_baseip $w`
+		export WODRTARGET=`get_appliance_baseip $w`
 	fi
-	# If no appliance, we do not define RTARGET on purpose
+	# If no appliance, we do not define WODRTARGET on purpose
 fi
 
 # Handle CREATE and CLEANUP first

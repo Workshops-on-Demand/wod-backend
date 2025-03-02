@@ -30,10 +30,10 @@ sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR
 sudo install -m 0600 -o student$stdid -g student$stdid {{ STUDDIR }}/student$stdid/.ssh/id_rsa.pub {{ STUDDIR }}/student$stdid/.ssh/authorized_keys
 
 # Setup Remote appliance account
-ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
-scp -q {{ NOCHECKSSH }} $TMPDIR/config $RTARGET:$TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo htpasswd -b /etc/httpd/conf/htpasswd student$stdid $randompw
+ssh -q {{ NOCHECKSSH }} $WODRTARGET mkdir -p $TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/config $WODRTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo htpasswd -b /etc/httpd/conf/htpasswd student$stdid $randompw
 
 # Cleanup
 rm -rf $TMPDIR

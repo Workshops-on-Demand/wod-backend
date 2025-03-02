@@ -76,18 +76,18 @@ docker compose up --build -d
 EOF
 
 # Copy content and start container
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET mkdir -p $TMPDIR
-scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/dockerd-entrypoint.sh $RTARGET:$TMPDIR
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET chmod 755 $TMPDIR $TMPDIR/dockerd-entrypoint.sh
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/Dockerfile
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET mkdir -p $TMPDIR
+scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $TMPDIR/Dockerfile $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/dockerd-entrypoint.sh $WODRTARGET:$TMPDIR
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET chmod 755 $TMPDIR $TMPDIR/dockerd-entrypoint.sh
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $TMPDIR/Dockerfile
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
 
 # ssh to get token from running container
-container_id=$(ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET docker ps -aqf "name=$NAME$stdid")
+container_id=$(ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET docker ps -aqf "name=$NAME$stdid")
 # We need time to let jupyterhub start before getting token
 sleep 5
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET "docker cp $container_id:/student/student$stdid/datavisutoken $TMPDIR"
-scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET:$TMPDIR/datavisutoken $TMPDIR
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET "docker cp $container_id:/student/student$stdid/datavisutoken $TMPDIR"
+scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET:$TMPDIR/datavisutoken $TMPDIR
 
 # ansible-vault to store it in the pass file creating a DATAVISUTOK ansible variable
 if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
@@ -98,5 +98,5 @@ ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vaul
 ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
-# ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo rm -rf $TMPDIR
+# ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR

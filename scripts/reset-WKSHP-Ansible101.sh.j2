@@ -5,6 +5,6 @@ set -x
 {{ WODSCRIPTDIR }}/reset-appliance.sh
 
 # Cleanup
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'rm -rf {{ STUDDIR }}/student$stdid/.??* {{ STUDDIR }}/student$stdid/*\'
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'rm -rf {{ STUDDIR }}/student$stdid/.??* {{ STUDDIR }}/student$stdid/*\'
 
 exit 0

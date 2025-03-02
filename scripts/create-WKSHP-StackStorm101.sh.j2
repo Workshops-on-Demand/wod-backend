@@ -3,4 +3,4 @@
 set -x
 
 {{ WODSCRIPTDIR }}/create-appliance.sh
-ssh $RTARGET "echo $randompw | sudo htpasswd -i /etc/st2/htpasswd student$stdid"
+ssh $WODRTARGET "echo $randompw | sudo htpasswd -i /etc/st2/htpasswd student$stdid"

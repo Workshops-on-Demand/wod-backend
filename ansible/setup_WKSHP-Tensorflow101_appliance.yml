@@ -1,6 +1,6 @@
 ---
 - name: Setup Playbook for WKSHP-DataVisu101 appliance
-  hosts: '{{ RTARGET }}'
+  hosts: '{{ WODRTARGET }}'
   gather_facts: true
   tasks:
     - name: Setup docker based appliance

@@ -45,7 +45,7 @@ services:
       - CONCOURSE_POSTGRES_USER=$NAME${stdid}_user
       - CONCOURSE_POSTGRES_PASSWORD=$NAME${stdid}_pass
       - CONCOURSE_POSTGRES_DATABASE=concourse
-      - CONCOURSE_EXTERNAL_URL=http://$RTARGET:8080
+      - CONCOURSE_EXTERNAL_URL=http://$WODRTARGET:8080
       - CONCOURSE_ADD_LOCAL_USER=student$stdid:$randompw
       - CONCOURSE_MAIN_TEAM_LOCAL_USER=admin
 
@@ -60,10 +60,10 @@ docker compose up -d
 EOF
 
 # Copy content and start container
-ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
-scp -q {{ NOCHECKSSH }} $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $RTARGET:$TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME 
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
+ssh -q {{ NOCHECKSSH }} $WODRTARGET mkdir -p $TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME $WODRTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $WODRTARGET chmod 644 $TMPDIR/docker-compose.yml $TMPDIR/launch-$NAME 
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'bash $TMPDIR/launch-$NAME\'
 
 # ansible-vault to store it in the pass file creating a CONCOURSETOK ansible variable
 if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
@@ -72,6 +72,6 @@ fi
 ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
-#ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
+#ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR
 

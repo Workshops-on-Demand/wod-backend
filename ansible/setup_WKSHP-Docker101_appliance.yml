@@ -1,6 +1,6 @@
 ---
 - name: Setup Playbook for WKSHP-Docker101 appliance
-  hosts: "{{ RTARGET | default([]) }}"
+  hosts: "{{ WODRTARGET | default([]) }}"
   gather_facts: true
   tasks:
     - name: Setup a Docker based appliance

@@ -1,6 +1,6 @@
 ---
 - name: Setup Playbook for WKSHP-Ansible101 appliance
-  hosts: "{{ RTARGET | default([]) }}"
+  hosts: "{{ WODRTARGET | default([]) }}"
   gather_facts: true
   tasks:
     - name: Ensure all required packages are installed

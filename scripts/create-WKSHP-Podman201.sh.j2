@@ -25,7 +25,7 @@ httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Podma
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
-Host $RTARGET
+Host $WODRTARGET
     Port $sshport
 EOF
 
@@ -43,5 +43,5 @@ fi
 ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR
