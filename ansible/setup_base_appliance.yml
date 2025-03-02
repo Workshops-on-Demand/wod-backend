@@ -1,6 +1,6 @@
 ---
 - name: Install a base system
-  ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
+  ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/install_base_system.yml"
 
 - name: Ensure that student directory exists
   become: true

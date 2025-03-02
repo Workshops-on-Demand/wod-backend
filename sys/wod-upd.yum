@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# Script to update distribution to latest content
-
-yum update -y

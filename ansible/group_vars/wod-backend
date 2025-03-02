@@ -1,3 +1,37 @@
+# Backend only
+#
+# UIDBASE is the offset used to create the Linux user account IDs
+# Example when creating user 35 with UIDBASE of 2000, the uid created is 2035
+#
+UIDBASE: 2000
+#
+# GIDBASE is the offset used to create the Linux group IDs
+# Example when creating user 35 with GIDBASE of 2000, the gid created is 2035
+#
+GIDBASE: 2000
+#
+# Setup CLEAN to true if you want all Liunx & Jupyter user accounts to be removed before ansible check
+#
+CLEAN: false
+#
+# VAULTPWD is the passwd used to manage the ansible vault
+#
+VAULTPWD: VeryComplexPasswd1234!
+#
+# NOCHECKSSH are ssh options used to dialog with appliances
+# By default avoid checking Host keys and Host file as they may change on a regular base
+#
+NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+#
+# Survey management - Use if you want to ask for feedbacks on your Workshops - Look at existing conclusion notebooks
+SURVEYURL: TBD
+SURVEYCHALURL: TBD
+#
+#
+# This variable is defined for ansible playbooks, do not change without knowing what you do
+# This is the only one remaining, so we can easily overload it with -e for private script compilation e.g.
+#
+SCRIPTDIR: "{{ WODBEDIR }}/scripts"
 #
 # These variables are located lower in the ansible tree to allow different values required for different backends while keeping a single frontend
 #

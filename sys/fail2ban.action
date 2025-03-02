@@ -1,5 +1,0 @@
-# Fail2Ban configuration file 
-# from triumvirat.org
-[Definition]
-actionban = /usr/local/bin/wod-fail2ban-IP ban <ip>
-actionunban = /usr/local/bin/wod-fail2ban-IP unban <ip>

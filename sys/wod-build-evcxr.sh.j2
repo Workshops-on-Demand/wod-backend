@@ -10,7 +10,7 @@ set -o pipefail
 
 mkdir -p $HOME/.mail
 
-source {{ SCRIPTDIR }}/wod.sh
+source {{ WODINSSCRIPTDIR }}/wod.sh
 
 ansible-playbook {{ ANSIBLEDIR }}/distrib.yml
 DISTRIB=`cat $HOME/.mail/distrib`
