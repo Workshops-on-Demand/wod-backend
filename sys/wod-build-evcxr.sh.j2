@@ -10,11 +10,11 @@ set -o pipefail
 
 mkdir -p $HOME/.mail
 
-source {{ SCRIPTDIR }}/wod.sh
+source /etc/wod.sh
 
-ansible-playbook {{ ANSIBLEDIR }}/distrib.yml
+ansible-playbook {{ WODANSIBLEDIR }}/distrib.yml
 DISTRIB=`cat $HOME/.mail/distrib`
-if [ -f "{{ SYSDIR }}/evcxr_jupyter.$DISTRIB" ]; then
+if [ -f "{{ WODSYSDIR }}/evcxr_jupyter.$DISTRIB" ]; then
 	echo "Not erasing existing evcxr_jupyter.$DISTRIB. Do it manually if you want to regenerate it"
 	exit -1
 fi
@@ -35,8 +35,8 @@ fi
 
 # Install it
 strip ~/.cargo/bin/evcxr_jupyter
-mv ~/.cargo/bin/evcxr_jupyter  {{ SYSDIR }}/evcxr_jupyter.$DISTRIB
-echo "You may want to perform -> cd {{ SYSDIR }} ; git add evcxr_jupyter.$DISTRIB"
+mv ~/.cargo/bin/evcxr_jupyter  {{ WODSYSDIR }}/evcxr_jupyter.$DISTRIB
+echo "You may want to perform -> cd {{ WODSYSDIR }} ; git add evcxr_jupyter.$DISTRIB"
 
 # Cleanup
 if [ _"$v"  = _"" ] || [ $v -le 65 ]; then

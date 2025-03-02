@@ -1,7 +1,7 @@
 ---
 - name: Setup Playbook for WKSHP-DataVisu101 appliance
-  hosts: '{{ RTARGET }}'
+  hosts: '{{ WODRTARGET }}'
   gather_facts: true
   tasks:
     - name: Setup docker based appliance
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_docker_based_appliance.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEDIR }}/setup_docker_based_appliance.yml"

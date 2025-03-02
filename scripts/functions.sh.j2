@@ -2,7 +2,7 @@
 #
 # Functions called from other management scripts
 #
-# (c) Bruno Cornec <bruno.cornec@hpe.com>, Hewlett Packard Development
+# (c) Bruno Cornec <bruno@hyper-linux.org>
 # (c) Frederic Passeron <frederic.passeron@hpe.com>, Hewlett Packard Development
 #
 # Released under the GPLv2 License
@@ -11,14 +11,14 @@ set -e
 #set -x
 
 # Manages private functions
-if [ -f {{ SCRIPTPRIVDIR }}/functions.sh ]; then
-        source {{ SCRIPTPRIVDIR }}/functions.sh
+if [ -f {{ WODSCRIPTPRIVDIR }}/functions.sh ]; then
+        source {{ WODSCRIPTPRIVDIR }}/functions.sh
 fi
 
 # This function fetches an accessToken using user moderator credentials and open a session
-get_session_token() {
+wod_get_session_token() {
 
-	ret=`curl -s --location --request POST "$WODAPIDBURL/login" \
+	ret=`curl $WODCURLOPT -s --location --request POST "$WODAPIDBEXTURL/login" \
 			--header 'Content-Type: application/json' \
 			--data "{\"username\":\"$WODAPIDBUSER\",\"password\":\"$WODAPIDBUSERPWD\"}" | jq -r '.accessToken'`
         echo "$ret"
@@ -26,12 +26,12 @@ get_session_token() {
 
 
 # This function returns the id number in the workshop DB when passed the workshop name
-get_workshop_id() {
+wod_get_workshop_id() {
 
 	id=0
-	id=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops" | jq -r '.[] | .notebook,.id' | grep -A 1 -E "^$1$" | tail -1`
-	#for i in `curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops" | jq -r '.[].id'`; do
-		#name=`curl -s --header "x-access-token:$accessToken"  --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$i" | jq .notebook | sed 's/"//g'`
+	id=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops" | jq -r '.[] | .notebook,.id' | grep -A 1 -E "^$1$" | tail -1`
+	#for i in `curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops" | jq -r '.[].id'`; do
+		#name=`curl -s --header "x-access-token:$accessToken"  --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$i" | jq .notebook | sed 's/"//g'`
 		#if [ _"$name" = _"$1" ]; then
 			#id=$i
 			#break
@@ -45,90 +45,106 @@ get_workshop_id() {
 }
 
 # This function exits when the student id is not in the correct range
-teststdid() {
+wod_test_stdid() {
 	
 	# We need to ensure that we've got a correct id as parameter if needed
-	MIN={{ USERMIN }}+{{ WODBASESTDID }}
-	MAX={{ USERMAX }}+{{ WODBASESTDID }}
+	MIN=$(({{ WODUSERMIN }}))
+	MAX=$(({{ WODUSERMAX }}))
 
 	if [ $1 -lt $MIN ] ||  [ $1 -gt $MAX ]; then
-                echo "Student id ($1) should be between $MIN and $MAX"
-                exit -1
-        fi
+		echo "Student id ($1) should be between $MIN and $MAX"
+		exit -1
+	fi
 }
 
 # This function returns the status of the reset boolean for the workshop id given as parameter
-get_reset_status() {
+wod_get_reset_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.reset'`
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.reset'`
 	echo "$ret"
 }
 
-# This function returns the status of the beta  boolean for the workshop id given as parameter
-get_beta_status() {
+# This function returns the status of the cleaned boolean for the user id given as parameter
+wod_get_cleaned_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.beta'`
-        echo "$ret"
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/customers/$1" | jq -r '.cleaned'`
+	echo "$ret"
+}
+
+wod_wait_till_clean() {
+	# Avoid concurrency with CLEANUP phase for 15' minutes max (step of 20")
+	# based on the cleaned status of the customer whose user id given as parameter
+	echo "Wait up to 15' using 20\" steps"
+	cmax=45
+	while [ _"`wod_get_cleaned_status $1`" != _"true" ] && [ $cmax -ge 0 ]; do
+		cmax=$((cmax - 1))
+		sleep 20
+	done
+	echo "End of wod_wait_till_clean (cmax: $cmax)"
 }
 
 # This function returns the status of the mono-appliance boolean for the workshop id given as parameter
-get_monoappliance_status() {
+wod_get_monoappliance_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.monoappliance'`
+        ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.monoappliance'`
         echo "$ret"
 }
 
 # This function returns the status of the multi-appliance boolean for the workshop id given as parameter
-get_multiappliance_status() {
+wod_get_multiappliance_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.multiappliance'`
+        ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.multiappliance'`
         echo "$ret"
 }
 
 # This function returns the status of the need of LDAP setup for the workshop id given as parameter
-get_ldap_status() {
+wod_get_ldap_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.ldap'`
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.ldap'`
 	echo "$ret"
 }
 
 
-# This function returns the status of the need of Var Pass setup for the workshop id given as parameter 
+# This function returns the status of the need of Var Pass setup for the workshop id given as parameter
 # it provides the PASSSTU variable through vault for the Notebook
-get_varpass_status() {
+wod_get_varpass_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.varpass'`
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.varpass'`
 	echo "$ret"
 }
 
 # This function returns the status of the need of compiled scripts for the workshop id given as parameter
-get_compile_status() {
+wod_get_compile_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.compile'`
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.compile'`
 	echo "$ret"
 }
 
 # This function returns the min of the range of the users booked for the workshop id given as parameter
-get_range_min() {
+wod_get_range_min() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.range[0]'`
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.range[0]'`
 	echo "$ret"
 }
 
 # This function returns the max of the range of the users booked for the workshop id given as parameter
-get_range_max() {
+wod_get_range_max() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.range[1]'`
+	ret=`curl $WODCURLOPT -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.range[1]'`
 	echo "$ret"
 }
 
 # This function returns the base IP address of the appliance related to the workshop given as parameter
-get_appliance_baseip() {
-	baseip=`grep IP-$1 {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+wod_get_appliance_baseip() {
+	baseip=`grep IP-$1 {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 	if [ _"$baseip" = _"" ]; then
-		baseip=`grep IP-$1 {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+		baseip=`grep IP-$1 {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 		if [ _"$baseip" = _"" ]; then
-			echo "Unable to find the the appliance base IP for $1"
+			echo "Unable to find the appliance base IP for $1"
+			exit -1
+		fi
+		if [ _"$baseip" = _"x.y.z.t" ]; then
+			echo "Unable to find the correct appliance base IP for $1 - edit your conf file to change x.y.z.t and create the appliance"
 			exit -1
 		fi
 	fi
@@ -136,37 +152,37 @@ get_appliance_baseip() {
 }
 
 # This function updates the LDAP passwd with $randompw for the student under management (using $stdid)
-update_ldap_passwd() {
+wod_update_ldap_passwd() {
 
 	# define that variable to overload the student name (used by sec-student e.g.)
-	if [ _"$LDAPSETUPUSER" = _"" ]; then
-		LDAPSETUPUSER="student"
+	if [ _"$WODLDAPSETUPUSER" = _"" ]; then
+		WODLDAPSETUPUSER="student"
 	fi
 	rm -f /tmp/ldif.$$
 	cat > /tmp/ldif.$$ << EOF
 
 # modify user password
-dn: uid=$LDAPSETUPUSER$stdid,ou=People,{{ LDAPDMN }}
+dn: uid=$WODLDAPSETUPUSER$stdid,ou=People,{{ WODLDAPDMN }}
 changetype: modify
 replace: userPassword
 userPassword: $randompw
 EOF
-	ldapmodify -D "cn=Directory Manager" -w {{ LDAPPWD }} -p {{ LDAPPORT }} -h {{ LDAPSRVNAME }} -x -f /tmp/ldif.$$
+	ldapmodify -D "cn=Directory Manager" -w {{ WODLDAPPWD }} -p {{ WODLDAPPORT }} -h {{ WODLDAPSRVNAME }} -x -f /tmp/ldif.$$
 	rm -f /tmp/ldif.$$
 }
 
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
-create_var_passwd() {
+wod_create_var_passwd() {
   
-	if [ ! -d "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass" ]; then
-		mkdir -p "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass"
+	if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
+		mkdir -p "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 	fi
 	# It's now mandatory that vault_secret is located in the private part
-	ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+	ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 }
 
 # This function retuns the workshop name from the mail body
-get_workshop_name() {
+wod_get_workshop_name() {
 
 	read w
 	if [ ! -n "$w" ]; then
@@ -181,12 +197,12 @@ get_workshop_name() {
 	echo "$w"
 }
 
-erase_student() {
+wod_erase_student() {
 
 	if [ _"$stddir" != _"" ]; then
 		echo "Erasing target student dir $stddir content"
 		sudo rm -rf $stddir/* $stddir/.??*
-		sudo cp -a {{ WODBEDIR }}/skel/.??* `find {{ WODPRIVDIR }}/skel -name '.??*'` $stddir
+		sudo cp -a {{ WODINSDIR }}/../skel/.??* `find {{ WODPRIVDIR }}/skel -name '.??*'` $stddir
 		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
 		echo "Create ssh keys to allow remote connections to appliance if needed"
 		sudo su - student${stdid} -c "ssh-keygen -b 2048 -t rsa -f .ssh/id_rsa -N ''"
@@ -194,7 +210,7 @@ erase_student() {
 }
 
 # This function creates a random password for a user, it is used for local and ldap users'passwords.
-generate_randompwd() {
+wod_generate_randompwd() {
 
 	if [ _"$RANDOMPW" != _"" ]; then
 		export randompw=$RANDOMPW
@@ -206,11 +222,11 @@ generate_randompwd() {
 
 
 # This function calculates a completion ratio at the end of a  workshop-on-demand.
-get_wod_completion_ratio() {
+wod_get_completion_ratio() {
 
 	cd $stddir/
 	when=$(date +"%Y-%m-%d %H:%m:%S")
-	what=$(ls | grep 'WKSHP')
+	what=$1
 	who=student$stdid
 	total=$(grep execution_count $what/*.ipynb  | wc -l)
 	missed=$(grep execution_count $what/*.ipynb  | grep null | wc -l)
@@ -226,11 +242,13 @@ get_wod_completion_ratio() {
 
 
 # Cleanup remaining processes for that student after the run
-cleanup_processes_student() {
+wod_cleanup_processes_student() {
+	set +e
 	ids=`ps auxww | grep /student$stdid | grep -v grep | awk '{ print $2 }'`
 	if [ _"$ids" != _"" ]; then
 		sudo kill $ids
 		sleep 2
 		sudo kill -9 $ids
 	fi
+	set -e
 }

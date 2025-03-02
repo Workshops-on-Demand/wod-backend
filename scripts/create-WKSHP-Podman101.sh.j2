@@ -2,11 +2,11 @@
 #script to create wod Podman101
 set -x
 
-source {{ SCRIPTDIR }}/functions.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 # Start by cleaning up stuff - do it early as after we setup .ssh content
-{{ SCRIPTDIR }}/reset-$ws.sh
-{{ SCRIPTDIR }}/create-appliance.sh
+{{ WODSCRIPTDIR }}/reset-$ws.sh
+{{ WODSCRIPTDIR }}/create-appliance.sh
 
 NAME=podmanlab
 TMPDIR=/tmp/$NAME.$stdid
@@ -16,26 +16,26 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-APPMIN=`get_range_min $wid`
+WODAPPMIN=`wod_get_range_min $wid`
 echo stdid=$stdid
-echo APPMIN=$APPMIN
+echo WODAPPMIN=$WODAPPMIN
 sshport={{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Podman101'] }}
-httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Podman101'] }}))
+httpport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Podman101'] }}))
 
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
-Host $RTARGET
+Host $WODRTARGET
     Port $sshport
 EOF
 
 
 # ansible-vault to store it in the pass file creating a PODMANTOK ansible variable
-if [ ! -d "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass" ]; then
-	mkdir -p "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass"
+if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
+	mkdir -p "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 fi
-ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo rm -rf $TMPDIR
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo rm -rf $TMPDIR
 rm -rf $TMPDIR

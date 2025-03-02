@@ -1,26 +1,26 @@
 ---
 - name: Install a base system
-  ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_base_system.yml"
+  ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/install_base_system.yml"
 
 - name: Ensure that student directory exists
   become: true
   become_user: root
   ansible.builtin.file:
-    path: "{{ STUDDIR }}"
+    path: "{{ WODSTUDDIR }}"
     state: directory
     owner: "{{ WODUSER }}"
     group: "{{ WODUSER }}"
     mode: '0711'
 
-- name: Use USERMIN for APPMIN if installing
+- name: Use WODUSERMIN for WODAPPMIN if installing
   ansible.builtin.set_fact:
-    APPMIN: "{{ USERMIN }}"
-  when: APPMIN is not defined
+    WODAPPMIN: "{{ WODUSERMIN }}"
+  when: WODAPPMIN is not defined
 
-- name: Use USERMAX for APPMAX if installing
+- name: Use WODUSERMAX for WODAPPMAX if installing
   ansible.builtin.set_fact:
-    APPMAX: "{{ USERMAX }}"
-  when: APPMAX is not defined
+    WODAPPMAX: "{{ WODUSERMAX }}"
+  when: WODAPPMAX is not defined
 
 - name: Remove Linux users and their home directory
   become: true
@@ -30,7 +30,7 @@
     state: absent
     remove: true
     force: true
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"
   when: CLEAN | bool
 
 - name: Ensure dedicated students groups exist
@@ -40,8 +40,8 @@
     name: "{{ 'student%s' | format(item) }}"
     state: present
     gid: "{{ item + GIDBASE }}"
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
-  when: LDAPSETUP != "1"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"
+  when: WODLDAPSETUP != "1"
 
 - name: Ensure Linux students users exists with their home dir
   become: true
@@ -50,13 +50,13 @@
     name: "{{ 'student%s' | format(item) }}"
     state: present
     create_home: true
-    home: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+    home: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
     comment: "{{ 'student%s' | format(item) }}"
     shell: /bin/bash
     uid: "{{ item + UIDBASE }}"
     group: "{{ 'student%s' | format(item) }}"
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
-  when: LDAPSETUP != "1"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"
+  when: WODLDAPSETUP != "1"
 
 - name: Disable SELinux for now as our students are non-standard
   become: true
@@ -74,9 +74,9 @@
   become: true
   become_user: root
   ansible.builtin.file:
-    path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+    path: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
     owner: "{{ 'student%s' | format(item) }}"
     group: "{{ 'student%s' | format(item) }}"
     mode: '0750'
     state: directory
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"

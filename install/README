@@ -1,3 +1,0 @@
-install.sh manages parameters and creates some env variables, as root then calls as WODUSER
-install-system-commons.sh which manages git clone, ssh rights/keys, , then calls 
-install-system.sh which manages wod.sh with vars, ansible-galaxy installs, ansible setup (inventory, group_vars/PKBDIR, PRIV content, ...), calls ansible, and application launch with pm2

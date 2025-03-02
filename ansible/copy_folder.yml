@@ -5,8 +5,8 @@
   hosts: all
   gather_facts: true
   vars:
-    VARDIR: "{{ ANSIBLEDIR }}/{{ PBKDIR }}"
-    VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}"
+    VARDIR: "{{ WODANSIBLEDIR }}/{{ WODGROUP }}"
+    VARPRIVDIR: "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}"
   tasks:
     - name: Check var STDID
       ansible.builtin.fail:
@@ -23,10 +23,10 @@
         msg: CHALLENGE variable is empty ! Fat fingers ?!?
       when: CHALLENGE is not defined
 
-    - name: Check var PBKDIR
+    - name: Check var WODGROUP
       ansible.builtin.fail:
-        msg: PBKDIR variable is empty ! Fat fingers ?!?
-      when: PBKDIR is not defined
+        msg: WODGROUP variable is empty ! Fat fingers ?!?
+      when: WODGROUP is not defined
 
     - name: Load variables generated at install time
       ansible.builtin.include_vars: /etc/wod.yml
@@ -140,14 +140,14 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         state: absent
 
     - name: Create workspace directory for jupyter
       become: true
       become_user: root
       ansible.builtin.file:
-        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces"
+        path: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces"
         state: directory
         owner: student{{ STDID }}
         group: student{{ STDID }}
@@ -158,8 +158,8 @@
       become: true
       become_user: root
       ansible.builtin.template:
-        src: "{{ SYSDIR }}/lab-a511.jupyterlab-workspace.j2"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
+        src: "{{ WODSYSDIR }}/lab-a511.jupyterlab-workspace.j2"
+        dest: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: "0644"
@@ -174,7 +174,7 @@
     - name: Synchronize target students with Notebooks Workshop content
       ansible.posix.synchronize:
         src: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        dest: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts:
           - --exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1
       when:
@@ -189,7 +189,7 @@
     - name: Synchronize target students with private Notebooks Workshop content
       ansible.posix.synchronize:
         src: "{{ WODPRIVNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        dest: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts:
           - --exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1
       when:
@@ -198,12 +198,12 @@
 
     - name: Check a private pre_templating.yml file exists
       ansible.builtin.stat:
-        path: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+        path: "{{ WODANSIBLEPRIVDIR }}/pre_templating.yml"
       ignore_errors: true
       register: pretemp
 
     - name: Include pre-templatnig tasks
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/pre_templating.yml"
       when: pretemp.stat.exists
 
     # - name: debug
@@ -214,7 +214,7 @@
     - name: Deliver notebooks as ansible template for variable expansion
       ansible.builtin.template:
         src: "{{ item }}"
-        dest: "{{ item | regex_replace(WODNOBO, STUDDIR + '/student' + STDID) }}"
+        dest: "{{ item | regex_replace(WODNOBO, WODSTUDDIR + '/student' + STDID) }}"
         mode: "0644"
       with_items: "{{ notebooks | json_query('files[*].path') }}"
       when:
@@ -223,7 +223,7 @@
     - name: Deliver private notebooks as ansible template for variable expansion
       ansible.builtin.template:
         src: "{{ item }}"
-        dest: "{{ item | regex_replace(WODPRIVNOBO, STUDDIR + '/student' + STDID) }}"
+        dest: "{{ item | regex_replace(WODPRIVNOBO, WODSTUDDIR + '/student' + STDID) }}"
         mode: "0644"
       with_items: "{{ notebookspriv | json_query('files[*].path') }}"
       when:
@@ -232,17 +232,17 @@
 
     - name: Check a private post_templating.yml file exists
       ansible.builtin.stat:
-        path: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+        path: "{{ WODANSIBLEPRIVDIR }}/post_templating.yml"
       ignore_errors: true
       register: posttemp
 
     - name: Include post-templating tasks
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/post_templating.yml"
       when: posttemp.stat.exists
 
     - name: Create a checkpoint directory
       ansible.builtin.file:
-        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints"
+        path: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints"
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -252,16 +252,16 @@
       become: true
       become_user: root
       ansible.builtin.copy:
-        src: "{{ SYSDIR }}/wod-generate-pdf.sh"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/wod-generate-pdf.sh"
+        src: "{{ WODSYSDIR }}/wod-generate-pdf.sh"
+        dest: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/wod-generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: "0755"
 
     - name: Create a checkpoint file for the user
       ansible.builtin.copy:
-        src: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
+        src: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/0-ReadMeFirst.ipynb"
+        dest: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/.ipynb_checkpoints/0-ReadMeFirst-checkpoint.ipynb"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
         mode: "0644"
@@ -270,7 +270,7 @@
       become: true
       become_user: root
       ansible.builtin.file:
-        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         recurse: true
@@ -280,7 +280,7 @@
       become: true
       become_user: root
       ansible.posix.acl:
-        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: true
         entity: "{{ WODUSER }}"
         etype: user
@@ -291,7 +291,7 @@
       become: true
       become_user: root
       ansible.posix.acl:
-        path: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: true
         entity: "{{ WODUSER }}"
         etype: user

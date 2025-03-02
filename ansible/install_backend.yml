@@ -8,10 +8,10 @@
     WODDVER: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
   tasks:
     - name: Include variables for the underlying distribution
-      ansible.builtin.include_vars: "{{ ANSIBLEDIR }}/group_vars/{{ WODDVER }}.yml"
+      ansible.builtin.include_vars: "{{ WODANSIBLEDIR }}/group_vars/{{ WODDVER }}.yml"
 
     - name: Base setup for a JupyterHub environment server or appliance
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_base_appliance.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEDIR }}/setup_base_appliance.yml"
 
     - name: Add CentOS SC repository into repo list
       become: true
@@ -253,6 +253,7 @@
       ansible.builtin.package:
         name:
           - golang
+        state: absent
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
@@ -306,7 +307,6 @@
           - expect
           - terraform
         state: present
-        update_cache: true
 
     - name: Ensure all required DEB packages are installed
       become: true
@@ -328,7 +328,6 @@
           - nfs-common
           - libcrypt-passwdmd5-perl
           - libopenmpi-dev
-          - fail2ban
           - libproc-processtable-perl
           - acct
           - netcat-openbsd
@@ -342,6 +341,7 @@
       ansible.builtin.package:
         name:
           - golang
+        state: present
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version > "20"
@@ -352,6 +352,7 @@
       ansible.builtin.package:
         name:
           - golang-go
+        state: present
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
@@ -369,7 +370,6 @@
           - zeromq-devel
           - perl-Crypt-PasswdMD5
           - openmpi-devel
-          - fail2ban-all
           - perl-Proc-ProcessTable
           - perl-Data-Dumper
           - psacct
@@ -541,8 +541,15 @@
         path: "{{ ansible_env.HOME }}/go"
         state: absent
 
-    - name: Ensure that this a compliant WoD system
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
+    - name: Adds jupyterhub binaries path to PATH
+      ansible.builtin.blockinfile:
+        path: "{{ ansible_env.HOME }}/.profile"
+        block: |
+          #######################################################################################
+          # set PATH so venv binaries are seen before system ones
+          if [ -d "/opt/jupyterhub//bin" ] ; then
+              PATH="/opt/jupyterhub/bin:$PATH"
+          fi
 
     # In this part we manage the jupyterhub setup
     #
@@ -550,7 +557,7 @@
       become: true
       become_user: root
       ansible.builtin.template:
-        src: "{{ SYSDIR }}/kernel_python.j2"
+        src: "{{ WODSYSDIR }}/kernel_python.j2"
         dest: /usr/local/bin/kernel_python
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -580,10 +587,10 @@
         src: "{{ item }}"
         dest: /usr/local/bin/{{ item | basename | regex_replace('\.j2$') }}
         mode: "0755"
-      with_fileglob: ["{{ SCRIPTDIR }}/build*.sh.j2"]
+      with_fileglob: ["{{ WODSCRIPTDIR }}/build*.sh.j2"]
 
     - name: Ensure Rust kernel is installed
-      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ WODDVER }}" --install
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ WODSYSDIR }}/evcxr_jupyter.{{ WODDVER }}" --install
       register: result
       changed_when: result.rc != 0
 
@@ -597,14 +604,14 @@
     - name: Fix kernel path for rust
       ansible.builtin.replace:
         path: "{{ JPHUB }}/share/jupyter/kernels/rust/kernel.json"
-        regexp: (\s)+"{{ SYSDIR }}evcxr_jupyter.{{ WODDVER }}".*$
+        regexp: (\s)+"{{ WODSYSDIR }}evcxr_jupyter.{{ WODDVER }}".*$
         replace: \1"/usr/local/bin/evcxr_jupyter",
 
     - name: Ensure Rust kernel is deployed
       become: true
       become_user: root
       ansible.builtin.copy:
-        src: "{{ SYSDIR }}/evcxr_jupyter.{{ WODDVER }}"
+        src: "{{ WODSYSDIR }}/evcxr_jupyter.{{ WODDVER }}"
         dest: /usr/local/bin/evcxr_jupyter
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -649,7 +656,7 @@
 
     # - name: Patch ansible kernel with fixes coming from master
     # ansible.posix.patch:
-    #  src: "{{ SYSDIR }}/master-vs-0.9.0.patch"
+    #  src: "{{ WODSYSDIR }}/master-vs-0.9.0.patch"
     # basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
     # strip: 2
     # backup: true
@@ -771,6 +778,15 @@
         - jupyterhub
         - wod-kill-processes
 
+    - name: Copy WoD service file as ansible template for variable expansion
+      become: true
+      become_user: root
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
+        mode: "0644"
+      with_fileglob: ["{{ WODINSSYSDIR }}/wod-*.service.j2"]
+
     - name: Remove jupyterhub configuration file
       become: true
       become_user: root
@@ -866,7 +882,7 @@
         src: "{{ item }}"
         dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
         mode: "0644"
-      with_fileglob: ['{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2']
+      with_fileglob: ['{{ WODSYSDIR }}//jupyterhub.service.j2', '{{ WODSYSPRIVDIR }}//jupyterhub.service.j2']
 
     - name: Enable WoD service
       become: true
@@ -879,10 +895,10 @@
       with_items:
         - jupyterhub
 
-    - name: Wait 5 seconds to let WoD services start
-      ansible.builtin.command: "sleep 5"
-      register: result
-      changed_when: result.rc != 0
+    - name: Wait enough to let WoD services start
+      ansible.builtin.wait_for:
+      port: "{{ WODBEPORT }}"
+      delay: 5
 
       # - name: Setup {{ WODUSER }} account in jupyterhub
       # uri:
@@ -906,7 +922,7 @@
 
     - name: Setup ansible configuration
       ansible.builtin.copy:
-        src: "{{ WODBEDIR }}/.ansible.cfg"
+        src: "{{ WODINSANSDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
         mode: "0644"
 
@@ -919,44 +935,8 @@
         enabled: true
         name: postfix
 
-    - name: Configure fail2ban filter
-      become: true
-      become_user: root
-      ansible.builtin.copy:
-        src: "{{ SYSDIR }}/fail2ban.conf"
-        dest: /etc/fail2ban/filter.d/jupyterhub.conf
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Configure fail2ban jail
-      become: true
-      become_user: root
-      ansible.builtin.copy:
-        src: "{{ SYSDIR }}/fail2ban.jail"
-        dest: /etc/fail2ban/jail.local
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Configure fail2ban action
-      become: true
-      become_user: root
-      ansible.builtin.copy:
-        src: "{{ SYSDIR }}/fail2ban.action"
-        dest: /etc/fail2ban/action.d/jupyterhub.conf
-        owner: root
-        group: root
-        mode: "0755"
-
-    - name: Enable fail2ban
-      become: true
-      become_user: root
-      ansible.builtin.systemd:
-        state: started
-        daemon_reload: true
-        enabled: true
-        name: fail2ban
+    - name: Setup security
+      ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/install_secure.yml"
 
     # On CentOS 7 we need to remove strict mode for sshd to work with our conf (mode 770 needed for user home dirs)
     - name: Fix sshd conf on CentOS/Rocky
@@ -997,12 +977,12 @@
         - nobo_path.rc != 0
 
     - name: Test private tasks YAML file
-      ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
+      ansible.builtin.command: ls "{{ WODANSIBLEPRIVDIR }}/install_backend.yml"
       register: acj_path
       failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/install_backend.yml"
       when:
         - acj_path.rc == 0

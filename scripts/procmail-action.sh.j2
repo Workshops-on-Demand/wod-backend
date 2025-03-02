@@ -12,9 +12,10 @@ set -e
 set -x
 
 # Defines WODBEDIR
-source {{ SCRIPTDIR }}/wod.sh
-source {{ SCRIPTDIR }}/random.sh
-source {{ SCRIPTDIR }}/functions.sh
+source /etc/wod.sh
+source {{ WODSCRIPTPRIVDIR }}/wod-private.sh
+source {{ WODSCRIPTDIR }}/random.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 #
 # Main part
 #
@@ -22,9 +23,7 @@ source {{ SCRIPTDIR }}/functions.sh
 #
 
 # endpoint variable - Has to be global
-export WODAPIDBURL={{ WODAPIDBURL }}
-WODAPIDBUSER={{ WODAPIDBUSER }}
-WODAPIDBUSERPWD={{ WODAPIDBUSERPWD }}
+export WODAPIDBEXTURL={{ WODAPIDBEXTURL }}
 export USER=$LOGNAME
 
 # Main of script
@@ -52,34 +51,43 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
-export stddir="{{ STUDDIR }}/student$stdid"
-export accessToken=`get_session_token`
+export stddir="{{ WODSTUDDIR }}/student$stdid"
+export accessToken=`wod_get_session_token`
 
 # Increment the student ID by Number of jupyterhub students in students table
 # Only for API Calls 
 dbstdid=$((stdid+{{ WODBASESTDID }}))
 
-# for PURGE we just need stddir and stdid
+userid=$1
+if [ _"$1" = _"" ]; then
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET|PURGE> <student id> <user id>"
+	echo "Customer id is mandatory"
+	exit -1
+fi
+
+# for PURGE we just need stddir and stdid and userid
 if [ "$action" = "PURGE" ]; then
-	curl --header "Authorization: token {{ WODBETOKEN }}" \
+	wod_wait_till_clean $userid
+	curl $WODCURLOPT --header "Authorization: token {{ WODBETOKEN }}" \
             --location \
             --request DELETE \
             "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
-	generate_randompwd
+	wod_generate_randompwd
 	# Unassign student and update student
-	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+	curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					--request PUT \
 					--data '{
 						"assigned":"false",\
 		 				"password":"'$randompw'"\
 						}' \
-					"$WODFEAPIURL/student/$dbstdid"
-	erase_student
-	cleanup_processes_student
+					"$WODAPIDBEXTURL/student/$dbstdid"
+	wod_erase_student
+	wod_cleanup_processes_student
+	echo "end of procmail-action for student $stdid (passwd $randompw) with workshop $w with action $action at `date`"
     exit 0
 fi
 
-w=`get_workshop_name`
+w=`wod_get_workshop_name`
 # We differentiate Challenges from Workshop by creating a MODEWS variable
 # Later passed as an ansible variable as well to process the notebook
 ws=`echo $w |sed 's/CHLG/WKSHP/'`
@@ -91,58 +99,52 @@ fi
 # If that doesn't fail, then export the workshop name
 export w
 export ws
-export wid=`get_workshop_id $w`
+export wid=`wod_get_workshop_id $w`
 #
 # Is it a no- or mono- or multi-appliance setup ?
-multiappliance=`get_multiappliance_status $wid`
-monoappliance=`get_monoappliance_status $wid`
-if [ _"`get_multiappliance_status $wid`" = _"true" ]; then
-	APPMINVALUE=`get_range_min $wid`
-	delta=$(($stdid-$APPMINVALUE))
-	baseip=`get_appliance_baseip $w`
+multiappliance=`wod_get_multiappliance_status $wid`
+monoappliance=`wod_get_monoappliance_status $wid`
+if [ _"`wod_get_multiappliance_status $wid`" = _"true" ]; then
+	WODAPPMINVALUE=`wod_get_range_min $wid`
+	delta=$(($stdid-$WODAPPMINVALUE))
+	baseip=`wod_get_appliance_baseip $w`
 	basedigit=`echo $baseip | cut -d'.' -f4`
 	netip=`echo $baseip | cut -d'.' -f1-3`
 	ip=$(($basedigit+$delta))
-	export RTARGET="$netip.$ip"
+	export WODRTARGET="$netip.$ip"
 else
-	if [ _"`get_monoappliance_status $wid`" = _"true" ]; then
-		export RTARGET=`get_appliance_baseip $w`
+	if [ _"`wod_get_monoappliance_status $wid`" = _"true" ]; then
+		export WODRTARGET=`wod_get_appliance_baseip $w`
 	fi
-	# If no appliance, we do not define RTARGET on purpose
+	# If no appliance, we do not define WODRTARGET on purpose
 fi
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
-	teststdid $stdid
+	wod_test_stdid $stdid
 
-	userid=$1
-	if [ _"$1" = _"" ]; then
-		echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
-		echo "Customer id is mandatory"
-		exit -1
-	fi
 
 	cd $WODNOBO
 
 	# Read workshop list on stdin
 	if [ -d "$stddir" ]; then
 		# Now change passwd
-		generate_randompwd
+		wod_generate_randompwd
 
 		# Some Notebooks need an LDAP passwd update as well
-		if [ _"`get_ldap_status $wid`" = _"true" ]; then
-			update_ldap_passwd
-			create_var_passwd
+		if [ _"`wod_get_ldap_status $wid`" = _"true" ]; then
+			wod_update_ldap_passwd
+			wod_create_var_passwd
 		fi
 		# Some Notebooks need to get the passwd for the user
-		if [ _"`get_varpass_status $wid`" = _"true" ]; then
-			create_var_passwd
+		if [ _"`wod_get_varpass_status $wid`" = _"true" ]; then
+			wod_create_var_passwd
 		fi
 
 		if [ "$action" = "CREATE" ]; then
-			erase_student
+			wod_erase_student
 			# compile flag is a STRING not a boolean
-			compile=`get_compile_status $wid`
+			compile=`wod_get_compile_status $wid`
 			if [ _"$compile" = _"null" ]; then
 				compile=""
 			fi
@@ -150,9 +152,9 @@ if [ $action != "RESET" ]; then
 				compilepub=""
 				compilepriv=""
 				for s in `echo $compile | tr ',' '\n'`; do
-					if [ -f "{{ SCRIPTDIR }}/$s" ]; then
+					if [ -f "{{ WODSCRIPTDIR }}/$s" ]; then
 						compilepub="$s,$compilepub"
-					elif  [ -f "{{ SCRIPTPRIVDIR }}/$s" ]; then
+					elif  [ -f "{{ WODSCRIPTPRIVDIR }}/$s" ]; then
 						compilepriv="$s,$compilepriv"
 					fi
 				done
@@ -160,50 +162,50 @@ if [ $action != "RESET" ]; then
 				compilepriv=`echo $compilepriv | sed 's|,$||'`
 				# Same compile_scripts.yml used with different calls for public/private
 				if [ _"$compilepub" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" -e "VARDIRECTORY={{ ANSIBLEDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "WODSCRIPTDIRECTORY={{ WODSCRIPTDIR }}" -e "VARDIRECTORY={{ WODANSIBLEDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT
 				fi
 				if [ _"$compilepriv" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "WODSCRIPTDIRECTORY={{ WODSCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT
 				fi
 			fi
-			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTDIR }}/create-$ws.sh" ]; then
 				echo "Setup workshop $w appliance"
 
-				{{ SCRIPTDIR }}/create-$ws.sh
+				{{ WODSCRIPTDIR }}/create-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/create-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/create-$ws.sh" ]; then
 				echo "Setup private workshop $w appliance"
-				{{ SCRIPTPRIVDIR }}/create-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEPRIVDIR }}/vault_secret
-			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
+			ansible-playbook {{ WODANSIBLEDIR }}/copy_folder.yml -i {{ WODANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $WODANSPLAYOPT $WODANSPRIVOPT --vault-password-file {{ WODANSIBLEPRIVDIR }}/vault_secret
+			if [ -x "{{ WODSCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
-				{{ SCRIPTDIR }}/post-copy-$ws.sh
+				{{ WODSCRIPTDIR }}/post-copy-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for private workshop $w"
-				{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
-			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml
 		fi
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		# Update Password
-		curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+		curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 			 --request PUT \
 			 --data '{"password":"'$randompw'"}' \
-			 "$WODAPIDBURL/student/$dbstdid"
+			 "$WODAPIDBEXTURL/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
-			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				 --request PUT \
 				 --data '{"active": "true"}' \
-				 "$WODAPIDBURL/customer/$userid"
+				 "$WODAPIDBEXTURL/customer/$userid"
 			##Start Student jupyterhub dedicated server
-			curl --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "Content-Type: application/json" \
 				 --header "Authorization: token {{ WODBETOKEN }}" \
 				 --location \
 				 --request POST \
@@ -212,52 +214,57 @@ if [ $action != "RESET" ]; then
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Launch cleanup script if any
-			if [ -x "{{ SCRIPTDIR }}/cleanup-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTDIR }}/cleanup-$ws.sh" ]; then
 				echo "Cleaning up workshop $w"
-				{{ SCRIPTDIR }}/cleanup-$ws.sh
+				{{ WODSCRIPTDIR }}/cleanup-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/cleanup-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/cleanup-$ws.sh" ]; then
 				echo "Cleaning up private workshop $w"
-				{{ SCRIPTPRIVDIR }}/cleanup-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/cleanup-$ws.sh
 			fi
 			# Keep completion status
-			completion=`get_wod_completion_ratio`
+			completion=`wod_get_completion_ratio $ws`
 
 			# Update completion ratio figure in customer table
-			 curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			 curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
               			 --request PUT \
               			 --data '{"completionPercentage": "'$completion'"}' \
-               			"$WODAPIDBURL/customer/$userid"
+               			"$WODAPIDBEXTURL/customer/$userid"
 
 
 			# Delete Student jupyterhub dedicated server
-			curl --header "Authorization: token {{ WODBETOKEN }}" \
+			curl $WODCURLOPT --header "Authorization: token {{ WODBETOKEN }}" \
 				--location \
 			--request DELETE \
                          "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 
-			# Get Worshop reset status to determine if users should be updated to inactive or not
-			if [ _"`get_reset_status $wid`" = _"true" ]; then
-				# Update student status to active
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			# Get Workshop reset status to determine if users should be updated to inactive or not
+			if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
+				# Update student status to assigned
+				curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
-					 "$WODAPIDBURL/student/$dbstdid"
-				# set customer to inactive by default for all workshops
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+					 "$WODAPIDBEXTURL/student/$dbstdid"
+				# Update customer status to inactive
+				curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					     --request PUT \
 					     --data '{"active": "false"}' \
-					     "$WODAPIDBURL/customer/$userid"
+					     "$WODAPIDBEXTURL/customer/$userid"
 			else
-				# Update student status to inactive
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+				# Update student status to unassigned
+				curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"false"}' \
-					 "$WODAPIDBURL/student/$dbstdid"
+					 "$WODAPIDBEXTURL/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
-	 			erase_student
-				cleanup_processes_student
+				wod_erase_student
+				wod_cleanup_processes_student
 			fi
+			# Update customer cleaned status to true
+			curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+				     --request PUT \
+				     --data '{"cleaned": "true"}' \
+				     "$WODAPIDBEXTURL/customer/$userid"
 		else
 			echo "Unknown action $action"
 		fi
@@ -266,15 +273,14 @@ if [ $action != "RESET" ]; then
 	fi
 
 elif [ "$action" = "RESET" ]; then
-	# Avoid concurrency with CLEANUP phase
-	sleep 10
-	if [ _"`get_reset_status $wid`" = _"true" ]; then
+	wod_wait_till_clean $userid
+	if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`
-			teststdid $min
+			wod_test_stdid $min
 			max=`echo $stdid | cut -d, -f2`
-			teststdid $max
+			wod_test_stdid $max
 			min=$((min+{{ WODBASESTDID }}))
 			max=$((max+{{ WODBASESTDID }}))
 			i=$max
@@ -282,12 +288,13 @@ elif [ "$action" = "RESET" ]; then
 			cap=$((max-min+1))
 
 			# API call to Now reset capacity to original value
-	        	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			# Oneview & advanced WKSHP case
+	        curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"capacity":"'$cap'"}' \
-				"$WODAPIDBURL/workshop/$wid"
+				"$WODAPIDBEXTURL/workshop/$wid"
 		else
-			teststdid $stdid
+			wod_test_stdid $stdid
 			# We have a single value to manage
 			i=$((stdid+{{ WODBASESTDID }}))
 			j=$((stdid+{{ WODBASESTDID }}))
@@ -298,41 +305,41 @@ elif [ "$action" = "RESET" ]; then
 			# Then call the reset script
 			# Now change passwd as sometimes the reset script needs to have it
 			stdid=$((i-{{ WODBASESTDID }}))
-			generate_randompwd
+			wod_generate_randompwd
 	
 			# Some Notebooks need an LDAP passwd update as well
-			if [ _"`get_ldap_status $wid`" = _"true" ]; then
-				update_ldap_passwd
+			if [ _"`wod_get_ldap_status $wid`" = _"true" ]; then
+				wod_update_ldap_passwd
 			fi
 			((i=i-1))
 		done
 
 		# Get Workshop backend reset status
-		if [ ! -x "{{ SCRIPTDIR }}/reset-$ws.sh" ] && [ ! -x "{{ SCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
+		if [ ! -x "{{ WODSCRIPTDIR }}/reset-$ws.sh" ] && [ ! -x "{{ WODSCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
-			if [ -x "{{ SCRIPTDIR }}/reset-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTDIR }}/reset-$ws.sh" ]; then
 				echo "Reseting workshop $w Backend"
-				{{ SCRIPTDIR }}/reset-$ws.sh
+				{{ WODSCRIPTDIR }}/reset-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
 				echo "Reseting private workshop $w Backend"
-				{{ SCRIPTPRIVDIR }}/reset-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/reset-$ws.sh
 			fi
 		fi
 
 		while [ $j -ge $min ]; do
 			# API call
 			# Update student status to unassigned
-			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"assigned":"false"}' \
-				"$WODAPIDBURL/student/$j"
+				"$WODAPIDBEXTURL/student/$j"
 			stdid=$((j-{{ WODBASESTDID }}))
-			stddir="{{ STUDDIR }}/student$stdid"
-			erase_student
-			cleanup_processes_student
+			stddir="{{ WODSTUDDIR }}/student$stdid"
+			wod_erase_student
+			wod_cleanup_processes_student
 			((j=j-1))
 		done
 	fi

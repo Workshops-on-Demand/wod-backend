@@ -2,11 +2,11 @@
 
 set -x
 
-source {{ SCRIPTDIR }}/functions.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 # Start by cleaning up stuff - do it early as after we setup .ssh content
-{{ SCRIPTDIR }}/reset-$ws.sh
-{{ SCRIPTDIR }}/create-appliance.sh
+{{ WODSCRIPTDIR }}/reset-$ws.sh
+{{ WODSCRIPTDIR }}/create-appliance.sh
 
 NAME=ansiblelab
 TMPDIR=/tmp/$NAME.$stdid
@@ -16,24 +16,24 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-APPMIN=`get_range_min $wid`
+WODAPPMIN=`wod_get_range_min $wid`
 echo stdid=$stdid
-echo APPMIN=$APPMIN
+echo WODAPPMIN=$WODAPPMIN
 
 # Adapt the ssh config for the student
 cat > $TMPDIR/config << EOF
 Host *
     StrictHostKeyChecking no
 EOF
-sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
+sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ WODSTUDDIR }}/student$stdid/.ssh/
 # Allow local ssh connection without passwd
-sudo install -m 0600 -o student$stdid -g student$stdid {{ STUDDIR }}/student$stdid/.ssh/id_rsa.pub {{ STUDDIR }}/student$stdid/.ssh/authorized_keys
+sudo install -m 0600 -o student$stdid -g student$stdid {{ WODSTUDDIR }}/student$stdid/.ssh/id_rsa.pub {{ WODSTUDDIR }}/student$stdid/.ssh/authorized_keys
 
 # Setup Remote appliance account
-ssh -q {{ NOCHECKSSH }} $RTARGET mkdir -p $TMPDIR
-scp -q {{ NOCHECKSSH }} $TMPDIR/config $RTARGET:$TMPDIR
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo htpasswd -b /etc/httpd/conf/htpasswd student$stdid $randompw
+ssh -q {{ NOCHECKSSH }} $WODRTARGET mkdir -p $TMPDIR
+scp -q {{ NOCHECKSSH }} $TMPDIR/config $WODRTARGET:$TMPDIR
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ WODSTUDDIR }}/student$stdid/.ssh/
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo htpasswd -b /etc/httpd/conf/htpasswd student$stdid $randompw
 
 # Cleanup
 rm -rf $TMPDIR

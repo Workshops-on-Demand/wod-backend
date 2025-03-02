@@ -16,10 +16,10 @@ echo "Range from $startrange to $endrange"
 
 echo "This script will empty home folders of students from $startrange to $endrange"
 
-source {{ SCRIPTDIR }}/wod.sh
-source {{ SCRIPTDIR }}/functions.sh
+source /etc/wod.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 for stdid in $(seq $startrange $endrange); do 
-	stddir="{{ STUDDIR }}/student$stdid"
-	erase_student
+	stddir="{{ WODSTUDDIR }}/student$stdid"
+	wod_erase_student
 done

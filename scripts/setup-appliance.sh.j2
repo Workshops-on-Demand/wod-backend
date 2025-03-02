@@ -22,8 +22,9 @@ exec &> >(tee $HOME/.mail/setup-appliance-$w)
 shift
 echo "We are working on the setup of the $w appliance"
 
-source {{ SCRIPTDIR }}/wod.sh
-source {{ SCRIPTDIR }}/functions.sh
+source /etc/wod.sh
+source {{ WODSCRIPTPRIVDIR }}/wod-private.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 #
 # Main part
 #
@@ -32,99 +33,97 @@ source {{ SCRIPTDIR }}/functions.sh
 
 # endpoint variable - Has to be global
 echo "Prepare environment variables for Workshop $w at `date`"
-export WODAPIDBURL={{ WODAPIDBURL }}
-export WODAPIDBUSER={{ WODAPIDBUSER }}
-export WODAPIDBUSERPWD={{ WODAPIDBUSERPWD }}
-export accessToken=`get_session_token`
+export WODAPIDBEXTURL={{ WODAPIDBEXTURL }}
+export accessToken=`wod_get_session_token`
 # If that doesn't fail, then export the workshop name
-export wid=`get_workshop_id $w`
+export wid=`wod_get_workshop_id $w`
 #export WKSHP=`echo $w | sed 's/WKSHP-//' | tr [a-z] [A-Z]`
 
 # Is it a multi-appliance setup ?
-multiappliance=`get_multiappliance_status $wid`
-monoappliance=`get_monoappliance_status $wid`
+multiappliance=`wod_get_multiappliance_status $wid`
+monoappliance=`wod_get_monoappliance_status $wid`
 echo "Searching for appliance base IP"
-baseip=`get_appliance_baseip $w`
-export APPMINVALUE=`get_range_min $wid`
-export APPMIN=$APPMINVALUE
-max=`get_range_max $wid`
-export APPMAX=$(($max+1))
+baseip=`wod_get_appliance_baseip $w`
+export WODAPPMINVALUE=`wod_get_range_min $wid`
+export WODAPPMIN=$WODAPPMINVALUE
+max=`wod_get_range_max $wid`
+export WODAPPMAX=$(($max+1))
 
 basedigit=`echo $baseip | cut -d'.' -f4`
 netip=`echo $baseip | cut -d'.' -f1-3`
 
 # Loop on the number of appliances we need - generally 1 except if multi-appliance is set
-if [ _"`get_multiappliance_status $wid`" != _"false" ]; then
-	capacity=$(($APPMAX-$APPMIN))
+if [ _"`wod_get_multiappliance_status $wid`" != _"false" ]; then
+	capacity=$(($WODAPPMAX-$WODAPPMIN))
 	lastdigit=$(($basedigit + $capacity -1))
 else
-	if [ _"`get_monoappliance_status $wid`" != _"false" ]; then
+	if [ _"`wod_get_monoappliance_status $wid`" != _"false" ]; then
 		lastdigit=$basedigit
 	else
 		echo "To setup an appliance for $w, you need to declare a variable as"
-		echo "IP-$w: x.y.z.t in the file {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }}"
+		echo "IP-$w: x.y.z.t in the file {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }}"
 		exit -1
 	fi
 fi
 
 j=0
 for i in $(seq $basedigit $lastdigit); do
-	if [ _"`get_multiappliance_status $wid`" != _"false" ]; then
-		export APPMIN=$(($APPMINVALUE+$j))
-		export APPMAX=$(($APPMIN+1))
+	if [ _"`wod_get_multiappliance_status $wid`" != _"false" ]; then
+		export WODAPPMIN=$(($WODAPPMINVALUE+$j))
+		export WODAPPMAX=$(($WODAPPMIN+1))
 		j=$((j+1))
 	fi
-	export RTARGET="$netip.$i"
-	if [ -x "{{ SCRIPTDIR }}/setup-pre-$w.sh" ]; then
-		echo "Setup Appliance for Workshop $w by executing {{ SCRIPTDIR }}/setup-pre-$w.sh at `date`"
-		{{ SCRIPTDIR }}/setup-pre-$w.sh
+	export WODRTARGET="$netip.$i"
+	if [ -x "{{ WODSCRIPTDIR }}/setup-pre-$w.sh" ]; then
+		echo "Setup Appliance for Workshop $w by executing {{ WODSCRIPTDIR }}/setup-pre-$w.sh at `date`"
+		{{ WODSCRIPTDIR }}/setup-pre-$w.sh
 		echo "End of Appliance pre setup for Workshop $w at `date`"
 	fi
-	if [ -x "{{ SCRIPTPRIVDIR }}/setup-pre-$w.sh" ]; then
-		echo "Setup Appliance for private Workshop $w by executing {{ SCRIPTPRIVDIR }}/setup-pre-$w.sh at `date`"
-		{{ SCRIPTPRIVDIR }}/setup-pre-$w.sh
+	if [ -x "{{ WODSCRIPTPRIVDIR }}/setup-pre-$w.sh" ]; then
+		echo "Setup Appliance for private Workshop $w by executing {{ WODSCRIPTPRIVDIR }}/setup-pre-$w.sh at `date`"
+		{{ WODSCRIPTPRIVDIR }}/setup-pre-$w.sh
 		echo "End of Appliance pre setup for Workshop $w at `date`"
 	fi
 
 	echo "Setup Global Appliance for Workshop $w at `date`"
-	{{ SCRIPTDIR }}/setup-globalappliance.sh
+	{{ WODSCRIPTDIR }}/setup-globalappliance.sh
 	echo "End of Global Appliance setup for Workshop $w at `date`"
 
-	if [ -x {{ SCRIPTPRIVDIR }}/setup-globalappliance.sh ]; then
+	if [ -x {{ WODSCRIPTPRIVDIR }}/setup-globalappliance.sh ]; then
 		echo "Setup Global Appliance for private Workshop $w at `date`"
-		{{ SCRIPTPRIVDIR }}/setup-globalappliance.sh
+		{{ WODSCRIPTPRIVDIR }}/setup-globalappliance.sh
 		echo "End of Global Appliance setup for private Workshop $w at `date`"
 	fi
 
-	if [ -x "{{ SCRIPTDIR }}/setup-post-$w.sh" ]; then
-		echo "Setup Appliance for Workshop $w by executing {{ SCRIPTDIR }}/setup-post-$w.sh at `date`"
-		{{ SCRIPTDIR }}/setup-post-$w.sh
+	if [ -x "{{ WODSCRIPTDIR }}/setup-post-$w.sh" ]; then
+		echo "Setup Appliance for Workshop $w by executing {{ WODSCRIPTDIR }}/setup-post-$w.sh at `date`"
+		{{ WODSCRIPTDIR }}/setup-post-$w.sh
 		echo "End of Appliance post setup for Workshop $w at `date`"
 	fi
-	if [ -x "{{ SCRIPTPRIVDIR }}/setup-post-$w.sh" ]; then
-		echo "Setup Appliance for private Workshop $w by executing {{ SCRIPTPRIVDIR }}/setup-post-$w.sh at `date`"
-		{{ SCRIPTPRIVDIR }}/setup-post-$w.sh
+	if [ -x "{{ WODSCRIPTPRIVDIR }}/setup-post-$w.sh" ]; then
+		echo "Setup Appliance for private Workshop $w by executing {{ WODSCRIPTPRIVDIR }}/setup-post-$w.sh at `date`"
+		{{ WODSCRIPTPRIVDIR }}/setup-post-$w.sh
 		echo "End of Appliance post setup for Workshop $w at `date`"
 	fi
 
-	if [ -x "{{ SCRIPTDIR }}/setup-$w.sh" ]; then
-		echo "Setup Appliance for Workshop $w by executing remotely {{ SCRIPTDIR }}/setup-$w.sh at `date`"
+	if [ -x "{{ WODSCRIPTDIR }}/setup-$w.sh" ]; then
+		echo "Setup Appliance for Workshop $w by executing remotely {{ WODSCRIPTDIR }}/setup-$w.sh at `date`"
 		TMPDIR=/tmp/sa.$$
-		ssh $RTARGET mkdir -p $TMPDIR
-		scp {{ SCRIPTDIR }}/setup-$w.sh $RTARGET:$TMPDIR/
+		ssh $WODRTARGET mkdir -p $TMPDIR
+		scp {{ WODSCRIPTDIR }}/setup-$w.sh $WODRTARGET:$TMPDIR/
 		# We have to pass the Workshop name to have it remotely as well as the $w variable
-		ssh $RTARGET "$TMPDIR/setup-$w.sh $w"
-		ssh $RTARGET rm -rf $TMPDIR
+		ssh $WODRTARGET "$TMPDIR/setup-$w.sh $w"
+		ssh $WODRTARGET rm -rf $TMPDIR
 		echo "End of Appliance setup for Workshop $w at `date`"
 	fi
 
-	if [ -x "{{ SCRIPTPRIVDIR }}/setup-$w.sh" ]; then
-		echo "Setup Appliance for private Workshop $w by executing remotely {{ SCRIPTPRIVDIR }}/setup-$w.sh at `date`"
+	if [ -x "{{ WODSCRIPTPRIVDIR }}/setup-$w.sh" ]; then
+		echo "Setup Appliance for private Workshop $w by executing remotely {{ WODSCRIPTPRIVDIR }}/setup-$w.sh at `date`"
 		TMPDIR=/tmp/sa.$$
-		ssh $RTARGET mkdir -p $TMPDIR
-		scp {{ SCRIPTPRIVDIR }}/setup-$w.sh $RTARGET:$TMPDIR/
-		ssh $RTARGET "$TMPDIR/setup-$w.sh $w"
-		ssh $RTARGET rm -rf $TMPDIR
+		ssh $WODRTARGET mkdir -p $TMPDIR
+		scp {{ WODSCRIPTPRIVDIR }}/setup-$w.sh $WODRTARGET:$TMPDIR/
+		ssh $WODRTARGET "$TMPDIR/setup-$w.sh $w"
+		ssh $WODRTARGET rm -rf $TMPDIR
 		echo "End of Appliance setup for private Workshop $w at `date`"
 	fi
 done

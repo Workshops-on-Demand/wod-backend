@@ -1,7 +1,7 @@
 ---
 - name: Playbook to setup an appliance
-  hosts: "{{ RTARGET | default([]) }}"
+  hosts: "{{ WODRTARGET | default([]) }}"
   gather_facts: true
   tasks:
     - name: Base setup for a JupyterHub environment server or appliance
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_base_appliance.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEDIR }}/setup_base_appliance.yml"

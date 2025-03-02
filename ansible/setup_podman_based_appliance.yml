@@ -1,6 +1,6 @@
 ---
 - name: Setup first the podman context (packages, deps, ...)
-  ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/install_podman.yml"
+  ansible.builtin.include_tasks: "{{ WODANSIBLEDIR }}/install_podman.yml"
 
 - name: Ensure Linux students users belong to the docker group
   become: true
@@ -10,4 +10,4 @@
     state: present
     append: true
     groups: "podman"
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"

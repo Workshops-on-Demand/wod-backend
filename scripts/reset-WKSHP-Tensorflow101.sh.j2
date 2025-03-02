@@ -2,7 +2,7 @@
 
 set -x
 
-{{ SCRIPTDIR }}/reset-appliance.sh
+{{ WODSCRIPTDIR }}/reset-appliance.sh
 
 NAME=tensorflowlab
 TMPDIR=/tmp/$NAME.$stdid
@@ -15,9 +15,9 @@ docker compose down
 EOF
 
 chmod 755 $TMPDIR/stop-compose
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET mkdir -p $TMPDIR
-scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $TMPDIR/stop-compose $RTARGET:$TMPDIR
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo su - student$stdid -c \'$TMPDIR/stop-compose\' && /bin/true
-ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $RTARGET sudo rm -rf $TMPDIR
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET mkdir -p $TMPDIR
+scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $TMPDIR/stop-compose $WODRTARGET:$TMPDIR
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET sudo su - student$stdid -c \'$TMPDIR/stop-compose\' && /bin/true
+ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET sudo rm -rf $TMPDIR
 exit 0
 

@@ -1,6 +1,6 @@
 # You need something like this to authenticate users
-{% set max2 = APPMAX|int + 1 %}
-{% for s in range( APPMIN|int, max2|int )|list %}
+{% set max2 = WODAPPMAX|int + 1 %}
+{% for s in range( WODAPPMIN|int, max2|int )|list %}
 Alias /student{{ s|string }} "/var/www/student/student{{ s|string }}"
 
 <Directory "/var/www/student/student{{ s|string }}">
