@@ -916,7 +916,7 @@
 
     - name: Setup ansible configuration
       ansible.builtin.copy:
-        src: "{{ WODINSDIR }}/.ansible.cfg"
+        src: "{{ WODINSANSDIR }}/.ansible.cfg"
         dest: "{{ ansible_env.HOME }}/.ansible.cfg"
         mode: "0644"
 
