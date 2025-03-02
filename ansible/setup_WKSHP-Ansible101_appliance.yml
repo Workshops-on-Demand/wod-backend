@@ -1,6 +1,6 @@
 ---
 - name: Setup Playbook for WKSHP-Ansible101 appliance
-  hosts: "{{ RTARGET | default([]) }}"
+  hosts: "{{ WODRTARGET | default([]) }}"
   gather_facts: true
   tasks:
     - name: Ensure all required packages are installed
@@ -78,7 +78,7 @@
         group: apache
         mode: "0700"
         state: directory
-      loop: "{{ range(APPMIN | int, APPMAX | int + 1) | list }}"
+      loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int + 1) | list }}"
 
     - name: Ensure students index.html file exist
       become: true
@@ -89,7 +89,7 @@
         owner: apache
         group: apache
         mode: "0600"
-      loop: "{{ range(APPMIN | int, APPMAX | int + 1) | list }}"
+      loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int + 1) | list }}"
 
     - name: Enable httpd service
       become: true

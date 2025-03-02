@@ -2,7 +2,7 @@
 
 set -x
 
-{{ SCRIPTDIR }}/reset-appliance.sh
+{{ WODSCRIPTDIR }}/reset-appliance.sh
 
 NAME=podmanlab
 
@@ -10,10 +10,10 @@ cd /student/student$stdid/
 
 
 # Stop/Remove existing content first - these commands could fail so protect with true from set -e
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman stop -i --all\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman rm --all --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman rmi --force hello-world nginx fedora localhost/myhttpd:v1 ddocker.io/redhat/ubi9 docker.io/library/nginx localhost/nginx-reverse-proxy localhost/myhttpd:v1\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'rm -f kubepodman.yml compose.yml Containerfile Containerfile-backend Containerfile-nginx default.conf index.html nginx-index.html\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su -  -c \'rm -rf /student/student$stdid/.local \' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman stop -i --all\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman rm --all --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman rmi --force hello-world nginx fedora localhost/myhttpd:v1 ddocker.io/redhat/ubi9 docker.io/library/nginx localhost/nginx-reverse-proxy localhost/myhttpd:v1\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'rm -f kubepodman.yml compose.yml Containerfile Containerfile-backend Containerfile-nginx default.conf index.html nginx-index.html\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su -  -c \'rm -rf /student/student$stdid/.local \' && /bin/true
 exit 0
 

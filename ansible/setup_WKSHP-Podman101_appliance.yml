@@ -1,7 +1,7 @@
 ---
 - name: Setup Playbook for WKSHP-Podman101 appliance
-  hosts: "{{ RTARGET | default([]) }}"
+  hosts: "{{ WODRTARGET | default([]) }}"
   gather_facts: true
   tasks:
     - name: Setup a Docker based appliance
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_podman_based_appliance.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEDIR }}/setup_podman_based_appliance.yml"

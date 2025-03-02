@@ -12,9 +12,9 @@ set -e
 set -x
 
 # Defines WODBEDIR
-source {{ SCRIPTDIR }}/wod.sh
-source {{ SCRIPTDIR }}/random.sh
-source {{ SCRIPTDIR }}/functions.sh
+source /etc/wod.sh
+source {{ WODSCRIPTDIR }}/random.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 #
 # Main part
 #
@@ -52,7 +52,7 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
-export stddir="{{ STUDDIR }}/student$stdid"
+export stddir="{{ WODSTUDDIR }}/student$stdid"
 export accessToken=`get_session_token`
 
 # Increment the student ID by Number of jupyterhub students in students table
@@ -97,18 +97,18 @@ export wid=`get_workshop_id $w`
 multiappliance=`get_multiappliance_status $wid`
 monoappliance=`get_monoappliance_status $wid`
 if [ _"`get_multiappliance_status $wid`" = _"true" ]; then
-	APPMINVALUE=`get_range_min $wid`
-	delta=$(($stdid-$APPMINVALUE))
+	WODAPPMINVALUE=`get_range_min $wid`
+	delta=$(($stdid-$WODAPPMINVALUE))
 	baseip=`get_appliance_baseip $w`
 	basedigit=`echo $baseip | cut -d'.' -f4`
 	netip=`echo $baseip | cut -d'.' -f1-3`
 	ip=$(($basedigit+$delta))
-	export RTARGET="$netip.$ip"
+	export WODRTARGET="$netip.$ip"
 else
 	if [ _"`get_monoappliance_status $wid`" = _"true" ]; then
-		export RTARGET=`get_appliance_baseip $w`
+		export WODRTARGET=`get_appliance_baseip $w`
 	fi
-	# If no appliance, we do not define RTARGET on purpose
+	# If no appliance, we do not define WODRTARGET on purpose
 fi
 
 # Handle CREATE and CLEANUP first
@@ -150,9 +150,9 @@ if [ $action != "RESET" ]; then
 				compilepub=""
 				compilepriv=""
 				for s in `echo $compile | tr ',' '\n'`; do
-					if [ -f "{{ SCRIPTDIR }}/$s" ]; then
+					if [ -f "{{ WODSCRIPTDIR }}/$s" ]; then
 						compilepub="$s,$compilepub"
-					elif  [ -f "{{ SCRIPTPRIVDIR }}/$s" ]; then
+					elif  [ -f "{{ WODSCRIPTPRIVDIR }}/$s" ]; then
 						compilepriv="$s,$compilepriv"
 					fi
 				done
@@ -160,33 +160,33 @@ if [ $action != "RESET" ]; then
 				compilepriv=`echo $compilepriv | sed 's|,$||'`
 				# Same compile_scripts.yml used with different calls for public/private
 				if [ _"$compilepub" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" -e "VARDIRECTORY={{ ANSIBLEDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "WODSCRIPTDIRECTORY={{ WODSCRIPTDIR }}" -e "VARDIRECTORY={{ WODANSIBLEDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT
 				fi
 				if [ _"$compilepriv" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "WODSCRIPTDIRECTORY={{ WODSCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT
 				fi
 			fi
-			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTDIR }}/create-$ws.sh" ]; then
 				echo "Setup workshop $w appliance"
 
-				{{ SCRIPTDIR }}/create-$ws.sh
+				{{ WODSCRIPTDIR }}/create-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/create-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/create-$ws.sh" ]; then
 				echo "Setup private workshop $w appliance"
-				{{ SCRIPTPRIVDIR }}/create-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEPRIVDIR }}/vault_secret
-			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
+			ansible-playbook {{ WODANSIBLEDIR }}/copy_folder.yml -i {{ WODANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $WODANSPLAYOPT $WODANSPRIVOPT --vault-password-file {{ WODANSIBLEPRIVDIR }}/vault_secret
+			if [ -x "{{ WODSCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
-				{{ SCRIPTDIR }}/post-copy-$ws.sh
+				{{ WODSCRIPTDIR }}/post-copy-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for private workshop $w"
-				{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
-			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml
 		fi
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
@@ -212,13 +212,13 @@ if [ $action != "RESET" ]; then
 
 		elif [ "$action" = "CLEANUP" ]; then
 			# Launch cleanup script if any
-			if [ -x "{{ SCRIPTDIR }}/cleanup-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTDIR }}/cleanup-$ws.sh" ]; then
 				echo "Cleaning up workshop $w"
-				{{ SCRIPTDIR }}/cleanup-$ws.sh
+				{{ WODSCRIPTDIR }}/cleanup-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/cleanup-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/cleanup-$ws.sh" ]; then
 				echo "Cleaning up private workshop $w"
-				{{ SCRIPTPRIVDIR }}/cleanup-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/cleanup-$ws.sh
 			fi
 			# Keep completion status
 			completion=`get_wod_completion_ratio`
@@ -308,17 +308,17 @@ elif [ "$action" = "RESET" ]; then
 		done
 
 		# Get Workshop backend reset status
-		if [ ! -x "{{ SCRIPTDIR }}/reset-$ws.sh" ] && [ ! -x "{{ SCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
+		if [ ! -x "{{ WODSCRIPTDIR }}/reset-$ws.sh" ] && [ ! -x "{{ WODSCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
-			if [ -x "{{ SCRIPTDIR }}/reset-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTDIR }}/reset-$ws.sh" ]; then
 				echo "Reseting workshop $w Backend"
-				{{ SCRIPTDIR }}/reset-$ws.sh
+				{{ WODSCRIPTDIR }}/reset-$ws.sh
 			fi
-			if [ -x "{{ SCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
+			if [ -x "{{ WODSCRIPTPRIVDIR }}/reset-$ws.sh" ]; then
 				echo "Reseting private workshop $w Backend"
-				{{ SCRIPTPRIVDIR }}/reset-$ws.sh
+				{{ WODSCRIPTPRIVDIR }}/reset-$ws.sh
 			fi
 		fi
 
@@ -330,7 +330,7 @@ elif [ "$action" = "RESET" ]; then
 				--data '{"assigned":"false"}' \
 				"$WODAPIDBURL/student/$j"
 			stdid=$((j-{{ WODBASESTDID }}))
-			stddir="{{ STUDDIR }}/student$stdid"
+			stddir="{{ WODSTUDDIR }}/student$stdid"
 			erase_student
 			cleanup_processes_student
 			((j=j-1))

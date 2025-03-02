@@ -3,17 +3,17 @@
 set -x
 
 ### copy ssh keys on the Appliance server
-if [ _"$RTARGET" = _"" ]; then
-	echo "RTARGET is not defined. Aborting..."
+if [ _"$WODRTARGET" = _"" ]; then
+	echo "WODRTARGET is not defined. Aborting..."
 	exit -1
 fi
-HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
+HOMEDIR=`ssh $WODRTARGET getent passwd student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ]; then
-	ssh -q $RTARGET sudo rm -rf $HOMEDIR/.ssh
-	[ -z ${LDAPSETUP+x} ] && ssh -q $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
+	ssh -q $WODRTARGET sudo rm -rf $HOMEDIR/.ssh
+	[ -z ${WODLDAPSETUP+x} ] && ssh -q $WODRTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	EXITVAL=0
 else
-	echo "student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
+	echo "student$stdid doesn't exist on the appliance $WODRTARGET for workshop $w"
 	EXITVAL=-1
 fi
 

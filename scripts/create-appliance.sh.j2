@@ -5,38 +5,38 @@ set -x
 ### copy ssh keys on the Appliance server
 TMPDIR=/tmp/app.$$
 sudo mkdir -p $TMPDIR
-sudo cp {{ STUDDIR }}/student$stdid/.ssh/id_rsa.pub $TMPDIR
+sudo cp {{ WODSTUDDIR }}/student$stdid/.ssh/id_rsa.pub $TMPDIR
 sudo chown -R $USER $TMPDIR
 
-if [ _"$RTARGET" = _"" ]; then
-	echo "RTARGET is not defined. Aborting..."
+if [ _"$WODRTARGET" = _"" ]; then
+	echo "WODRTARGET is not defined. Aborting..."
 	exit -1
 fi
-ssh $RTARGET mkdir -p $TMPDIR
-scp $TMPDIR/id_rsa.pub $RTARGET:$TMPDIR/
-HOMEDIR=`ssh $RTARGET getent passwd student$stdid | cut -d: -f6`
+ssh $WODRTARGET mkdir -p $TMPDIR
+scp $TMPDIR/id_rsa.pub $WODRTARGET:$TMPDIR/
+HOMEDIR=`ssh $WODRTARGET getent passwd student$stdid | cut -d: -f6`
 if [ _"$HOMEDIR" != _"" ]; then
 	# Avoid changing passwd in case of LDAP
-	[ -z ${LDAPSETUP+x} ] && ssh $RTARGET "echo student$stdid:$randompw | sudo chpasswd"
+	[ -z ${WODLDAPSETUP+x} ] && ssh $WODRTARGET "echo student$stdid:$randompw | sudo chpasswd"
 	# Preventive cleanup
 	cat > $TMPDIR/preventive-cleanup << EOF
 #!/bin/bash
 rm -rf $HOMEDIR/.??* $HOMEDIR/*
 rsync -av /etc/skel/ $HOMEDIR/
 EOF
-	scp $TMPDIR/preventive-cleanup $RTARGET:$TMPDIR/
-	ssh $RTARGET chmod 755 $TMPDIR/preventive-cleanup
-	ssh $RTARGET sudo su - student$stdid -c $TMPDIR/preventive-cleanup
+	scp $TMPDIR/preventive-cleanup $WODRTARGET:$TMPDIR/
+	ssh $WODRTARGET chmod 755 $TMPDIR/preventive-cleanup
+	ssh $WODRTARGET sudo su - student$stdid -c $TMPDIR/preventive-cleanup
 	# SSH setup
-	ssh $RTARGET sudo install -d -m 0700 -o student$stdid -g student$stdid $HOMEDIR/.ssh
-	ssh $RTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
+	ssh $WODRTARGET sudo install -d -m 0700 -o student$stdid -g student$stdid $HOMEDIR/.ssh
+	ssh $WODRTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/id_rsa.pub $HOMEDIR/.ssh/authorized_keys
 	EXITVAL=0
 else
-	echo "student$stdid doesn't exist on the appliance $RTARGET for workshop $w"
+	echo "student$stdid doesn't exist on the appliance $WODRTARGET for workshop $w"
 	EXITVAL=-1
 fi
 
 ## check staging or prod
-ssh $RTARGET rm -rf $TMPDIR
+ssh $WODRTARGET rm -rf $TMPDIR
 rm -rf $TMPDIR
 exit $EXITVAL

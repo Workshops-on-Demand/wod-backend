@@ -11,8 +11,8 @@ set -e
 #set -x
 
 # Manages private functions
-if [ -f {{ SCRIPTPRIVDIR }}/functions.sh ]; then
-        source {{ SCRIPTPRIVDIR }}/functions.sh
+if [ -f {{ WODSCRIPTPRIVDIR }}/functions.sh ]; then
+        source {{ WODSCRIPTPRIVDIR }}/functions.sh
 fi
 
 # This function fetches an accessToken using user moderator credentials and open a session
@@ -48,13 +48,13 @@ get_workshop_id() {
 teststdid() {
 	
 	# We need to ensure that we've got a correct id as parameter if needed
-	MIN={{ USERMIN }}+{{ WODBASESTDID }}
-	MAX={{ USERMAX }}+{{ WODBASESTDID }}
+	MIN=$(({{ USERMIN }}+{{ WODBASESTDID }}))
+	MAX=$(({{ USERMAX }}+{{ WODBASESTDID }}))
 
 	if [ $1 -lt $MIN ] ||  [ $1 -gt $MAX ]; then
-                echo "Student id ($1) should be between $MIN and $MAX"
-                exit -1
-        fi
+		echo "Student id ($1) should be between $MIN and $MAX"
+		exit -1
+	fi
 }
 
 # This function returns the status of the reset boolean for the workshop id given as parameter
@@ -124,9 +124,9 @@ get_range_max() {
 
 # This function returns the base IP address of the appliance related to the workshop given as parameter
 get_appliance_baseip() {
-	baseip=`grep IP-$1 {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	baseip=`grep IP-$1 {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 	if [ _"$baseip" = _"" ]; then
-		baseip=`grep IP-$1 {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+		baseip=`grep IP-$1 {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 		if [ _"$baseip" = _"" ]; then
 			echo "Unable to find the the appliance base IP for $1"
 			exit -1
@@ -139,30 +139,30 @@ get_appliance_baseip() {
 update_ldap_passwd() {
 
 	# define that variable to overload the student name (used by sec-student e.g.)
-	if [ _"$LDAPSETUPUSER" = _"" ]; then
-		LDAPSETUPUSER="student"
+	if [ _"$WODLDAPSETUPUSER" = _"" ]; then
+		WODLDAPSETUPUSER="student"
 	fi
 	rm -f /tmp/ldif.$$
 	cat > /tmp/ldif.$$ << EOF
 
 # modify user password
-dn: uid=$LDAPSETUPUSER$stdid,ou=People,{{ LDAPDMN }}
+dn: uid=$WODLDAPSETUPUSER$stdid,ou=People,{{ WODLDAPDMN }}
 changetype: modify
 replace: userPassword
 userPassword: $randompw
 EOF
-	ldapmodify -D "cn=Directory Manager" -w {{ LDAPPWD }} -p {{ LDAPPORT }} -h {{ LDAPSRVNAME }} -x -f /tmp/ldif.$$
+	ldapmodify -D "cn=Directory Manager" -w {{ WODLDAPPWD }} -p {{ WODLDAPPORT }} -h {{ WODLDAPSRVNAME }} -x -f /tmp/ldif.$$
 	rm -f /tmp/ldif.$$
 }
 
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
-	if [ ! -d "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass" ]; then
-		mkdir -p "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass"
+	if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
+		mkdir -p "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 	fi
 	# It's now mandatory that vault_secret is located in the private part
-	ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+	ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 }
 
 # This function retuns the workshop name from the mail body
@@ -186,7 +186,7 @@ erase_student() {
 	if [ _"$stddir" != _"" ]; then
 		echo "Erasing target student dir $stddir content"
 		sudo rm -rf $stddir/* $stddir/.??*
-		sudo cp -a {{ WODBEDIR }}/skel/.??* `find {{ WODPRIVDIR }}/skel -name '.??*'` $stddir
+		sudo cp -a {{ WODINSDIR }}/../skel/.??* `find {{ WODPRIVDIR }}/skel -name '.??*'` $stddir
 		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
 		echo "Create ssh keys to allow remote connections to appliance if needed"
 		sudo su - student${stdid} -c "ssh-keygen -b 2048 -t rsa -f .ssh/id_rsa -N ''"
