@@ -2,7 +2,7 @@
 
 set -x
 
-source {{ SCRIPTDIR }}/functions.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 
 # Setting variables:
@@ -11,36 +11,36 @@ echo "------------------------------------------------  defining variables------
 echo "Getting Studentid"
 echo "student id is" $stdid
 
-ocendpoint=$(cat {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} |grep 'OCENDPOINT' | cut -d: -f2 |sed 's/[ ]*"[,]*//g')
+ocendpoint=$(cat {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} |grep 'OCENDPOINT' | cut -d: -f2 |sed 's/[ ]*"[,]*//g')
 
 
-{{ SCRIPTDIR }}/reset-appliance.sh
+{{ WODSCRIPTDIR }}/reset-appliance.sh
 
 NAME=podmanlab
 
 cd /student/student$stdid/
 
 
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'oc login -u student$stdid -p $randompw --insecure-skip-tls-verify https://$ocendpoint:6443' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'oc login -u student$stdid -p $randompw --insecure-skip-tls-verify https://$ocendpoint:6443' && /bin/true
 
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'oc delete project my-project$stdid' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'oc delete project declarative$stdid' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'oc delete project patient-portal-student' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'oc delete patient-portal' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman rm --all --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'systemctl --user stop frontend.service' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'systemctl --user stop payment-processor.service' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'systemctl --user stop database.service' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman rm --all --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman stop -i --all\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman network prune --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman volume prune --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman pod prune --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'podman image prune --force\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su -  -c \'rm -rf /student/student$stdid/.config/containers/systemd/* \' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'systemctl --user daemon-reload' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su -  -c \'rm -rf /student/student$stdid/.local \' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su -  -c \'rm -rf /student/student$stdid/my-persistent-storage\' && /bin/true
-ssh -q {{ NOCHECKSSH }} $RTARGET sudo su -  -c \'rm -rf /student/student$stdid/my-deployment-service-route.yaml my-deployment.yaml database.yml frontend.yml payment-processor.yml \' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'oc delete project my-project$stdid' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'oc delete project declarative$stdid' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'oc delete project patient-portal-student' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'oc delete patient-portal' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman rm --all --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'systemctl --user stop frontend.service' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'systemctl --user stop payment-processor.service' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'systemctl --user stop database.service' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman rm --all --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman stop -i --all\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman network prune --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman volume prune --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman pod prune --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'podman image prune --force\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su -  -c \'rm -rf /student/student$stdid/.config/containers/systemd/* \' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su - student$stdid -c \'systemctl --user daemon-reload' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su -  -c \'rm -rf /student/student$stdid/.local \' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su -  -c \'rm -rf /student/student$stdid/my-persistent-storage\' && /bin/true
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo su -  -c \'rm -rf /student/student$stdid/my-deployment-service-route.yaml my-deployment.yaml database.yml frontend.yml payment-processor.yml \' && /bin/true
 exit 0
 

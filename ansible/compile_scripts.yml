@@ -30,21 +30,21 @@
 
     - name: Include additional variables if they exist
       ansible.builtin.include_vars:
-        ansible.builtin.file: "{{ VARDIRECTORY }}/variables_{{ CHALLENGE }}.yml"
+        file: "{{ VARDIRECTORY }}/variables_{{ CHALLENGE }}.yml"
       when: token_file.stat.exists
 
     # Allows usage of jinja2 variables in the script to compile
     # These variables should be protected as pre-processed by deliver
     - name: Expand file to compile with token variables
       ansible.builtin.template:
-        src: "{{ SCRIPTDIRECTORY }}/{{ item }}"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ item }}"
+        src: "{{ WODSCRIPTDIRECTORY }}/{{ item }}"
+        dest: "{{ WODSTUDDIR }}/student{{ STDID }}/{{ item }}"
         mode: "0600"
       with_items: "{{ cmpfiles }}"
       when: COMPILE | length > 0
 
     - name: Compile shc scripts in place
-      ansible.builtin.shell: cd "{{ STUDDIR }}/student{{ STDID }}" && shc -f "{{ item }}"
+      ansible.builtin.shell: cd "{{ WODSTUDDIR }}/student{{ STDID }}" && shc -f "{{ item }}"
       with_items: "{{ cmpfiles }}"
       when: COMPILE | length > 0
       register: result
@@ -58,10 +58,8 @@
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: "0755"
-      with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x"
+      with_fileglob: "{{ WODSTUDDIR }}/student{{ STDID }}/*.shc.x"
       when: COMPILE | length > 0
-      register: result
-      changed_when: result.rc != 0
 
     - name: Setup ACL for the scripts
       become: true
@@ -73,11 +71,11 @@
         etype: user
         permissions: rwx
         state: present
-      with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x"
+      with_fileglob: "{{ WODSTUDDIR }}/student{{ STDID }}/*.shc.x"
       when: COMPILE | length > 0
 
     - name: Remove shc scripts in place
-      ansible.builtin.command: rm -f {{ STUDDIR }}/student{{ STDID }}/*.c.x {{ STUDDIR }}/student{{ STDID }}/*.x {{ STUDDIR }}/student{{ STDID }}/*.shc
+      ansible.builtin.command: rm -f {{ WODSTUDDIR }}/student{{ STDID }}/*.c.x {{ WODSTUDDIR }}/student{{ STDID }}/*.x {{ WODSTUDDIR }}/student{{ STDID }}/*.shc
       when: COMPILE | length > 0
       register: result
       changed_when: result.rc != 0
@@ -86,7 +84,7 @@
       become: true
       become_user: root
       ansible.builtin.command: rm -f {{ item }}
-      with_fileglob: "{{ STUDDIR }}/student{{ STDID }}/*.shc.x.c"
+      with_fileglob: "{{ WODSTUDDIR }}/student{{ STDID }}/*.shc.x.c"
       when: COMPILE | length > 0
       register: result
       changed_when: result.rc != 0
