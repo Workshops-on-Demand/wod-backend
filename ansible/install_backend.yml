@@ -543,6 +543,16 @@
     - name: Ensure that this a compliant WoD system
       ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/check_system.yml"
 
+    - name: Adds jupyterhub binaries path to PATH
+      ansible.builtin.blockinfile:
+        path: "{{ ansible_env.HOME }}/.profile"
+        block: |
+          #######################################################################################
+          # set PATH so venv binaries are seen before system ones
+          if [ -d "/opt/jupyterhub//bin" ] ; then
+              PATH="/opt/jupyterhub/bin:$PATH"
+          fi
+
     # In this part we manage the jupyterhub setup
     #
     - name: Make kernel_python available under /usr/local/bin
