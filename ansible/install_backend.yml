@@ -481,6 +481,7 @@
     - name: Ensure all required pip packages are installed
       ansible.builtin.pip:
         name:
+          - ipython < 9.0.0
           - jupyterlab
           - jupyterhub-idle-culler
           - bash_kernel>=0.7.2
