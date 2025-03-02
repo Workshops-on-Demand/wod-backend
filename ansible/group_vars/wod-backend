@@ -31,7 +31,7 @@ SURVEYCHALURL: TBD
 # This variable is defined for ansible playbooks, do not change without knowing what you do
 # This is the only one remaining, so we can easily overload it with -e for private script compilation e.g.
 #
-SCRIPTDIR: "{{ WODBEDIR }}/scripts"
+WODSCRIPTDIR: "{{ WODBEDIR }}/scripts"
 #
 # These variables are located lower in the ansible tree to allow different values required for different backends while keeping a single frontend
 #

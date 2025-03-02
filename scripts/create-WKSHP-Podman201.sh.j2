@@ -2,11 +2,11 @@
 
 set -x
 
-source {{ SCRIPTDIR }}/functions.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 # Start by cleaning up stuff - do it early as after we setup .ssh content
-{{ SCRIPTDIR }}/reset-$ws.sh
-{{ SCRIPTDIR }}/create-appliance.sh
+{{ WODSCRIPTDIR }}/reset-$ws.sh
+{{ WODSCRIPTDIR }}/create-appliance.sh
 
 NAME=podmanlab
 TMPDIR=/tmp/$NAME.$stdid

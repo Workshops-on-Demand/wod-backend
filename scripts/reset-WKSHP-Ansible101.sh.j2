@@ -2,7 +2,7 @@
 
 set -x
 
-{{ SCRIPTDIR }}/reset-appliance.sh
+{{ WODSCRIPTDIR }}/reset-appliance.sh
 
 # Cleanup
 ssh -q {{ NOCHECKSSH }} $RTARGET sudo su - student$stdid -c \'rm -rf {{ STUDDIR }}/student$stdid/.??* {{ STUDDIR }}/student$stdid/*\'

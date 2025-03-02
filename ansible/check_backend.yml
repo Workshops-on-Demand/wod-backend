@@ -154,7 +154,7 @@
         src: "{{ item }}"
         dest: "{{ item | dirname }}/{{ item | basename | regex_replace('.j2$') }}"
         mode: "0755"
-      with_fileglob: ['{{ SCRIPTDIR }}/*.sh*.j2', '{{ SCRIPTPRIVDIR }}/*.sh*.j2']
+      with_fileglob: ['{{ WODSCRIPTDIR }}/*.sh*.j2', '{{ WODSCRIPTPRIVDIR }}/*.sh*.j2']
 
     - name: Deliver variables files as ansible template for variable expansion
       ansible.builtin.template:

@@ -37,7 +37,7 @@
     # These variables should be protected as pre-processed by deliver
     - name: Expand file to compile with token variables
       ansible.builtin.template:
-        src: "{{ SCRIPTDIRECTORY }}/{{ item }}"
+        src: "{{ WODSCRIPTDIRECTORY }}/{{ item }}"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ item }}"
         mode: "0600"
       with_items: "{{ cmpfiles }}"

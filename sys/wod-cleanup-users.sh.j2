@@ -17,7 +17,7 @@ echo "Range from $startrange to $endrange"
 echo "This script will empty home folders of students from $startrange to $endrange"
 
 source /etc/wod.sh
-source {{ SCRIPTDIR }}/functions.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 for stdid in $(seq $startrange $endrange); do 
 	stddir="{{ STUDDIR }}/student$stdid"

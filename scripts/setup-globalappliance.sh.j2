@@ -3,7 +3,7 @@
 #set -x
 
 source /etc/wod.sh
-source {{ SCRIPTDIR }}/functions.sh
+source {{ WODSCRIPTDIR }}/functions.sh
 
 # Do we need LDAP setup or not
 if [ _"`get_ldap_status $wid`" != _"false" ]; then

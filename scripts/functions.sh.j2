@@ -11,8 +11,8 @@ set -e
 #set -x
 
 # Manages private functions
-if [ -f {{ SCRIPTPRIVDIR }}/functions.sh ]; then
-        source {{ SCRIPTPRIVDIR }}/functions.sh
+if [ -f {{ WODSCRIPTPRIVDIR }}/functions.sh ]; then
+        source {{ WODSCRIPTPRIVDIR }}/functions.sh
 fi
 
 # This function fetches an accessToken using user moderator credentials and open a session
