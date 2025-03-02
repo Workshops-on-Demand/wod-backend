@@ -109,7 +109,7 @@
 
     - name: Deploy an instanciated procmailrc conf file
       ansible.builtin.template:
-        src: "{{ SYSDIR }}/procmailrc.j2"
+        src: "{{ WODSYSDIR }}/procmailrc.j2"
         dest: "{{ ansible_env.HOME }}/.procmailrc"
         mode: "0600"
 
@@ -250,7 +250,7 @@
         src: "{{ item }}"
         dest: "/etc/systemd/system/{{ item | basename | regex_replace('.j2$') }}"
         mode: "0644"
-      with_fileglob: ['{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2']
+      with_fileglob: ['{{ WODSYSDIR }}//jupyterhub.service.j2', '{{ WODSYSPRIVDIR }}//jupyterhub.service.j2']
 
     # Done after private part, which may affect branding
     - name: Enable backend WoD services

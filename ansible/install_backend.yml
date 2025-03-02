@@ -549,7 +549,7 @@
       become: true
       become_user: root
       ansible.builtin.template:
-        src: "{{ SYSDIR }}/kernel_python.j2"
+        src: "{{ WODSYSDIR }}/kernel_python.j2"
         dest: /usr/local/bin/kernel_python
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -582,7 +582,7 @@
       with_fileglob: ["{{ WODSCRIPTDIR }}/build*.sh.j2"]
 
     - name: Ensure Rust kernel is installed
-      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ WODDVER }}" --install
+      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && "{{ WODSYSDIR }}/evcxr_jupyter.{{ WODDVER }}" --install
       register: result
       changed_when: result.rc != 0
 
@@ -596,14 +596,14 @@
     - name: Fix kernel path for rust
       ansible.builtin.replace:
         path: "{{ JPHUB }}/share/jupyter/kernels/rust/kernel.json"
-        regexp: (\s)+"{{ SYSDIR }}evcxr_jupyter.{{ WODDVER }}".*$
+        regexp: (\s)+"{{ WODSYSDIR }}evcxr_jupyter.{{ WODDVER }}".*$
         replace: \1"/usr/local/bin/evcxr_jupyter",
 
     - name: Ensure Rust kernel is deployed
       become: true
       become_user: root
       ansible.builtin.copy:
-        src: "{{ SYSDIR }}/evcxr_jupyter.{{ WODDVER }}"
+        src: "{{ WODSYSDIR }}/evcxr_jupyter.{{ WODDVER }}"
         dest: /usr/local/bin/evcxr_jupyter
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -648,7 +648,7 @@
 
     # - name: Patch ansible kernel with fixes coming from master
     # ansible.posix.patch:
-    #  src: "{{ SYSDIR }}/master-vs-0.9.0.patch"
+    #  src: "{{ WODSYSDIR }}/master-vs-0.9.0.patch"
     # basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
     # strip: 2
     # backup: true
@@ -865,7 +865,7 @@
         src: "{{ item }}"
         dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }}
         mode: "0644"
-      with_fileglob: ['{{ SYSDIR }}//jupyterhub.service.j2', '{{ SYSPRIVDIR }}//jupyterhub.service.j2']
+      with_fileglob: ['{{ WODSYSDIR }}//jupyterhub.service.j2', '{{ WODSYSPRIVDIR }}//jupyterhub.service.j2']
 
     - name: Enable WoD service
       become: true

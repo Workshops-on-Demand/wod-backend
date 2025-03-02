@@ -158,7 +158,7 @@
       become: true
       become_user: root
       ansible.builtin.template:
-        src: "{{ SYSDIR }}/lab-a511.jupyterlab-workspace.j2"
+        src: "{{ WODSYSDIR }}/lab-a511.jupyterlab-workspace.j2"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
@@ -252,7 +252,7 @@
       become: true
       become_user: root
       ansible.builtin.copy:
-        src: "{{ SYSDIR }}/wod-generate-pdf.sh"
+        src: "{{ WODSYSDIR }}/wod-generate-pdf.sh"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/wod-generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}
