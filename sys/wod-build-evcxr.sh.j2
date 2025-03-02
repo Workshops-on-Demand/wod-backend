@@ -12,7 +12,7 @@ mkdir -p $HOME/.mail
 
 source /etc/wod.sh
 
-ansible-playbook {{ ANSIBLEDIR }}/distrib.yml
+ansible-playbook {{ WODANSIBLEDIR }}/distrib.yml
 DISTRIB=`cat $HOME/.mail/distrib`
 if [ -f "{{ SYSDIR }}/evcxr_jupyter.$DISTRIB" ]; then
 	echo "Not erasing existing evcxr_jupyter.$DISTRIB. Do it manually if you want to regenerate it"

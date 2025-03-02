@@ -8,10 +8,10 @@
     WODDVER: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
   tasks:
     - name: Include variables for the underlying distribution
-      ansible.builtin.include_vars: "{{ ANSIBLEDIR }}/group_vars/{{ WODDVER }}.yml"
+      ansible.builtin.include_vars: "{{ WODANSIBLEDIR }}/group_vars/{{ WODDVER }}.yml"
 
     - name: Base setup for a JupyterHub environment server or appliance
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/setup_base_appliance.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEDIR }}/setup_base_appliance.yml"
 
     - name: Add CentOS SC repository into repo list
       become: true
@@ -960,12 +960,12 @@
         - nobo_path.rc != 0
 
     - name: Test private tasks YAML file
-      ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
+      ansible.builtin.command: ls "{{ WODANSIBLEPRIVDIR }}/install_backend.yml"
       register: acj_path
       failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/install_backend.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/install_backend.yml"
       when:
         - acj_path.rc == 0

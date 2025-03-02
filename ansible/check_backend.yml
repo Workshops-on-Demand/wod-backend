@@ -4,7 +4,7 @@
   gather_facts: true
   tasks:
     - name: Ensure that this a compliant WoD system
-      ansible.builtin.include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
+      ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/check_system.yml"
 
     - name: Setup backend ufw firewall TCP rules
       become: true
@@ -161,7 +161,7 @@
         src: "{{ item }}"
         dest: "{{ item | dirname }}/{{ item | basename | regex_replace('.j2$') }}"
         mode: "0644"
-      with_fileglob: ['{{ ANSIBLEDIR }}/{{ WODGROUP }}/*.yml.j2', '{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/*.yml.j2']
+      with_fileglob: ['{{ WODANSIBLEDIR }}/{{ WODGROUP }}/*.yml.j2', '{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/*.yml.j2']
 
     - name: "Ensure existence of directory {{ STUDDIR }}"
       become: true
@@ -191,15 +191,15 @@
         group: "{{ WODUSER }}"
         mode: "0750"
 
-    - name: "Ensure that file vault_secret exists in {{ ANSIBLEPRIVDIR }}"
+    - name: "Ensure that file vault_secret exists in {{ WODANSIBLEPRIVDIR }}"
       ansible.builtin.lineinfile:
-        path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
+        path: "{{ WODANSIBLEPRIVDIR }}/vault_secret"
         regexp: ^.*$
         line: "{{ VAULTPWD }}"
 
-    - name: "Fix modes for vault_secret under {{ ANSIBLEPRIVDIR }}"
+    - name: "Fix modes for vault_secret under {{ WODANSIBLEPRIVDIR }}"
       ansible.builtin.file:
-        path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
+        path: "{{ WODANSIBLEPRIVDIR }}/vault_secret"
         mode: "0600"
 
     - name: Ensure that required nbconvert directories exists
@@ -233,13 +233,13 @@
     # during normal operations - waiting till end of users management can take hours for 2000 users.
     # Potential impact: private scripts are run before users creation, so may miss some part of setup.
     - name: Test private tasks YAML file
-      ansible.builtin.command: ls "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
+      ansible.builtin.command: ls "{{ WODANSIBLEPRIVDIR }}/check_backend.yml"
       register: acj_path
       failed_when: false
       changed_when: false
 
     - name: Now call private tasks if available
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/check_backend.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/check_backend.yml"
       when:
         - acj_path.rc == 0
 

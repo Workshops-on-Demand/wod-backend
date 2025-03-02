@@ -62,7 +62,7 @@ else
 		lastdigit=$basedigit
 	else
 		echo "To setup an appliance for $w, you need to declare a variable as"
-		echo "IP-$w: x.y.z.t in the file {{ ANSIBLEDIR }}/group_vars/{{ WODGROUP }}"
+		echo "IP-$w: x.y.z.t in the file {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }}"
 		exit -1
 	fi
 fi

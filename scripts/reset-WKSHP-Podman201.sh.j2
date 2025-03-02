@@ -11,7 +11,7 @@ echo "------------------------------------------------  defining variables------
 echo "Getting Studentid"
 echo "student id is" $stdid
 
-ocendpoint=$(cat {{ ANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} |grep 'OCENDPOINT' | cut -d: -f2 |sed 's/[ ]*"[,]*//g')
+ocendpoint=$(cat {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} |grep 'OCENDPOINT' | cut -d: -f2 |sed 's/[ ]*"[,]*//g')
 
 
 {{ WODSCRIPTDIR }}/reset-appliance.sh

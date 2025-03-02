@@ -5,8 +5,8 @@
   hosts: all
   gather_facts: true
   vars:
-    VARDIR: "{{ ANSIBLEDIR }}/{{ WODGROUP }}"
-    VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}"
+    VARDIR: "{{ WODANSIBLEDIR }}/{{ WODGROUP }}"
+    VARPRIVDIR: "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}"
   tasks:
     - name: Check var STDID
       ansible.builtin.fail:
@@ -198,12 +198,12 @@
 
     - name: Check a private pre_templating.yml file exists
       ansible.builtin.stat:
-        path: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+        path: "{{ WODANSIBLEPRIVDIR }}/pre_templating.yml"
       ignore_errors: true
       register: pretemp
 
     - name: Include pre-templatnig tasks
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/pre_templating.yml"
       when: pretemp.stat.exists
 
     # - name: debug
@@ -232,12 +232,12 @@
 
     - name: Check a private post_templating.yml file exists
       ansible.builtin.stat:
-        path: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+        path: "{{ WODANSIBLEPRIVDIR }}/post_templating.yml"
       ignore_errors: true
       register: posttemp
 
     - name: Include post-templating tasks
-      ansible.builtin.include_tasks: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+      ansible.builtin.include_tasks: "{{ WODANSIBLEPRIVDIR }}/post_templating.yml"
       when: posttemp.stat.exists
 
     - name: Create a checkpoint directory
