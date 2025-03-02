@@ -5,8 +5,8 @@
   hosts: all
   gather_facts: true
   vars:
-    VARDIR: "{{ ANSIBLEDIR }}/{{ PBKDIR }}"
-    VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}"
+    VARDIR: "{{ ANSIBLEDIR }}/{{ WODGROUP }}"
+    VARPRIVDIR: "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}"
   tasks:
     - name: Check var STDID
       ansible.builtin.fail:
@@ -23,10 +23,10 @@
         msg: CHALLENGE variable is empty ! Fat fingers ?!?
       when: CHALLENGE is not defined
 
-    - name: Check var PBKDIR
+    - name: Check var WODGROUP
       ansible.builtin.fail:
-        msg: PBKDIR variable is empty ! Fat fingers ?!?
-      when: PBKDIR is not defined
+        msg: WODGROUP variable is empty ! Fat fingers ?!?
+      when: WODGROUP is not defined
 
     - name: Load variables generated at install time
       ansible.builtin.include_vars: /etc/wod.yml

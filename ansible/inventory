@@ -1,5 +1,5 @@
 #
-# Place to your jupyterhub machine (FQDN) in a group used as PBKDIR name
+# Place to your jupyterhub machine (FQDN) in a group used as WODGROUP name
 #
 [production]
 127.0.0.1  ansible_connection=local

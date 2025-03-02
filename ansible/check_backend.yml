@@ -161,7 +161,7 @@
         src: "{{ item }}"
         dest: "{{ item | dirname }}/{{ item | basename | regex_replace('.j2$') }}"
         mode: "0644"
-      with_fileglob: ['{{ ANSIBLEDIR }}/{{ PBKDIR }}/*.yml.j2', '{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/*.yml.j2']
+      with_fileglob: ['{{ ANSIBLEDIR }}/{{ WODGROUP }}/*.yml.j2', '{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/*.yml.j2']
 
     - name: "Ensure existence of directory {{ STUDDIR }}"
       become: true

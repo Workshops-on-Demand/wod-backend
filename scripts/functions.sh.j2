@@ -124,9 +124,9 @@ get_range_max() {
 
 # This function returns the base IP address of the appliance related to the workshop given as parameter
 get_appliance_baseip() {
-	baseip=`grep IP-$1 {{ ANSIBLEPRIVDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	baseip=`grep IP-$1 {{ ANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 	if [ _"$baseip" = _"" ]; then
-		baseip=`grep IP-$1 {{ ANSIBLEDIR }}/group_vars/{{ PBKDIR }} | cut -d: -f2 | sed 's/[ 	]*//'`
+		baseip=`grep IP-$1 {{ ANSIBLEDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 		if [ _"$baseip" = _"" ]; then
 			echo "Unable to find the the appliance base IP for $1"
 			exit -1
@@ -158,11 +158,11 @@ EOF
 # This function creates a variable file in which password is stored from the ansible playbook with $randompw
 create_var_passwd() {
   
-	if [ ! -d "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass" ]; then
-		mkdir -p "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass"
+	if [ ! -d "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
+		mkdir -p "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 	fi
 	# It's now mandatory that vault_secret is located in the private part
-	ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
+	ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 }
 
 # This function retuns the workshop name from the mail body

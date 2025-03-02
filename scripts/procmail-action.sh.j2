@@ -160,10 +160,10 @@ if [ $action != "RESET" ]; then
 				compilepriv=`echo $compilepriv | sed 's|,$||'`
 				# Same compile_scripts.yml used with different calls for public/private
 				if [ _"$compilepub" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" -e "VARDIRECTORY={{ ANSIBLEDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "SCRIPTDIRECTORY={{ SCRIPTDIR }}" -e "VARDIRECTORY={{ ANSIBLEDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
 				fi
 				if [ _"$compilepriv" != _"" ]; then
-					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
+					ansible-playbook {{ ANSIBLEDIR }}/compile_scripts.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "SCRIPTDIRECTORY={{ SCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $ANSPLAYOPT $ANSPRIVOPT
 				fi
 			fi
 			if [ -x "{{ SCRIPTDIR }}/create-$ws.sh" ]; then
@@ -176,7 +176,7 @@ if [ $action != "RESET" ]; then
 				{{ SCRIPTPRIVDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEPRIVDIR }}/vault_secret
+			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEPRIVDIR }}/vault_secret
 			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				{{ SCRIPTDIR }}/post-copy-$ws.sh
@@ -186,7 +186,7 @@ if [ $action != "RESET" ]; then
 				{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
-			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml
 		fi
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
