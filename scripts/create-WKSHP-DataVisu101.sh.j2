@@ -94,8 +94,8 @@ if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
 	mkdir -p "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 fi
 # We can overwrite the existing variables file as we don't need PASSSTU 
-ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" `cat $TMPDIR/datavisutoken` --name "'DATAVISUTOK'" > "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
-ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" `cat $TMPDIR/datavisutoken` --name "'DATAVISUTOK'" > "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 # ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $WODRTARGET sudo rm -rf $TMPDIR

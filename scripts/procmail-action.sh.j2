@@ -160,7 +160,7 @@ if [ $action != "RESET" ]; then
 				compilepriv=`echo $compilepriv | sed 's|,$||'`
 				# Same compile_scripts.yml used with different calls for public/private
 				if [ _"$compilepub" != _"" ]; then
-					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "WODSCRIPTDIRECTORY={{ SCRIPTDIR }}" -e "VARDIRECTORY={{ WODANSIBLEDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT
+					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepub\"" -e "WODSCRIPTDIRECTORY={{ WODSCRIPTDIR }}" -e "VARDIRECTORY={{ WODANSIBLEDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT
 				fi
 				if [ _"$compilepriv" != _"" ]; then
 					ansible-playbook {{ WODANSIBLEDIR }}/compile_scripts.yml -i {{ WODANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ WODGROUP }} -e "STDID=$stdid" -e "COMPILE=\"$compilepriv\"" -e "WODSCRIPTDIRECTORY={{ WODSCRIPTPRIVDIR }}" -e "VARDIRECTORY={{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}" -e "CHALLENGE=$w" $WODANSPLAYOPT $WODANSPRIVOPT

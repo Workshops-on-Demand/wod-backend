@@ -162,7 +162,7 @@ create_var_passwd() {
 		mkdir -p "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 	fi
 	# It's now mandatory that vault_secret is located in the private part
-	ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
+	ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 }
 
 # This function retuns the workshop name from the mail body

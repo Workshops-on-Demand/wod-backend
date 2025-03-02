@@ -34,7 +34,7 @@ EOF
 if [ ! -d "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass" ]; then
 	mkdir -p "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass"
 fi
-ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ ANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
+ansible-vault encrypt_string --vault-password-file "{{ WODANSIBLEPRIVDIR }}/vault_secret" $httpport --name "'HTTPPORT'" >> "{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/pass/variables_${w}_${stdid}.yml"
 
 # Cleanup
 ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo rm -rf $TMPDIR
