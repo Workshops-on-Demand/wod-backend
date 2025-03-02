@@ -20,6 +20,6 @@ source /etc/wod.sh
 source {{ WODSCRIPTDIR }}/functions.sh
 
 for stdid in $(seq $startrange $endrange); do 
-	stddir="{{ STUDDIR }}/student$stdid"
+	stddir="{{ WODSTUDDIR }}/student$stdid"
 	erase_student
 done

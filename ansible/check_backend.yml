@@ -163,11 +163,11 @@
         mode: "0644"
       with_fileglob: ['{{ WODANSIBLEDIR }}/{{ WODGROUP }}/*.yml.j2', '{{ WODANSIBLEPRIVDIR }}/{{ WODGROUP }}/*.yml.j2']
 
-    - name: "Ensure existence of directory {{ STUDDIR }}"
+    - name: "Ensure existence of directory {{ WODSTUDDIR }}"
       become: true
       become_user: root
       ansible.builtin.file:
-        path: "{{ STUDDIR }}"
+        path: "{{ WODSTUDDIR }}"
         state: directory
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -301,7 +301,7 @@
         name: "{{ 'student%s' | format(item) }}"
         state: present
         create_home: true
-        home: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+        home: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
         comment: "{{ 'student%s' | format(item) }}"
         shell: /bin/bash
         uid: "{{ item + UIDBASE }}"
@@ -321,7 +321,7 @@
       become: true
       become_user: root
       ansible.posix.acl:
-        path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+        path: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
         recursive: true
         entity: "{{ WODUSER }}"
         etype: user
@@ -334,7 +334,7 @@
       become: true
       become_user: root
       ansible.posix.acl:
-        path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+        path: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
         recursive: true
         entity: "{{ WODUSER }}"
         etype: user

@@ -6,7 +6,7 @@
   become: true
   become_user: root
   ansible.builtin.file:
-    path: "{{ STUDDIR }}"
+    path: "{{ WODSTUDDIR }}"
     state: directory
     owner: "{{ WODUSER }}"
     group: "{{ WODUSER }}"
@@ -50,7 +50,7 @@
     name: "{{ 'student%s' | format(item) }}"
     state: present
     create_home: true
-    home: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+    home: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
     comment: "{{ 'student%s' | format(item) }}"
     shell: /bin/bash
     uid: "{{ item + UIDBASE }}"
@@ -74,7 +74,7 @@
   become: true
   become_user: root
   ansible.builtin.file:
-    path: "{{ STUDDIR }}/{{ 'student%s' | format(item) }}"
+    path: "{{ WODSTUDDIR }}/{{ 'student%s' | format(item) }}"
     owner: "{{ 'student%s' | format(item) }}"
     group: "{{ 'student%s' | format(item) }}"
     mode: '0750'

@@ -25,14 +25,14 @@ cat > $TMPDIR/config << EOF
 Host *
     StrictHostKeyChecking no
 EOF
-sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
+sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ WODSTUDDIR }}/student$stdid/.ssh/
 # Allow local ssh connection without passwd
-sudo install -m 0600 -o student$stdid -g student$stdid {{ STUDDIR }}/student$stdid/.ssh/id_rsa.pub {{ STUDDIR }}/student$stdid/.ssh/authorized_keys
+sudo install -m 0600 -o student$stdid -g student$stdid {{ WODSTUDDIR }}/student$stdid/.ssh/id_rsa.pub {{ WODSTUDDIR }}/student$stdid/.ssh/authorized_keys
 
 # Setup Remote appliance account
 ssh -q {{ NOCHECKSSH }} $WODRTARGET mkdir -p $TMPDIR
 scp -q {{ NOCHECKSSH }} $TMPDIR/config $WODRTARGET:$TMPDIR
-ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ STUDDIR }}/student$stdid/.ssh/
+ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo install -m 0600 -o student$stdid -g student$stdid $TMPDIR/config {{ WODSTUDDIR }}/student$stdid/.ssh/
 ssh -q {{ NOCHECKSSH }} $WODRTARGET sudo htpasswd -b /etc/httpd/conf/htpasswd student$stdid $randompw
 
 # Cleanup
