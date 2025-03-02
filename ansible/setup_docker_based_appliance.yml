@@ -10,4 +10,4 @@
     state: present
     append: true
     groups: "docker"
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"

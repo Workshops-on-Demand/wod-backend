@@ -16,11 +16,11 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-APPMIN=`get_range_min $wid`
+WODAPPMIN=`get_range_min $wid`
 echo stdid=$stdid
-echo APPMIN=$APPMIN
-sshport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Docker101'] }}))
-httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Docker101'] }}))
+echo WODAPPMIN=$WODAPPMIN
+sshport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Docker101'] }}))
+httpport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Docker101'] }}))
 
 cat > $TMPDIR/Dockerfile << EOF
 FROM ${NAME}:latest

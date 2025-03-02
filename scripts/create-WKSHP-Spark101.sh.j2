@@ -16,12 +16,12 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-APPMIN=`get_range_min $wid`
+WODAPPMIN=`get_range_min $wid`
 echo stdid=$stdid
-echo APPMIN=$APPMIN
-sparkport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SPARKPORT-WKSHP-Spark101'] }}))
-sparkport2=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['SPARKPORT2-WKSHP-Spark101'] }}))
-httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Spark101'] }}))
+echo WODAPPMIN=$WODAPPMIN
+sparkport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['SPARKPORT-WKSHP-Spark101'] }}))
+sparkport2=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['SPARKPORT2-WKSHP-Spark101'] }}))
+httpport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Spark101'] }}))
 
 cat > $TMPDIR/dockerd-entrypoint.sh << EOF
 export HTTPPORT

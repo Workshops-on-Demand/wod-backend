@@ -16,11 +16,11 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-APPMIN=`get_range_min $wid`
+WODAPPMIN=`get_range_min $wid`
 echo stdid=$stdid
-echo APPMIN=$APPMIN
+echo WODAPPMIN=$WODAPPMIN
 sshport={{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Podman101'] }}
-httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Podman101'] }}))
+httpport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Podman101'] }}))
 
 
 # Adapt the ssh config for the student

@@ -12,15 +12,15 @@
     group: "{{ WODUSER }}"
     mode: '0711'
 
-- name: Use USERMIN for APPMIN if installing
+- name: Use USERMIN for WODAPPMIN if installing
   ansible.builtin.set_fact:
-    APPMIN: "{{ USERMIN }}"
-  when: APPMIN is not defined
+    WODAPPMIN: "{{ USERMIN }}"
+  when: WODAPPMIN is not defined
 
-- name: Use USERMAX for APPMAX if installing
+- name: Use USERMAX for WODAPPMAX if installing
   ansible.builtin.set_fact:
-    APPMAX: "{{ USERMAX }}"
-  when: APPMAX is not defined
+    WODAPPMAX: "{{ USERMAX }}"
+  when: WODAPPMAX is not defined
 
 - name: Remove Linux users and their home directory
   become: true
@@ -30,7 +30,7 @@
     state: absent
     remove: true
     force: true
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"
   when: CLEAN | bool
 
 - name: Ensure dedicated students groups exist
@@ -40,7 +40,7 @@
     name: "{{ 'student%s' | format(item) }}"
     state: present
     gid: "{{ item + GIDBASE }}"
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"
   when: WODLDAPSETUP != "1"
 
 - name: Ensure Linux students users exists with their home dir
@@ -55,7 +55,7 @@
     shell: /bin/bash
     uid: "{{ item + UIDBASE }}"
     group: "{{ 'student%s' | format(item) }}"
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"
   when: WODLDAPSETUP != "1"
 
 - name: Disable SELinux for now as our students are non-standard
@@ -79,4 +79,4 @@
     group: "{{ 'student%s' | format(item) }}"
     mode: '0750'
     state: directory
-  loop: "{{ range(APPMIN | int, APPMAX | int) | list }}"
+  loop: "{{ range(WODAPPMIN | int, WODAPPMAX | int) | list }}"

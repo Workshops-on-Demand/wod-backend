@@ -16,10 +16,10 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-APPMIN=`get_range_min $wid`
+WODAPPMIN=`get_range_min $wid`
 echo stdid=$stdid
-echo APPMIN=$APPMIN
-httpport=$(($stdid-$APPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Concourse101'] }}))
+echo WODAPPMIN=$WODAPPMIN
+httpport=$(($stdid-$WODAPPMIN+{{ hostvars[inventory_hostname]['HTTPPORT-WKSHP-Concourse101'] }}))
 
 cat > $TMPDIR/docker-compose.yml << EOF
 ---
