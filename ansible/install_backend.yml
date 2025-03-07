@@ -897,7 +897,7 @@
 
     - name: Wait enough to let WoD services start
       ansible.builtin.wait_for:
-      port: {{ WODBEPORT }}
+      port: "{{ WODBEPORT }}"
       delay: 5
 
       # - name: Setup {{ WODUSER }} account in jupyterhub
