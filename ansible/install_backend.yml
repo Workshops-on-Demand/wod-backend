@@ -895,10 +895,10 @@
       with_items:
         - jupyterhub
 
-    - name: Wait 5 seconds to let WoD services start
-      ansible.builtin.command: "sleep 5"
-      register: result
-      changed_when: result.rc != 0
+    - name: Wait enough to let WoD services start
+      ansible.builtin.wait_for:
+      port: {{ WODBEPORT }}
+      delay: 5
 
       # - name: Setup {{ WODUSER }} account in jupyterhub
       # uri:
