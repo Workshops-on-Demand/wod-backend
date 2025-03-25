@@ -60,8 +60,6 @@
         mode: "0755"
       with_fileglob: "{{ WODSTUDDIR }}/student{{ STDID }}/*.shc.x"
       when: COMPILE | length > 0
-      register: result
-      changed_when: result.rc != 0
 
     - name: Setup ACL for the scripts
       become: true
