@@ -282,7 +282,8 @@ elif [ "$action" = "RESET" ]; then
 			cap=$((max-min+1))
 
 			# API call to Now reset capacity to original value
-	        	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			# Oneview & advanced WKSHP case
+	        curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"capacity":"'$cap'"}' \
 				"$WODAPIDBURL/workshop/$wid"
