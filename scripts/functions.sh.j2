@@ -64,6 +64,13 @@ get_reset_status() {
 	echo "$ret"
 }
 
+# This function returns the status of the active boolean for the userid id given as parameter
+get_active_status() {
+
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customer/$1" | jq -r '.active'`
+	echo "$ret"
+}
+
 # This function returns the status of the beta  boolean for the workshop id given as parameter
 get_beta_status() {
 
@@ -128,7 +135,11 @@ get_appliance_baseip() {
 	if [ _"$baseip" = _"" ]; then
 		baseip=`grep IP-$1 {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
 		if [ _"$baseip" = _"" ]; then
-			echo "Unable to find the the appliance base IP for $1"
+			echo "Unable to find the appliance base IP for $1"
+			exit -1
+		fi
+		if [ _"$baseip" = _"x.y.z.t" ]; then
+			echo "Unable to find the correct appliance base IP for $1 - edit your conf file to change x.y.z.t and create the appliance"
 			exit -1
 		fi
 	fi

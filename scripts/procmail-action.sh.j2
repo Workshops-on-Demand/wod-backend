@@ -111,16 +111,17 @@ else
 	# If no appliance, we do not define WODRTARGET on purpose
 fi
 
+userid=$1
+if [ _"$1" = _"" ]; then
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> <user id>"
+	echo "Customer id is mandatory"
+	exit -1
+fi
+
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
 	teststdid $stdid
 
-	userid=$1
-	if [ _"$1" = _"" ]; then
-		echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
-		echo "Customer id is mandatory"
-		exit -1
-	fi
 
 	cd $WODNOBO
 
@@ -238,18 +239,18 @@ if [ $action != "RESET" ]; then
 
 			# Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $wid`" = _"true" ]; then
-				# Update student status to active
+				# Update student status to assigned
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
 					 "$WODAPIDBURL/student/$dbstdid"
-				# set customer to inactive by default for all workshops
+				# Update student status to inactive
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					     --request PUT \
 					     --data '{"active": "false"}' \
 					     "$WODAPIDBURL/customer/$userid"
 			else
-				# Update student status to inactive
+				# Update student status to unassigned
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"false"}' \
@@ -266,8 +267,13 @@ if [ $action != "RESET" ]; then
 	fi
 
 elif [ "$action" = "RESET" ]; then
-	# Avoid concurrency with CLEANUP phase
-	sleep 10
+	# Avoid concurrency with CLEANUP phase for 15' minutes max (step of 20")
+	# based on the active status of the customer
+	cmax=45
+	while [ _"`get_active_status $userid`" != _"false" ] && [ $cmax -ge 0 ]; do
+		cmax=$((cmax - 1))
+		sleep 20
+	done
 	if [ _"`get_reset_status $wid`" = _"true" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
