@@ -67,7 +67,7 @@ get_reset_status() {
 # This function returns the status of the active boolean for the userid id given as parameter
 get_active_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customer/$1" | jq -r '.active'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customers/$1" | jq -r '.active'`
 	echo "$ret"
 }
 
