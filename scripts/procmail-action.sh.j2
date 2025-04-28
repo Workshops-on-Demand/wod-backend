@@ -61,6 +61,7 @@ dbstdid=$((stdid+{{ WODBASESTDID }}))
 
 # for PURGE we just need stddir and stdid
 if [ "$action" = "PURGE" ]; then
+	wod_wait_till_clean
 	curl --header "Authorization: token {{ WODBETOKEN }}" \
             --location \
             --request DELETE \
@@ -267,14 +268,8 @@ if [ $action != "RESET" ]; then
 	fi
 
 elif [ "$action" = "RESET" ]; then
-	# Avoid concurrency with CLEANUP phase for 15' minutes max (step of 20")
-	# based on the active status of the customer
-	cmax=45
-	while [ _"`get_active_status $userid`" != _"false" ] && [ $cmax -ge 0 ]; do
-		cmax=$((cmax - 1))
-		sleep 20
-	done
-	if [ _"`get_reset_status $wid`" = _"true" ]; then
+	wod_wait_till_clean
+	if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`

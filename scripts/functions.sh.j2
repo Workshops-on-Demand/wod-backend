@@ -64,18 +64,21 @@ wod_get_reset_status() {
 	echo "$ret"
 }
 
-# This function returns the status of the active boolean for the userid id given as parameter
-get_active_status() {
+# This function returns the status of the cleaned boolean for the userid id given as parameter
+wod_get_cleaned_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customers/$1" | jq -r '.active'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customers/$1" | jq -r '.cleaned'`
 	echo "$ret"
 }
 
-# This function returns the status of the beta  boolean for the workshop id given as parameter
-get_beta_status() {
-
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.beta'`
-        echo "$ret"
+wod_wait_till_clean() {
+	# Avoid concurrency with CLEANUP phase for 15' minutes max (step of 20")
+	# based on the cleaned status of the customer
+	cmax=45
+	while [ _"`wod_get_cleaned_status $userid`" = _"false" ] && [ $cmax -ge 0 ]; do
+		cmax=$((cmax - 1))
+		sleep 20
+	done
 }
 
 # This function returns the status of the mono-appliance boolean for the workshop id given as parameter
