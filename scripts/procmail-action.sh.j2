@@ -53,7 +53,7 @@ fi
 shift
 
 export stddir="{{ WODSTUDDIR }}/student$stdid"
-export accessToken=`get_session_token`
+export accessToken=`wod_get_session_token`
 
 # Increment the student ID by Number of jupyterhub students in students table
 # Only for API Calls 
@@ -65,7 +65,7 @@ if [ "$action" = "PURGE" ]; then
             --location \
             --request DELETE \
             "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
-	generate_randompwd
+	wod_generate_randompwd
 	# Unassign student and update student
 	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					--request PUT \
@@ -74,12 +74,12 @@ if [ "$action" = "PURGE" ]; then
 		 				"password":"'$randompw'"\
 						}' \
 					"$WODFEAPIURL/student/$dbstdid"
-	erase_student
-	cleanup_processes_student
+	wod_erase_student
+	wod_cleanup_processes_student
     exit 0
 fi
 
-w=`get_workshop_name`
+w=`wod_get_workshop_name`
 # We differentiate Challenges from Workshop by creating a MODEWS variable
 # Later passed as an ansible variable as well to process the notebook
 ws=`echo $w |sed 's/CHLG/WKSHP/'`
@@ -91,22 +91,22 @@ fi
 # If that doesn't fail, then export the workshop name
 export w
 export ws
-export wid=`get_workshop_id $w`
+export wid=`wod_get_workshop_id $w`
 #
 # Is it a no- or mono- or multi-appliance setup ?
-multiappliance=`get_multiappliance_status $wid`
-monoappliance=`get_monoappliance_status $wid`
-if [ _"`get_multiappliance_status $wid`" = _"true" ]; then
-	WODAPPMINVALUE=`get_range_min $wid`
+multiappliance=`wod_get_multiappliance_status $wid`
+monoappliance=`wod_get_monoappliance_status $wid`
+if [ _"`wod_get_multiappliance_status $wid`" = _"true" ]; then
+	WODAPPMINVALUE=`wod_get_range_min $wid`
 	delta=$(($stdid-$WODAPPMINVALUE))
-	baseip=`get_appliance_baseip $w`
+	baseip=`wod_get_appliance_baseip $w`
 	basedigit=`echo $baseip | cut -d'.' -f4`
 	netip=`echo $baseip | cut -d'.' -f1-3`
 	ip=$(($basedigit+$delta))
 	export WODRTARGET="$netip.$ip"
 else
-	if [ _"`get_monoappliance_status $wid`" = _"true" ]; then
-		export WODRTARGET=`get_appliance_baseip $w`
+	if [ _"`wod_get_monoappliance_status $wid`" = _"true" ]; then
+		export WODRTARGET=`wod_get_appliance_baseip $w`
 	fi
 	# If no appliance, we do not define WODRTARGET on purpose
 fi
@@ -120,7 +120,7 @@ fi
 
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
-	teststdid $stdid
+	wod_test_stdid $stdid
 
 
 	cd $WODNOBO
@@ -128,22 +128,22 @@ if [ $action != "RESET" ]; then
 	# Read workshop list on stdin
 	if [ -d "$stddir" ]; then
 		# Now change passwd
-		generate_randompwd
+		wod_generate_randompwd
 
 		# Some Notebooks need an LDAP passwd update as well
-		if [ _"`get_ldap_status $wid`" = _"true" ]; then
-			update_ldap_passwd
-			create_var_passwd
+		if [ _"`wod_get_ldap_status $wid`" = _"true" ]; then
+			wod_update_ldap_passwd
+			wod_create_var_passwd
 		fi
 		# Some Notebooks need to get the passwd for the user
-		if [ _"`get_varpass_status $wid`" = _"true" ]; then
-			create_var_passwd
+		if [ _"`wod_get_varpass_status $wid`" = _"true" ]; then
+			wod_create_var_passwd
 		fi
 
 		if [ "$action" = "CREATE" ]; then
-			erase_student
+			wod_erase_student
 			# compile flag is a STRING not a boolean
-			compile=`get_compile_status $wid`
+			compile=`wod_get_compile_status $wid`
 			if [ _"$compile" = _"null" ]; then
 				compile=""
 			fi
@@ -222,7 +222,7 @@ if [ $action != "RESET" ]; then
 				{{ WODSCRIPTPRIVDIR }}/cleanup-$ws.sh
 			fi
 			# Keep completion status
-			completion=`get_wod_completion_ratio`
+			completion=`wod_get_completion_ratio`
 
 			# Update completion ratio figure in customer table
 			 curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
@@ -238,7 +238,7 @@ if [ $action != "RESET" ]; then
                          "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 
 			# Get Worshop reset status to determine if users should be updated to inactive or not
-			if [ _"`get_reset_status $wid`" = _"true" ]; then
+			if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
 				# Update student status to assigned
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
@@ -256,8 +256,8 @@ if [ $action != "RESET" ]; then
 					 --data '{"assigned":"false"}' \
 					 "$WODAPIDBURL/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
-	 			erase_student
-				cleanup_processes_student
+				wod_erase_student
+				wod_cleanup_processes_student
 			fi
 		else
 			echo "Unknown action $action"
@@ -278,9 +278,9 @@ elif [ "$action" = "RESET" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`
-			teststdid $min
+			wod_test_stdid $min
 			max=`echo $stdid | cut -d, -f2`
-			teststdid $max
+			wod_test_stdid $max
 			min=$((min+{{ WODBASESTDID }}))
 			max=$((max+{{ WODBASESTDID }}))
 			i=$max
@@ -294,7 +294,7 @@ elif [ "$action" = "RESET" ]; then
 				--data '{"capacity":"'$cap'"}' \
 				"$WODAPIDBURL/workshop/$wid"
 		else
-			teststdid $stdid
+			wod_test_stdid $stdid
 			# We have a single value to manage
 			i=$((stdid+{{ WODBASESTDID }}))
 			j=$((stdid+{{ WODBASESTDID }}))
@@ -305,11 +305,11 @@ elif [ "$action" = "RESET" ]; then
 			# Then call the reset script
 			# Now change passwd as sometimes the reset script needs to have it
 			stdid=$((i-{{ WODBASESTDID }}))
-			generate_randompwd
+			wod_generate_randompwd
 	
 			# Some Notebooks need an LDAP passwd update as well
-			if [ _"`get_ldap_status $wid`" = _"true" ]; then
-				update_ldap_passwd
+			if [ _"`wod_get_ldap_status $wid`" = _"true" ]; then
+				wod_update_ldap_passwd
 			fi
 			((i=i-1))
 		done
@@ -338,8 +338,8 @@ elif [ "$action" = "RESET" ]; then
 				"$WODAPIDBURL/student/$j"
 			stdid=$((j-{{ WODBASESTDID }}))
 			stddir="{{ WODSTUDDIR }}/student$stdid"
-			erase_student
-			cleanup_processes_student
+			wod_erase_student
+			wod_cleanup_processes_student
 			((j=j-1))
 		done
 	fi

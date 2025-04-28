@@ -6,7 +6,7 @@ source /etc/wod.sh
 source {{ WODSCRIPTDIR }}/functions.sh
 
 # Do we need LDAP setup or not
-if [ _"`get_ldap_status $wid`" != _"false" ]; then
+if [ _"`wod_get_ldap_status $wid`" != _"false" ]; then
 	echo "This is a setup with LDAP"
 	WODLDAPSETUP=1
 else

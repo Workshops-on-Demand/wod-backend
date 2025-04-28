@@ -16,7 +16,7 @@ mkdir -p $TMPDIR
 
 # Define local variables
 echo wid=$wid
-WODAPPMIN=`get_range_min $wid`
+WODAPPMIN=`wod_get_range_min $wid`
 echo stdid=$stdid
 echo WODAPPMIN=$WODAPPMIN
 sshport={{ hostvars[inventory_hostname]['SSHPORT-WKSHP-Podman101'] }}

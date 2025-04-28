@@ -21,5 +21,5 @@ source {{ WODSCRIPTDIR }}/functions.sh
 
 for stdid in $(seq $startrange $endrange); do 
 	stddir="{{ WODSTUDDIR }}/student$stdid"
-	erase_student
+	wod_erase_student
 done
