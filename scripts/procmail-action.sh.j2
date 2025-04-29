@@ -74,7 +74,7 @@ if [ "$action" = "PURGE" ]; then
 						"assigned":"false",\
 		 				"password":"'$randompw'"\
 						}' \
-					"$WODFEAPIURL/student/$dbstdid"
+					"$WODAPIDBURL/student/$dbstdid"
 	wod_erase_student
 	wod_cleanup_processes_student
     exit 0
