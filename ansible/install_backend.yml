@@ -253,6 +253,7 @@
       ansible.builtin.package:
         name:
           - golang
+        state: absent
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
@@ -306,7 +307,6 @@
           - expect
           - terraform
         state: present
-        update_cache: true
 
     - name: Ensure all required DEB packages are installed
       become: true
@@ -342,6 +342,7 @@
       ansible.builtin.package:
         name:
           - golang
+        state: present
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version > "20"
@@ -352,6 +353,7 @@
       ansible.builtin.package:
         name:
           - golang-go
+        state: present
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
