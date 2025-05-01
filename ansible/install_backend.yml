@@ -541,9 +541,6 @@
         path: "{{ ansible_env.HOME }}/go"
         state: absent
 
-    - name: Ensure that this a compliant WoD system
-      ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/check_system.yml"
-
     - name: Adds jupyterhub binaries path to PATH
       ansible.builtin.blockinfile:
         path: "{{ ansible_env.HOME }}/.profile"
