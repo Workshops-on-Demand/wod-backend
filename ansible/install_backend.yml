@@ -328,7 +328,6 @@
           - nfs-common
           - libcrypt-passwdmd5-perl
           - libopenmpi-dev
-          - fail2ban
           - libproc-processtable-perl
           - acct
           - netcat-openbsd
@@ -371,7 +370,6 @@
           - zeromq-devel
           - perl-Crypt-PasswdMD5
           - openmpi-devel
-          - fail2ban-all
           - perl-Proc-ProcessTable
           - perl-Data-Dumper
           - psacct
@@ -940,8 +938,8 @@
         enabled: true
         name: postfix
 
-    - name: Setup fail2ban
-      ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/install_fail2ban.yml"
+    - name: Setup security
+      ansible.builtin.include_tasks: "{{ WODINSANSDIR }}/install_secure.yml"
 
     # On CentOS 7 we need to remove strict mode for sshd to work with our conf (mode 770 needed for user home dirs)
     - name: Fix sshd conf on CentOS/Rocky
