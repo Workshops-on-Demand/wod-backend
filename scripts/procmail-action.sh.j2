@@ -223,7 +223,7 @@ if [ $action != "RESET" ]; then
 				{{ WODSCRIPTPRIVDIR }}/cleanup-$ws.sh
 			fi
 			# Keep completion status
-			completion=`wod_get_completion_ratio`
+			completion=`wod_get_completion_ratio $ws`
 
 			# Update completion ratio figure in customer table
 			 curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \

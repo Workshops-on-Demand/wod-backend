@@ -226,7 +226,7 @@ wod_get_completion_ratio() {
 
 	cd $stddir/
 	when=$(date +"%Y-%m-%d %H:%m:%S")
-	what=$(ls | grep 'WKSHP')
+	what=$1
 	who=student$stdid
 	total=$(grep execution_count $what/*.ipynb  | wc -l)
 	missed=$(grep execution_count $what/*.ipynb  | grep null | wc -l)
