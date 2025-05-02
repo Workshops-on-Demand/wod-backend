@@ -59,9 +59,16 @@ export accessToken=`wod_get_session_token`
 # Only for API Calls 
 dbstdid=$((stdid+{{ WODBASESTDID }}))
 
-# for PURGE we just need stddir and stdid
+userid=$1
+if [ _"$1" = _"" ]; then
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET|PURGE> <student id> <user id>"
+	echo "Customer id is mandatory"
+	exit -1
+fi
+
+# for PURGE we just need stddir and stdid and userid
 if [ "$action" = "PURGE" ]; then
-	wod_wait_till_clean
+	wod_wait_till_clean $userid
 	curl --header "Authorization: token {{ WODBETOKEN }}" \
             --location \
             --request DELETE \
@@ -110,13 +117,6 @@ else
 		export WODRTARGET=`wod_get_appliance_baseip $w`
 	fi
 	# If no appliance, we do not define WODRTARGET on purpose
-fi
-
-userid=$1
-if [ _"$1" = _"" ]; then
-	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> <user id>"
-	echo "Customer id is mandatory"
-	exit -1
 fi
 
 # Handle CREATE and CLEANUP first
@@ -268,7 +268,7 @@ if [ $action != "RESET" ]; then
 	fi
 
 elif [ "$action" = "RESET" ]; then
-	wod_wait_till_clean
+	wod_wait_till_clean $userid
 	if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
 		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
