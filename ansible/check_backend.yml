@@ -302,7 +302,9 @@
         headers:
           Authorization: token {{ WODBETOKEN }}
         method: POST
-        status_code: 201
+        status_code:
+          - 201
+          - 409
       loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
 
     - name: Setup ACL for students with the account {{ WODUSER }}
