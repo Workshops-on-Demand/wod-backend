@@ -84,6 +84,7 @@ if [ "$action" = "PURGE" ]; then
 					"$WODAPIDBURL/student/$dbstdid"
 	wod_erase_student
 	wod_cleanup_processes_student
+	echo "end of procmail-action for student $stdid (passwd $randompw) with workshop $w with action $action at `date`"
     exit 0
 fi
 
