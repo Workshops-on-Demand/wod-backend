@@ -243,10 +243,12 @@ wod_get_completion_ratio() {
 
 # Cleanup remaining processes for that student after the run
 wod_cleanup_processes_student() {
+	set +e
 	ids=`ps auxww | grep /student$stdid | grep -v grep | awk '{ print $2 }'`
 	if [ _"$ids" != _"" ]; then
 		sudo kill $ids
 		sleep 2
 		sudo kill -9 $ids
 	fi
+	set -e
 }
