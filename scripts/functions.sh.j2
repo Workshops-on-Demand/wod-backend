@@ -64,7 +64,7 @@ wod_get_reset_status() {
 	echo "$ret"
 }
 
-# This function returns the status of the cleaned boolean for the userid id given as parameter
+# This function returns the status of the cleaned boolean for the user id given as parameter
 wod_get_cleaned_status() {
 
 	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customers/$1" | jq -r '.cleaned'`
@@ -73,10 +73,10 @@ wod_get_cleaned_status() {
 
 wod_wait_till_clean() {
 	# Avoid concurrency with CLEANUP phase for 15' minutes max (step of 20")
-	# based on the cleaned status of the customer whose userid id given as parameter
+	# based on the cleaned status of the customer whose user id given as parameter
 	echo "Wait up to 15' using 20\" steps"
 	cmax=45
-	while [ _"`wod_get_cleaned_status $1`" = _"false" ] && [ $cmax -ge 0 ]; do
+	while [ _"`wod_get_cleaned_status $1`" != _"true" ] && [ $cmax -ge 0 ]; do
 		cmax=$((cmax - 1))
 		sleep 20
 	done

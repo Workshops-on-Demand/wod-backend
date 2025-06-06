@@ -238,14 +238,14 @@ if [ $action != "RESET" ]; then
 			--request DELETE \
                          "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 
-			# Get Worshop reset status to determine if users should be updated to inactive or not
+			# Get Workshop reset status to determine if users should be updated to inactive or not
 			if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
 				# Update student status to assigned
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
 					 "$WODAPIDBURL/student/$dbstdid"
-				# Update student status to inactive
+				# Update customer status to inactive
 				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					     --request PUT \
 					     --data '{"active": "false"}' \
@@ -260,6 +260,11 @@ if [ $action != "RESET" ]; then
 				wod_erase_student
 				wod_cleanup_processes_student
 			fi
+			# Update customer cleaned status to true
+			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+				     --request PUT \
+				     --data '{"cleaned": "true"}' \
+				     "$WODAPIDBURL/customer/$userid"
 		else
 			echo "Unknown action $action"
 		fi
