@@ -25,7 +25,7 @@ NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 #
 # Backend API management
 #
-WODBEAPIURL: {{ WODBEPROTO }}://{{ WODBEFQDN.split(',')[0].split(':')[0] }}:{{ WODBEPORT }}
+WODBEAPIURL: {{ WODBEPROTO }}://{{ WODBEFQDN }}:{{ WODBEPORT }}
 #
 #
 # These variables are located lower in the ansible tree to allow different values required for different backends while keeping a single frontend
