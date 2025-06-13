@@ -23,11 +23,6 @@ VAULTPWD: VeryComplexPasswd1234!
 #
 NOCHECKSSH: -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 #
-# Backend API management
-#
-WODBEAPIURL: {{ WODBEPROTO }}://{{ WODBEFQDN }}:{{ WODBEPORT }}
-#
-#
 # These variables are located lower in the ansible tree to allow different values required for different backends while keeping a single frontend
 #
 # JPHUB  is the directory used to install the JupyterHub stack (a python venv)
