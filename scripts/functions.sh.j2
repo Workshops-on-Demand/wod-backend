@@ -18,7 +18,7 @@ fi
 # This function fetches an accessToken using user moderator credentials and open a session
 wod_get_session_token() {
 
-	ret=`curl -s --location --request POST "$WODAPIDBURL/login" \
+	ret=`curl -s --location --request POST "$WODAPIDBEXTURL/login" \
 			--header 'Content-Type: application/json' \
 			--data "{\"username\":\"$WODAPIDBUSER\",\"password\":\"$WODAPIDBUSERPWD\"}" | jq -r '.accessToken'`
         echo "$ret"
@@ -29,9 +29,9 @@ wod_get_session_token() {
 wod_get_workshop_id() {
 
 	id=0
-	id=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops" | jq -r '.[] | .notebook,.id' | grep -A 1 -E "^$1$" | tail -1`
-	#for i in `curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops" | jq -r '.[].id'`; do
-		#name=`curl -s --header "x-access-token:$accessToken"  --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$i" | jq .notebook | sed 's/"//g'`
+	id=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops" | jq -r '.[] | .notebook,.id' | grep -A 1 -E "^$1$" | tail -1`
+	#for i in `curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops" | jq -r '.[].id'`; do
+		#name=`curl -s --header "x-access-token:$accessToken"  --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$i" | jq .notebook | sed 's/"//g'`
 		#if [ _"$name" = _"$1" ]; then
 			#id=$i
 			#break
@@ -60,14 +60,14 @@ wod_test_stdid() {
 # This function returns the status of the reset boolean for the workshop id given as parameter
 wod_get_reset_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.reset'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.reset'`
 	echo "$ret"
 }
 
 # This function returns the status of the cleaned boolean for the user id given as parameter
 wod_get_cleaned_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/customers/$1" | jq -r '.cleaned'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/customers/$1" | jq -r '.cleaned'`
 	echo "$ret"
 }
 
@@ -86,21 +86,21 @@ wod_wait_till_clean() {
 # This function returns the status of the mono-appliance boolean for the workshop id given as parameter
 wod_get_monoappliance_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.monoappliance'`
+        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.monoappliance'`
         echo "$ret"
 }
 
 # This function returns the status of the multi-appliance boolean for the workshop id given as parameter
 wod_get_multiappliance_status() {
 
-        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.multiappliance'`
+        ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.multiappliance'`
         echo "$ret"
 }
 
 # This function returns the status of the need of LDAP setup for the workshop id given as parameter
 wod_get_ldap_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.ldap'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.ldap'`
 	echo "$ret"
 }
 
@@ -109,28 +109,28 @@ wod_get_ldap_status() {
 # it provides the PASSSTU variable through vault for the Notebook
 wod_get_varpass_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.varpass'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.varpass'`
 	echo "$ret"
 }
 
 # This function returns the status of the need of compiled scripts for the workshop id given as parameter
 wod_get_compile_status() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.compile'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.compile'`
 	echo "$ret"
 }
 
 # This function returns the min of the range of the users booked for the workshop id given as parameter
 wod_get_range_min() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.range[0]'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.range[0]'`
 	echo "$ret"
 }
 
 # This function returns the max of the range of the users booked for the workshop id given as parameter
 wod_get_range_max() {
 
-	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBURL/workshops/$1" | jq -r '.range[1]'`
+	ret=`curl -s --header "x-access-token:$accessToken" --header "Content-Type: application/json" "$WODAPIDBEXTURL/workshops/$1" | jq -r '.range[1]'`
 	echo "$ret"
 }
 
