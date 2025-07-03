@@ -77,7 +77,7 @@
       ansible.builtin.lineinfile:
         path: /etc/postfix/main.cf
         regex: ^inet_interfaces =
-        line: inet_interfaces =  {{ WODBEFQDN }},{{ WODBEEXTFQDN }},localhost
+        line: inet_interfaces =  {{ WODBEFQDN }},localhost
         state: present
 
     - name: Ensure the mailbox command is correct
