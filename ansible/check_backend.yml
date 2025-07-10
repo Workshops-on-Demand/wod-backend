@@ -255,7 +255,7 @@
     # Users management
     - name: Remove existing jupyterhub users
       ansible.builtin.command:
-        cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        cmd: "curl -X DELETE --silent {{ WODCURLOPT }} -H 'Authorization: token {{ WODBETOKEN }}' {{ WODBEAPIURL }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
       loop: "{{ range(USERMIN, USERMAX + 1) | list }}"
       when: CLEAN | bool

@@ -69,13 +69,13 @@ fi
 # for PURGE we just need stddir and stdid and userid
 if [ "$action" = "PURGE" ]; then
 	wod_wait_till_clean $userid
-	curl --header "Authorization: token {{ WODBETOKEN }}" \
+	curl $WODCURLOPT --header "Authorization: token {{ WODBETOKEN }}" \
             --location \
             --request DELETE \
             "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
 	wod_generate_randompwd
 	# Unassign student and update student
-	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+	curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					--request PUT \
 					--data '{
 						"assigned":"false",\
@@ -194,19 +194,19 @@ if [ $action != "RESET" ]; then
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		# Update Password
-		curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+		curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 			 --request PUT \
 			 --data '{"password":"'$randompw'"}' \
 			 "$WODAPIDBEXTURL/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
-			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				 --request PUT \
 				 --data '{"active": "true"}' \
 				 "$WODAPIDBEXTURL/customer/$userid"
 			##Start Student jupyterhub dedicated server
-			curl --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "Content-Type: application/json" \
 				 --header "Authorization: token {{ WODBETOKEN }}" \
 				 --location \
 				 --request POST \
@@ -227,14 +227,14 @@ if [ $action != "RESET" ]; then
 			completion=`wod_get_completion_ratio $ws`
 
 			# Update completion ratio figure in customer table
-			 curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			 curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
               			 --request PUT \
               			 --data '{"completionPercentage": "'$completion'"}' \
                			"$WODAPIDBEXTURL/customer/$userid"
 
 
 			# Delete Student jupyterhub dedicated server
-			curl --header "Authorization: token {{ WODBETOKEN }}" \
+			curl $WODCURLOPT --header "Authorization: token {{ WODBETOKEN }}" \
 				--location \
 			--request DELETE \
                          "{{ WODBEAPIURL }}/hub/api/users/student$stdid/server"
@@ -242,18 +242,18 @@ if [ $action != "RESET" ]; then
 			# Get Workshop reset status to determine if users should be updated to inactive or not
 			if [ _"`wod_get_reset_status $wid`" = _"true" ]; then
 				# Update student status to assigned
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+				curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"true"}' \
 					 "$WODAPIDBEXTURL/student/$dbstdid"
 				# Update customer status to inactive
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+				curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					     --request PUT \
 					     --data '{"active": "false"}' \
 					     "$WODAPIDBEXTURL/customer/$userid"
 			else
 				# Update student status to unassigned
-				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+				curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 					 --request PUT \
 					 --data '{"assigned":"false"}' \
 					 "$WODAPIDBEXTURL/student/$dbstdid"
@@ -262,7 +262,7 @@ if [ $action != "RESET" ]; then
 				wod_cleanup_processes_student
 			fi
 			# Update customer cleaned status to true
-			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				     --request PUT \
 				     --data '{"cleaned": "true"}' \
 				     "$WODAPIDBEXTURL/customer/$userid"
@@ -290,7 +290,7 @@ elif [ "$action" = "RESET" ]; then
 
 			# API call to Now reset capacity to original value
 			# Oneview & advanced WKSHP case
-	        curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+	        curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"capacity":"'$cap'"}' \
 				"$WODAPIDBEXTURL/workshop/$wid"
@@ -333,7 +333,7 @@ elif [ "$action" = "RESET" ]; then
 		while [ $j -ge $min ]; do
 			# API call
 			# Update student status to unassigned
-			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
+			curl $WODCURLOPT --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
 				--request PUT \
 				--data '{"assigned":"false"}' \
 				"$WODAPIDBEXTURL/student/$j"
