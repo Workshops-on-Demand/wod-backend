@@ -69,7 +69,7 @@
       become: true
       become_user: root
       ansible.builtin.apt_repository:
-        repo: deb [arch=amd64] https://apt.releases.hashicorp.com focal main
+        repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ WODDISTRIBNAME }} main
         state: present
       when:
         - ansible_distribution == "Ubuntu"
