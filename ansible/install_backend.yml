@@ -815,6 +815,7 @@
     - name: Adapt jupyterhub configuration file
       ansible.builtin.blockinfile:
         path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
+        marker: "### {mark} WoD MANAGED BLOCK ###"
         block: |
           #######################################################################################
           c.Spawner.default_url = '/lab'
