@@ -819,6 +819,9 @@
         block: |
           #######################################################################################
           c.Spawner.default_url = '/lab'
+          # Pre v5 add that be default
+          c.Authenticator.allow_all = True
+          c.Spawner.default_url = '/lab'
           c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
           c.JupyterHub.shutdown_on_logout = True
           c.JupyterHub.redirect_to_server = True
