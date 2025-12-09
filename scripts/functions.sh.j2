@@ -71,6 +71,7 @@ wod_get_cleaned_status() {
 	echo "$ret"
 }
 
+# This function waits in order to avoid concurrency with the CLEANUP phase
 wod_wait_till_clean() {
 	# Avoid concurrency with CLEANUP phase for 15' minutes max (step of 20")
 	# based on the cleaned status of the customer whose user id given as parameter
