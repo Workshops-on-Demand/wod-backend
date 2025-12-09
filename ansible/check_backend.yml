@@ -206,17 +206,6 @@
         - /usr/local/share/jupyter/nbconvert/templates/latex/
         - "{{ JPHUB }}/share/jupyter/nbconvert/templates/html/"
 
-    - name: Deliver images in the static web server zone
-      become: true
-      become_user: root
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: "{{ item | regex_replace(WODBEDIR, JPHUB) | regex_replace('/img', '/share/jupyterhub/static') }}"
-        owner: "{{ WODUSER }}"
-        group: "{{ WODUSER }}"
-        mode: "0644"
-      with_fileglob: ['{{ WODBEDIR }}/img/*']
-
     # Perform private part before users management to allow interruption of the deliver script
     # during normal operations - waiting till end of users management can take hours for 2000 users.
     # Potential impact: private scripts are run before users creation, so may miss some part of setup.
