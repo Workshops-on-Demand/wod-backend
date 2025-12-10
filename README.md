@@ -21,8 +21,8 @@ Pre reqs for appliance :
 
 Necessary scripts to run set up for workshops appliances 
 pre reqs:
-- Workshop entry in front end DB
-- Necessary infos in ansible variable file defining platform on which the Workshop will run (definied in plaftform yaml file in ansible/group-vars/...)
+- Workshop entry in api-db server
+- Necessary infos in ansible variable file defining platform on which the Workshop will run (definied in platform yaml file in ansible/group-vars/...)
 - Necessary scripts:
     -setup-WKSHP-Workshop-name.sh.j2
     -In case of Docker Appliance:
