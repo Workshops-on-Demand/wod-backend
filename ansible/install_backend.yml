@@ -547,8 +547,8 @@
         block: |
           #######################################################################################
           # set PATH so venv binaries are seen before system ones
-          if [ -d "/opt/jupyterhub//bin" ] ; then
-              PATH="/opt/jupyterhub/bin:$PATH"
+          if [ -d "{{ JPHUB }}/bin" ] ; then
+              PATH="{{ JPHUB }}/bin:$PATH"
           fi
 
     # In this part we manage the jupyterhub setup
