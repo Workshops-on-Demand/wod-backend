@@ -1,0 +1,5 @@
+# Ubuntu 24.04 needs that
+virtualenv_command: "virtualenv"
+virtualenv_python: "python3"
+python_lib: lib/python3.13/site-packages
+dotnetpath: /usr/bin
