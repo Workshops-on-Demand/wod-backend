@@ -356,9 +356,9 @@
           - shc
           - patch
           - expect
-          - terraform
         state: present
 
+    # Doesn't work for Ubuntu 26 yet
     - name: Ensure all dotnet packages are installed
       become: true
       become_user: root
@@ -366,6 +366,7 @@
         name:
           - dotnet-runtime-9.0
           - dotnet-sdk-9.0
+          - terraform
       when:
         - ansible_facts['distribution'] == "Ubuntu"
         - ansible_facts['distribution_major_version'] >= "20"
