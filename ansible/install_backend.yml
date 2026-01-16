@@ -52,7 +52,8 @@
         name: conda
         types: deb
         uris: https://repo.anaconda.com/pkgs/misc/debrepo/conda
-        suites: '{{ ansible_facts["distribution_release"] }}'
+        suites: '25.10'
+        #suites: '{{ ansible_facts["distribution_release"] }}'
         components: stable
         architectures: amd64
         signed_by: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
@@ -101,7 +102,8 @@
         name: hashicorp
         types: deb
         uris: https://apt.releases.hashicorp.com
-        suites: '{{ WODDISTRIBNAME }}'
+        suites: 'questing'
+        #suites: '{{ WODDISTRIBNAME }}'
         components: stable
         architectures: amd64
         signed_by: https://apt.releases.hashicorp.com/gpg
