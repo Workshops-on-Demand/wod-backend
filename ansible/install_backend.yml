@@ -49,6 +49,7 @@
       become: true
       become_user: root
       ansible.builtin.deb822_repository:
+        name: conda
         types: deb
         uris: https://repo.anaconda.com/pkgs/misc/debrepo/conda
         suites: '{{ ansible_facts["distribution_release"] }}'
@@ -97,6 +98,7 @@
       become: true
       become_user: root
       ansible.builtin.deb822_repository:
+        name: hashicorp
         types: deb
         uris: https://apt.releases.hashicorp.com
         suites: '{{ WODDISTRIBNAME }}'
@@ -235,6 +237,7 @@
       #ansible.builtin.apt_repository:
         #repo: ppa:dotnet/backports
       #ansible.builtin.deb822_repository:
+        #name: dotnet
         #types: deb
         #uris: 
         #suites: '{{ WODDISTRIBNAME }}'
