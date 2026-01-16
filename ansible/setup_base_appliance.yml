@@ -65,7 +65,7 @@
     policy: targeted
     state: permissive
   when:
-    - ansible_distribution == "CentOS" or ansible_distribution == "Rocky" or ansible_distribution == "RedHat"
+    - ansible_facts['distribution'] == "CentOS" or ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "RedHat"
 
   # Do it in all cases LDAP or not as mode needs to be confirmed for ssh login
   # However, that doesn't seem to work on CentOS as dirs remains with mode 770
