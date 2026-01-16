@@ -45,16 +45,17 @@
         - ansible_distribution_major_version >= "20"
         - ansible_distribution_major_version < "26"
 
-    - name: Add conda GPG Key to APT with deb822_repository
+    - name: Add conda GPG Key to APT with deb822
       become: true
       become_user: root
       ansible.builtin.deb822_repository:
         name: conda
         types: deb
         uris: https://repo.anaconda.com/pkgs/misc/debrepo/conda
-        suites: '25.10'
+        suites: 'stable'
         #suites: '{{ ansible_facts["distribution_release"] }}'
-        components: stable
+        components: 
+         - main
         architectures: amd64
         signed_by: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
       when:
@@ -102,9 +103,10 @@
         name: hashicorp
         types: deb
         uris: https://apt.releases.hashicorp.com
-        suites: 'questing'
+        suites: 'focal'
         #suites: '{{ WODDISTRIBNAME }}'
-        components: stable
+        components:
+          - main
         architectures: amd64
         signed_by: https://apt.releases.hashicorp.com/gpg
       when:
@@ -243,7 +245,8 @@
         #types: deb
         #uris: 
         #suites: '{{ WODDISTRIBNAME }}'
-        #components: stable
+        #components:
+        # - main
         #architectures: amd64
         #signed_by: 
       #when:
