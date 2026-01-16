@@ -34,7 +34,7 @@
         - ansible_distribution == "Rocky"
         - ansible_distribution_major_version >= "8"
 
-    - name: Add conda GPG Key to APT
+    - name: Add conda GPG Key to APT with apt_key
       become: true
       become_user: root
       ansible.builtin.apt_key:
@@ -43,6 +43,21 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version < "26"
+
+    - name: Add conda GPG Key to APT with deb822_repository
+      become: true
+      become_user: root
+      ansible.builtin.deb822_repository:
+        types: deb
+        uris: https://repo.anaconda.com/pkgs/misc/debrepo/conda
+        suites: '{{ ansible_facts["distribution_release"] }}'
+        components: stable
+        architectures: amd64
+        signed_by: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "26"
 
     # TODO: Do it for EPEL if really needed
     - name: Add conda APT repository
@@ -54,8 +69,9 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version < "26"
 
-    - name: Add Hashicorp GPG Key to APT
+    - name: Add Hashicorp GPG Key to APT with apt_key
       become: true
       become_user: root
       ansible.builtin.apt_key:
@@ -64,6 +80,7 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version < "26"
 
     - name: Add Hashicorp APT repository
       become: true
@@ -74,6 +91,21 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version < "26"
+
+    - name: Add Hashicorp APT repository with deb822
+      become: true
+      become_user: root
+      ansible.builtin.deb822_repository:
+        types: deb
+        uris: https://apt.releases.hashicorp.com
+        suites: '{{ WODDISTRIBNAME }}'
+        components: stable
+        architectures: amd64
+        signed_by: https://apt.releases.hashicorp.com/gpg
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "26"
 
     - name: Add Hashicorp GPG Key to RPM DB
       become: true
@@ -103,7 +135,9 @@
         url: https://packages.cloud.google.com/apt/doc//apt-key.gpg
         state: present
       when:
-        - ansible_os_family == "Debian"
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version < "20"
 
     - name: Add K8s GPG Key to RPM DB
       become: true
@@ -127,16 +161,6 @@
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version == "20"
 
-    - name: Add Golang APT repository
-      become: true
-      become_user: root
-      ansible.builtin.apt_repository:
-        repo: ppa:longsleep/golang-backports
-        state: present
-      when:
-        - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version <= "20"
-
     - name: Add K8s YUM repository
       become: true
       become_user: root
@@ -149,6 +173,16 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
+    - name: Add Golang APT repository
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: ppa:longsleep/golang-backports
+        state: present
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version <= "20"
+
     - name: Add dotnet APT repository
       become: true
       become_user: root
@@ -158,6 +192,7 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version >= "22"
+        - ansible_distribution_major_version < "26"
 
     - name: Remove Microsoft repo file just in case
       become: true
@@ -193,6 +228,22 @@
       when:
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version <= "20"
+
+   #- name: Add dotnet APT repository with deb822
+      #become: true
+      #become_user: root
+      #ansible.builtin.apt_repository:
+        #repo: ppa:dotnet/backports
+      #ansible.builtin.deb822_repository:
+        #types: deb
+        #uris: 
+        #suites: '{{ WODDISTRIBNAME }}'
+        #components: stable
+        #architectures: amd64
+        #signed_by: 
+      #when:
+        #- ansible_distribution == "Ubuntu"
+        #- ansible_distribution_major_version >= "26"
 
     - name: Setup MicroSoft repo for YUM
       become: true
@@ -286,14 +337,6 @@
           - clang
           - cmake
           - texlive-xetex
-          # - aspnetcore-runtime-6.0
-          # - dotnet-runtime-6.0
-          # - dotnet-sdk-6.0
-          # - aspnetcore-runtime-7.0
-          # - dotnet-runtime-7.0
-          # - dotnet-sdk-7.0
-          - dotnet-runtime-9.0
-          - dotnet-sdk-9.0
           - postfix
           - procmail
           - conda
@@ -307,6 +350,18 @@
           - expect
           - terraform
         state: present
+
+    - name: Ensure all dotnet packages are installed
+      become: true
+      become_user: root
+      ansible.builtin.package:
+        name:
+          - dotnet-runtime-9.0
+          - dotnet-sdk-9.0
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version >= "20"
+        - ansible_distribution_major_version < "26"
 
     - name: Ensure all required DEB packages are installed
       become: true
