@@ -149,60 +149,6 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Add dotnet APT repository
-      become: true
-      become_user: root
-      ansible.builtin.apt_repository:
-        repo: ppa:dotnet/backports
-        state: present
-      when:
-        - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version >= "22"
-
-    - name: Remove Microsoft repo file just in case
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        path: /etc/apt/sources.list.d/microsoft-prod.list
-        state: absent
-      when:
-        - ansible_os_family == "Debian"
-
-    - name: Remove MicroSoft repo package
-      become: true
-      become_user: root
-      ansible.builtin.package:
-        name:
-          - packages-microsoft-prod
-        state: absent
-
-    - name: Add Microsoft GPG Key to RPM DB
-      become: true
-      become_user: root
-      ansible.builtin.rpm_key:
-        key: https://packages.microsoft.com/keys/microsoft.asc
-        state: present
-      when:
-        - ansible_distribution == "Rocky"
-
-    - name: Setup MicroSoft repo for APT
-      become: true
-      become_user: root
-      ansible.builtin.apt:
-        deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
-      when:
-        - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version <= "20"
-
-    - name: Setup MicroSoft repo for YUM
-      become: true
-      become_user: root
-      ansible.builtin.yum:
-        name: https://packages.microsoft.com/config/rhel/{{ ansible_distribution_major_version }}/packages-microsoft-prod.rpm
-        state: present
-      when:
-        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
-
     - name: Update apt cache
       become: true
       become_user: root
@@ -218,34 +164,7 @@
       ansible.builtin.package:
         name:
           - kubectl
-          - aspnetcore-runtime-3.1
-          - aspnetcore-runtime-5.0
-          - dotnet-runtime-3.1
-          - dotnet-runtime-5.0
-          - dotnet-sdk-3.1
-          - dotnet-sdk-5.0
-          # Incompatible with dotnet 8 and 9
-          - aspnetcore-runtime-6.0
-          - dotnet-runtime-6.0
-          - dotnet-sdk-6.0
-          - dotnet-hostfxr-6.0
-          - aspnetcore-runtime-7.0
-          - dotnet-runtime-7.0
-          - dotnet-sdk-7.0
-          - aspnetcore-runtime-8.0
-          - dotnet-runtime-8.0
-          - dotnet-sdk-8.0
-          - powershell
         state: absent
-
-    - name: Clean potential remaining dotnet rubbish in v7
-      become: true
-      become_user: root
-      ansible.builtin.package:
-        name:
-          - dotnet-host-7.0
-        state: absent
-        purge: true
 
     - name: Ensure all non-required APT packages are uninstalled
       become: true
@@ -286,14 +205,6 @@
           - clang
           - cmake
           - texlive-xetex
-          # - aspnetcore-runtime-6.0
-          # - dotnet-runtime-6.0
-          # - dotnet-sdk-6.0
-          # - aspnetcore-runtime-7.0
-          # - dotnet-runtime-7.0
-          # - dotnet-sdk-7.0
-          - dotnet-runtime-9.0
-          - dotnet-sdk-9.0
           - postfix
           - procmail
           - conda
@@ -617,17 +528,6 @@
         group: "{{ WODUSER }}"
         mode: "0755"
 
-    - name: Extract iJava kernel
-      ansible.builtin.unarchive:
-        src: https://github.com/SpencerPark/IJava/releases/download/v{{ IJAVAVER }}/ijava-{{ IJAVAVER }}.zip
-        dest: "{{ ansible_env.HOME }}"
-        remote_src: true
-
-    - name: Ensure jupyterhub IJava kernel is installed
-      ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
-      register: result
-      changed_when: result.rc != 0
-
     - name: Ensure jupyterhub ssh kernel is installed
       ansible.builtin.shell: . '{{ JPHUB }}/bin/activate' && python3 -m sshkernel install --sys-prefix
       register: result
@@ -666,95 +566,6 @@
       ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/.local/share/jupyter/kernels"
         state: absent
-
-    - name: Ensure powershell is removed through dotnet before installing
-      become: true
-      become_user: root
-      ansible.builtin.command: "{{ dotnetpath }}/dotnet tool uninstall --global powershell"
-      ignore_errors: true
-      register: ignore_errors_register
-      changed_when: ignore_errors_register.rc != 0
-
-    - name: Ensure dotnet interactive is removed through dotnet before installing
-      become: true
-      become_user: root
-      ansible.builtin.command: "{{ dotnetpath }}/dotnet tool uninstall --global Microsoft.dotnet-interactive"
-      ignore_errors: true
-      register: ignore_errors_register
-      changed_when: ignore_errors_register.rc != 0
-
-    - name: Remove old MS tools to be sure a good one will be available
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        path: /usr/local/bin/{{ item }}
-        state: absent
-      with_items:
-        - pwsh
-        - powershell
-        - dotnet
-        - dotnet-interactive
-
-    - name: Remove pwsh components to be sure a good one will be available
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        path: /usr/local/bin/.store
-        state: absent
-
-    # Incorrect CentOS v7 package vs Ubuntu which provides /usr/bin/dotnet
-    - name: Ensure dotnet link is correct if needed
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        src: "{{ dotnetpath }}/dotnet"
-        dest: /usr/local/bin/dotnet
-        state: link
-        owner: "{{ WODUSER }}"
-        group: "{{ WODUSER }}"
-        mode: "0755"
-        force: true
-      when:
-        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
-
-    - name: Fix again bad packaging from MS on dotnet sdk for v7.0 :-(
-      become: true
-      become_user: root
-      ansible.builtin.file:
-        src: /usr/share/dotnet/{{ item }}
-        dest: /usr/lib/dotnet/{{ item }}
-        state: link
-        force: true
-      with_items:
-        - sdk
-        - sdk-manifests
-        - templates
-      when:
-        - ansible_distribution == "Ubuntu"
-        - ansible_distribution_major_version == "22"
-
-    - name: Ensure powershell is installed through dotnet
-      become: true
-      become_user: root
-      ansible.builtin.command: "{{ dotnetpath }}/dotnet tool install --tool-path /usr/local/bin powershell"
-      register: result
-      changed_when: result.rc != 0
-
-    - name: Ensure dotnet interactive is installed through dotnet
-      become: true
-      become_user: root
-      ansible.builtin.command: "{{ dotnetpath }}/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive"
-      register: result
-      changed_when: result.rc != 0
-
-    - name: Ensure dotnet kernel is installed
-      become: true
-      become_user: root
-      ansible.builtin.command: /usr/local/bin/dotnet-interactive jupyter install --path "{{ JPHUB }}/share/jupyter/kernels"
-      # Only working with dotnet 7.0 which is incompatible with needed 8.0
-      ignore_errors: true
-      register: result
-      changed_when: result.rc != 0
 
     - name: "Ensure that directory /etc/jupyterhub exists under {{ JPHUB }}"
       ansible.builtin.file:
