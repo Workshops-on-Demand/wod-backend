@@ -134,17 +134,23 @@ wod_get_range_max() {
 
 # This function returns the base IP address of the appliance related to the workshop given as parameter
 wod_get_appliance_baseip() {
-	baseip=`grep IP-$1 {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	baseip=""
+	if [ -f "{{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }}" ]; then
+		baseip=`grep IP-$1 {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
+	fi
 	if [ _"$baseip" = _"" ]; then
-		baseip=`grep IP-$1 {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
+		if [ -f "{{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }}" ]; then
+			baseip=`grep IP-$1 {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }} | cut -d: -f2 | sed 's/[ 	]*//'`
+		fi
 		if [ _"$baseip" = _"" ]; then
 			echo "Unable to find the appliance base IP for $1"
+			echo "Check conf files {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} or {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }}"
 			exit -1
 		fi
-		if [ _"$baseip" = _"x.y.z.t" ]; then
-			echo "Unable to find the correct appliance base IP for $1 - edit your conf file to change x.y.z.t and create the appliance"
-			exit -1
-		fi
+	fi
+	if [ _"$baseip" = _"x.y.z.t" ]; then
+		echo "Unable to find the correct appliance base IP for $1 - edit your conf files {{ WODANSIBLEPRIVDIR }}/group_vars/{{ WODGROUP }} or {{ WODANSIBLEDIR }}/group_vars/{{ WODGROUP }} to change x.y.z.t and create the appliance"
+		exit -1
 	fi
 	echo "$baseip"
 }
