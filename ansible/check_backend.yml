@@ -58,7 +58,7 @@
       become_user: root
       ansible.builtin.lineinfile:
         path: /etc/postfix/master.cf
-        regex: ^smtp\s*inet
+        regex: inet\s*smtpd$
         line: "{{ WODPOSTPORT }}      inet  n       -       y       -       -       smtpd"
         state: present
 
